@@ -39,6 +39,9 @@
  * MA 02111-1307 USA
  *
  */
+#include <config.h>
+#ifdef CONFIG_TWL4030
+
 #include <twl4030.h>
 #include <asm/arch/led.h>
 
@@ -633,3 +636,5 @@ void twl4030_power_reset_init(void)
 		    PM_MASTER_P1_SW_EVENTS);
 #endif
 }
+
+#endif

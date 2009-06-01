@@ -38,6 +38,7 @@
 #define CONFIG_TWL4030_KEYPAD   1    /* Use the keypad */
 #define CONFIG_TWL4030_USB      1    /* Initialize twl usb */
 #define CONFIG_BOARD_REVISION   1    /* Board revision */
+#define CONFIG_TWL4030          1    /* Initialize twl */
 
 //#define CONFIG_3430_AS_3410	1    /* true for 3430 in 3410 mode */
 
