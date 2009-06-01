@@ -98,9 +98,14 @@ IRQ_STACK_START:
 FIQ_STACK_START:
 	.word 0x0badc0de
 #endif
-#define ROM_CODE_SIMULATE
+#define ROM_CODE_SIMULATE	/* FIXME: Remove once ROM code is ready */
 #if defined(ROM_CODE_SIMULATE)
 Slave:
+	wfe
+	ldr 	r3, =0x48281800
+	ldr	r0, [r3]
+	cmp 	r0, #0
+	bxne 	r0
 	b Slave
 #endif
 
@@ -117,6 +122,9 @@ reset:
 	orr	r0,r0,#0xd3
 	msr	cpsr,r0
 #if defined(ROM_CODE_SIMULATE)
+	mov 	r0, #0
+	ldr 	r3, =0x48281800
+	str	r0, [r3]
 	/* Read MPIDR register*/
 	mrc p15, 0, r0, c0, c0, 5
 	/* Mask off CPU ID field */
