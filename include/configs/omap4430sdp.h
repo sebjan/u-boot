@@ -35,6 +35,7 @@
 #define CONFIG_OMAP44XX		1    /* which is a 44XX */
 #define CONFIG_OMAP4430		1    /* which is in a 4430 */
 #define CONFIG_4430SDP		1    /* working with SDP */
+#define CONFIG_FASTBOOT		1    /* Using fastboot interface */
 
 /* disabling I Cache for ZeBu */
 /* #define CONFIG_ICACHE_OFF 1 */
@@ -239,6 +240,10 @@ initrd=0x81600000,20M ramdisk_size=20480"
 #define CFG_ENV_SECT_SIZE	boot_flash_sec
 #define CFG_ENV_OFFSET		boot_flash_off
 #define CFG_ENV_ADDR		boot_flash_env_addr
+
+/* Fastboot variables */
+#define CFG_FASTBOOT_TRANSFER_BUFFER (PHYS_SDRAM_1 + SZ_16M)
+#define CFG_FASTBOOT_TRANSFER_BUFFER_SIZE (SZ_128M - SZ_16M)
 
 
 /*-----------------------------------------------------------------------
