@@ -64,8 +64,10 @@
 
 /* Use do_reset for fastboot's 'reboot' command */
 extern int do_reset (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
+#if 0
 /* Use do_nand for fastboot's flash commands */
 extern int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[]);
+#endif
 /* Use do_setenv and do_saveenv to permenantly save data */
 int do_saveenv (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
 int do_setenv ( cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
@@ -128,18 +130,26 @@ static void save_env(struct fastboot_ptentry *ptn,
 		printf("Ignoring these flags\n");
 	} else if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_HW_ECC) {
 		sprintf(ecc_type, "hw");
+#if 0
 		do_nand(NULL, 0, 3, ecc);
+#endif
 	} else if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_SW_ECC) {
 		sprintf(ecc_type, "sw");
+#if 0
 		do_nand(NULL, 0, 3, ecc);
+#endif
 	}
 	sprintf(start, "0x%x", ptn->start);
 	sprintf(length, "0x%x", ptn->length);
 
 	/* This could be a problem is there is an outstanding lock */
+#if 0
 	do_nand(NULL, 0, 4, unlock);
+#endif
 	do_saveenv(NULL, 0, 1, saveenv);
+#if 0
 	do_nand(NULL, 0, 4, lock);
+#endif
 }
 
 static void save_block_values(struct fastboot_ptentry *ptn,
@@ -218,26 +228,33 @@ static void save_block_values(struct fastboot_ptentry *ptn,
 		else if (env_ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_HW_ECC)
 		{
 			sprintf (ecc_type, "hw");
+#if 0
 			do_nand (NULL, 0, 3, ecc);
+#endif
 		}
 		else if (env_ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_SW_ECC)
 		{
 			sprintf (ecc_type, "sw");
+#if 0
 			do_nand (NULL, 0, 3, ecc);
+#endif
 		}
 		
 		sprintf (start, "0x%x", env_ptn->start);
 		sprintf (length, "0x%x", env_ptn->length);			
-
+#if 0
 		/* This could be a problem is there is an outstanding lock */
 		do_nand (NULL, 0, 4, unlock);
+#endif
 	}
 
 	do_saveenv (NULL, 0, 1, saveenv);
 	
 	if (env_ptn)
 	{
+#if 0
 		do_nand (NULL, 0, 4, lock);
+#endif
 	}
 }
 
@@ -460,10 +477,14 @@ static int write_to_ptn(struct fastboot_ptentry *ptn)
 		printf("Ignoring these flags\n");
 	} else if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_HW_ECC) {
 		sprintf(ecc_type, "hw");
+#if 0
 		do_nand(NULL, 0, 3, ecc);
+#endif
 	} else if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_SW_ECC) {
 		sprintf(ecc_type, "sw");
+#if 0
 		do_nand(NULL, 0, 3, ecc);
+#endif
 	}
 
 	/* Some flashing requires writing the same data in multiple,
@@ -486,9 +507,10 @@ static int write_to_ptn(struct fastboot_ptentry *ptn)
 
 	for (repeat = 0; repeat < repeat_max; repeat++) {
 		sprintf(start, "0x%x", ptn->start + (repeat * ptn->length));
-
+#if 0
 		do_nand(NULL, 0, 4, unlock);
 		do_nand(NULL, 0, 4, erase);
+#endif
 
 		if ((ptn->flags &
 		     FASTBOOT_PTENTRY_FLAGS_WRITE_NEXT_GOOD_BLOCK) &&
@@ -523,8 +545,9 @@ static int write_to_ptn(struct fastboot_ptentry *ptn)
 					/* nand's address always advances */
 					sprintf(wstart, "0x%x",
 						ptn->start + (repeat * ptn->length) + offset);
-
+#if 0
 					ret = do_nand(NULL, 0, 5, write);
+#endif
 					if (ret)
 						break;
 					else
@@ -539,6 +562,7 @@ static int write_to_ptn(struct fastboot_ptentry *ptn)
 			}
 		} else if (ptn->flags &
 			 FASTBOOT_PTENTRY_FLAGS_WRITE_CONTIGUOUS_BLOCK) {
+#if 0
 			/* Keep writing until you get a good block
 			   transfer_buffer should already be aligned */
 			if (interface.nand_block_size) {
@@ -611,6 +635,7 @@ static int write_to_ptn(struct fastboot_ptentry *ptn)
 				printf("Warning nand block size can not be 0 when using 'continuous block' for partition '%s'\n", ptn->name);
 				printf("Ignoring write request\n");
 			}
+#endif
 		} else {
 			/* Normal case */
 			sprintf(addr,    "0x%x", interface.transfer_buffer);
@@ -623,7 +648,9 @@ static int write_to_ptn(struct fastboot_ptentry *ptn)
 					download_bytes_unpadded);
 #endif
 
+#if 0
 			ret = do_nand(NULL, 0, 5, write);
+#endif
 
 			if (0 == repeat) {
 				if (ret) /* failed */
@@ -633,8 +660,9 @@ static int write_to_ptn(struct fastboot_ptentry *ptn)
 							  download_bytes);
 			}
 		}
-
+#if 0
 		do_nand(NULL, 0, 4, lock);
+#endif
 
 		if (ret)
 			break;
@@ -840,10 +868,11 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 				for (repeat = 0; repeat < repeat_max; repeat++) 
 				{
 					sprintf (start, "0x%x", ptn->start + (repeat * ptn->length));
-				
+#if 0
 					do_nand (NULL, 0, 4, unlock);
 					status = do_nand (NULL, 0, 4, erase);
 					do_nand (NULL, 0, 4, lock);
+#endif
 
 					if (status)
 						break;
