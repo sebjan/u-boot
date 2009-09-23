@@ -30,17 +30,61 @@
 
 int do_mmc (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
-	if (mmc_init (1) != 0) {
-		printf ("No MMC card found\n");
-		return 1;
+	ulong src_addr, dst_addr, size;
+	char *cmd;
+
+	if (argc == 1) {
+		if (strncmp(argv[0],"mmcinit",7) !=0) {
+			goto mmc_cmd_usage;
+		} else {
+			if (mmc_init (1) != 0) {
+                        	printf ("No MMC card found\n");
+                       		return 1;
+                	}
+		}
+	}
+
+	cmd = argv[1];
+	if (strncmp(cmd, "read", 4) != 0 && strncmp(cmd, "write", 5) != 0
+					&& strncmp(cmd, "erase", 5) != 0)
+		goto mmc_cmd_usage;
+
+	if (strcmp(cmd, "erase") == 0) {
+		if (argc == 4) {
+			src_addr = simple_strtoul(argv[2], NULL, 16);
+			dst_addr = simple_strtoul(argv[3], NULL, 16);
+		} else if (argc == 3) {
+			/* TODO dst_addr should be end of CARD */
+			src_addr = simple_strtoul(argv[2], NULL, 16);
+			dst_addr = 0;
+		} else {
+			/* TODO dst_addr should be end of CARD */
+			src_addr = 0;
+			dst_addr = 0;
+		}
+		mmc_erase(src_addr,dst_addr);
+	}
+	src_addr = simple_strtoul(argv[2], NULL, 16);
+        dst_addr = simple_strtoul(argv[3], NULL, 16);
+        size = simple_strtoul(argv[4], NULL, 16);
+	if (strcmp(cmd, "read") == 0) {
+		mmc_read(src_addr,(unsigned char *)dst_addr,size);
+	}
+	if (strcmp(cmd, "write") == 0) {
+		mmc_write((unsigned char *)src_addr,dst_addr, (int)size);
 	}
 	return 0;
+
+mmc_cmd_usage:
+	printf ("Usage:\n%s\n", cmdtp->usage);
+	return 1;
 }
 
-U_BOOT_CMD(
-	mmcinit,	1,	0,	do_mmc,
-	"mmcinit - init mmc card\n",
-	NULL
-);
-
+U_BOOT_CMD(mmcinit, 5, 1, do_mmc,
+	"mmcinit - init mmc card in FAT Mode\n"
+	"mmc read src dst size - Read MMC src to RAM dst\n"
+	"mmc write src dst size - WRITE RAM src to MMC dst\n"
+	"mmc erase src  - ERASE entire MMC Card\n"
+	"mmc erase src [dst] - ERASE from  src to end of card\n",
+	NULL);
 #endif	/* CFG_CMD_MMC */

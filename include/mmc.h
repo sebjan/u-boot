@@ -27,7 +27,8 @@
 
 int mmc_init(int verbose);
 int mmc_read(unsigned int src, unsigned char *dst, int size);
-int mmc_write(unsigned char *src, unsigned long dst, int size);
+int mmc_write(unsigned char *src, unsigned int dst, int size);
+int mmc_erase(unsigned int start, unsigned int end);
 int mmc2info(unsigned int addr);
 
 #endif /* _MMC_H_ */
