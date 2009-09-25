@@ -147,7 +147,7 @@ int default_environment_size = sizeof(default_environment);
 
 void env_crc_update (void)
 {
-	env_ptr->crc = crc32(0, env_ptr->data, ENV_SIZE);
+	/*env_ptr->crc = crc32(0, env_ptr->data, ENV_SIZE);*/
 }
 
 static uchar env_get_char_init (int index)

@@ -286,7 +286,7 @@ int _do_setenv (int flag, int argc, char *argv[])
 
 	/* Delete only ? */
 	if ((argc < 3) || argv[2] == NULL) {
-		env_crc_update ();
+	/*	env_crc_update (); */
 		return 0;
 	}
 
@@ -324,7 +324,7 @@ int _do_setenv (int flag, int argc, char *argv[])
 	*++env = '\0';
 
 	/* Update CRC */
-	env_crc_update ();
+	/*env_crc_update (); */
 
 	/*
 	 * Some variables should be updated when the corresponding

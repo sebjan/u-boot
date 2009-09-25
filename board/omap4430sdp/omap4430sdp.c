@@ -194,18 +194,19 @@ void s_init(void)
 	/* TODO: Disable Watchdog's here if needed.
 	watchdog_init();
 	*/
-
+#if 0
 	external_boot = (get_boot_type() == 0x1F) ? 1 : 0;
 	/* Right now flushing at low MPU speed. Need to move after clock init */
 	v7_flush_dcache_all(get_device_type(), external_boot);
 
 	try_unlock_memory();
-
+#endif
 #ifndef CONFIG_ICACHE_OFF
 	icache_enable();
 #endif
 
 	set_muxconf_regs();
+#if 0
 	delay(100);
 
 	/* Writing to AuxCR in U-boot using SMI for GP/EMU DEV */
@@ -213,11 +214,8 @@ void s_init(void)
 	 * Once that is resolved, we can postpone this config to kernel
 	 */
 	setup_auxcr(get_device_type(), external_boot);
-
+#endif
 	prcm_init();
-
-	if (!in_sdram)
-		dmm_init();
 
 }
 
@@ -320,7 +318,7 @@ int dram_init(void)
 	btype = get_board_type();
 	mtype = get_mem_type();
 	/* fixme... dont know why this func is crashing in ZeBu */
-	display_board_info(btype);
+	//display_board_info(btype);
     /* If a second bank of DDR is attached to CS1 this is
      * where it can be started.  Early init code will init
      * memory on CS0.
@@ -328,7 +326,7 @@ int dram_init(void)
 	if ((mtype == DDR_COMBO) || (mtype == DDR_STACKED))
 		do_dmm_init(0x30, NOT_EARLY);
 
-	size0 = SZ_128M;
+	size0 = SZ_512M;
 	size1 = 0;
 
 	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;

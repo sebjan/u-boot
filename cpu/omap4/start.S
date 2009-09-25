@@ -98,7 +98,7 @@ IRQ_STACK_START:
 FIQ_STACK_START:
 	.word 0x0badc0de
 #endif
-#define ROM_CODE_SIMULATE	/* FIXME: Remove once ROM code is ready */
+/*#define ROM_CODE_SIMULATE*/	/* FIXME: Remove once ROM code is ready */
 #if defined(ROM_CODE_SIMULATE)
 Slave:
 	wfe

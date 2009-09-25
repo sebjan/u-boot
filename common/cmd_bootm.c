@@ -223,11 +223,11 @@ int do_bootm (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 
 	if (verify) {
 		puts ("   Verifying Checksum ... ");
-		if (crc32 (0, (unsigned char *)data, len) != ntohl(hdr->ih_dcrc)) {
+		/*if (crc32 (0, (unsigned char *)data, len) != ntohl(hdr->ih_dcrc)) {
 			printf ("Bad Data CRC\n");
 			SHOW_BOOT_PROGRESS (-3);
 			return 1;
-		}
+		}*/
 		puts ("OK\n");
 	}
 	SHOW_BOOT_PROGRESS (4);
@@ -643,7 +643,7 @@ do_bootm_linux (cmd_tbl_t *cmdtp, int flag,
 #endif	/* CONFIG_HW_WATCHDOG || CONFIG_WATCHDOG */
 
 			puts ("   Verifying Checksum ... ");
-
+#if 0
 #if defined(CONFIG_HW_WATCHDOG) || defined(CONFIG_WATCHDOG)
 
 			while (cdata < edata) {
@@ -665,6 +665,7 @@ do_bootm_linux (cmd_tbl_t *cmdtp, int flag,
 				SHOW_BOOT_PROGRESS (-12);
 				do_reset (cmdtp, flag, argc, argv);
 			}
+#endif
 			puts ("OK\n");
 		}
 
@@ -1051,10 +1052,10 @@ static int image_info (ulong addr)
 	len  = ntohl(hdr->ih_size);
 
 	puts ("   Verifying Checksum ... ");
-	if (crc32 (0, (unsigned char *)data, len) != ntohl(hdr->ih_dcrc)) {
+	/*if (crc32 (0, (unsigned char *)data, len) != ntohl(hdr->ih_dcrc)) {
 		puts ("   Bad Data CRC\n");
 		return 1;
-	}
+	}*/
 	puts ("OK\n");
 	return 0;
 }
@@ -1107,9 +1108,9 @@ int do_imls (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 			len  = ntohl(hdr->ih_size);
 
 			puts ("   Verifying Checksum ... ");
-			if (crc32 (0, (unsigned char *)data, len) != ntohl(hdr->ih_dcrc)) {
+			/*if (crc32 (0, (unsigned char *)data, len) != ntohl(hdr->ih_dcrc)) {
 				puts ("   Bad Data CRC\n");
-			}
+			}*/
 			puts ("OK\n");
 next_sector:		;
 		}
