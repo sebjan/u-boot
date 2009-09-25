@@ -39,7 +39,6 @@
 
 /* disabling I Cache for ZeBu */
 /* #define CONFIG_ICACHE_OFF 1 */
-#define CONFIG_L2_OFF		1
 
 
 #define CONFIG_OFF_PADCONF	0    /* Enable OFFMODE pad configuration */

@@ -149,7 +149,6 @@ void secureworld_exit(void)
  ***********************************************************/
 int get_boot_type(void);
 void v7_flush_dcache_all(int , int);
-void l2cache_enable(void);
 void setup_auxcr(int , int);
 
 void try_unlock_memory(void)
@@ -203,11 +202,6 @@ void s_init(void)
 	icache_enable();
 #endif
 
-#ifdef CONFIG_L2_OFF
-	l2cache_disable();
-#else
-	l2cache_enable();
-#endif
 	set_muxconf_regs();
 	delay(100);
 

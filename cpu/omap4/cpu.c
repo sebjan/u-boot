@@ -127,13 +127,6 @@ int cleanup_before_linux(void)
 
 	/* invalidate I-cache */
 	arm_cache_flush();
-#ifndef CONFIG_L2_OFF
-	/* turn off L2 cache */
-	l2cache_disable();
-	/* invalidate L2 cache also */
-	external_boot = (get_boot_type() == 0x1F) ? 1 : 0;
-	v7_flush_dcache_all(get_device_type(), external_boot);
-#endif
 	i = 0;
 	/* mem barrier to sync up things */
 	asm ("mcr p15, 0, %0, c7, c10, 4" : : "r" (i));
@@ -167,30 +160,6 @@ void icache_disable(void)
 	reg = read_p15_c1();
 	cp_delay();
 	write_p15_c1(reg & ~C1_IC);
-}
-
-void l2cache_enable(void)
-{
-	unsigned long i;
-
-	/* New procedure where we can disable/enable L2 ourselves */
-	if (get_cpu_rev() == CPU_4430_ES1) {
-		__asm__ __volatile__("mrc p15, 0, %0, c1, c0, 1" : "=r" (i));
-		__asm__ __volatile__("orr %0, %0, #0x2" : "=r"(i));
-		__asm__ __volatile__("mcr p15, 0, %0, c1, c0, 1" : "=r" (i));
-	}
-}
-
-void l2cache_disable()
-{
-	unsigned long i;
-
-	/* we can disable/enable L2 ourselves */
-	if (get_cpu_rev() == CPU_4430_ES1) {
-		__asm__ __volatile__("mrc p15, 0, %0, c1, c0, 1" : "=r" (i));
-		__asm__ __volatile__("bic %0, %0, #0x2" : "=r"(i));
-		__asm__ __volatile__("mcr p15, 0, %0, c1, c0, 1" : "=r" (i));
-	}
 }
 
 int icache_status(void)
