@@ -146,6 +146,8 @@ Master:
 	add	r1, r1, r3
 	mov	r3, #SRAM_OFFSET2
 	add	r1, r1, r3
+	mov	r3, #SRAM_OFFSET3
+	add	r1, r1, r3
 next:
 	ldmia	r0!, {r3-r10}		/* copy from source address [r0]    */
 	stmia	r1!, {r3-r10}		/* copy to   target address [r1]    */
