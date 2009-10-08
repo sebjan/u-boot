@@ -24,9 +24,11 @@
 
 #define S12M		12000000
 #define S13M		13000000
+#define S16_8M		16800000
 #define S19_2M		19200000
 #define S24M		24000000
 #define S26M		26000000
+#define	S27M		27000000
 #define S38_4M		38400000
 
 #include <asm/arch/clocks443x.h>

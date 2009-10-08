@@ -21,6 +21,7 @@
 #define _OMAP443X_CLOCKS_H_
 
 #define PLL_STOP        1         /* PER & IVA */
+#define PLL_MN_POWER_BYPASS 	4
 #define PLL_LOW_POWER_BYPASS   5  /* MPU, IVA & CORE */
 #define PLL_FAST_RELOCK_BYPASS 6  /* CORE */
 #define PLL_LOCK        7         /* MPU, IVA, CORE & PER */

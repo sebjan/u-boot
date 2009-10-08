@@ -190,7 +190,9 @@ void s_init(void)
 #ifdef CONFIG_4430SDP
 	in_sdram = 0;  /* allow setup from memory for Virtio */
 #endif
+	/* TODO: Disable Watchdog's here if needed.
 	watchdog_init();
+	*/
 
 	external_boot = (get_boot_type() == 0x1F) ? 1 : 0;
 	/* Right now flushing at low MPU speed. Need to move after clock init */
@@ -210,11 +212,8 @@ void s_init(void)
 	 * Once that is resolved, we can postpone this config to kernel
 	 */
 	setup_auxcr(get_device_type(), external_boot);
-/*
-	prcm_init();
 
-	per_clocks_enable();
-*/
+	prcm_init();
 
 	if (!in_sdram)
 		dmm_init();
@@ -249,6 +248,7 @@ void wait_for_command_complete(unsigned int wd_base)
  * Routine: watchdog_init
  * Description: Shut down watch dogs
  *****************************************/
+#if 0
 void watchdog_init(void)
 {
 	/* There are 3 watch dogs WD1=Secure, WD2=MPU, WD3=IVA. WD1 is
@@ -265,6 +265,7 @@ void watchdog_init(void)
 	wait_for_command_complete(WD2_BASE);
 	__raw_writel(WD_UNLOCK2, WD2_BASE + WSPR);
 }
+#endif
 
 /*******************************************************************
  * Routine:ether_init
@@ -386,6 +387,6 @@ void nand_init(void)
 {
 	/* REVISIT */
 	return;
-}
+
 #endif
 

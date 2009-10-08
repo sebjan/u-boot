@@ -153,13 +153,7 @@ next:
 	stmia	r1!, {r3-r10}		/* copy to   target address [r1]    */
 	cmp	r0, r2			/* until source end address [r2]    */
 	bne	next			/* loop until equal */
-#if !defined(CFG_NAND_BOOT) && !defined(CFG_ONENAND_BOOT)
-	/* No need to copy/exec the clock code - DPLL adjust already done
-	 * in NAND/oneNAND Boot.
-	 */
-	bl	cpy_clk_code	/* put dpll adjust code behind vectors */
-#endif /* NAND Boot */
-#endif	  /* 24xx */
+#endif	  /* 44xx */
 	/* the mask ROM code should have PLL and others stable */
 #ifndef CONFIG_SKIP_LOWLEVEL_INIT
 	bl  cpu_init_crit
