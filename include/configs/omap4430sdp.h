@@ -41,7 +41,7 @@
 /* #define CONFIG_ICACHE_OFF 1 */
 
 
-#define CONFIG_OFF_PADCONF	0    /* Enable OFFMODE pad configuration */
+//#define CONFIG_OFF_PADCONF	0    /* Enable OFFMODE pad configuration */
 
 #include <asm/arch/cpu.h>        /* get chip and board defs */
 
