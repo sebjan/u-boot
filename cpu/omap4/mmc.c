@@ -607,7 +607,7 @@ int mmc_write(unsigned char *src, unsigned int dst, int size)
 	return ret;
 }
 
-int mmc_erase(unsigned int start, unsigned int end)
+int mmc_erase(unsigned int start, int size)
 {
 	printf("Not implemented\n");
 	return 0;
