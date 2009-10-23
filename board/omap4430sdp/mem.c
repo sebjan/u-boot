@@ -377,6 +377,7 @@ void gpmc_init(void)
 	for (idx = 0; idx < GPMC_MAX_CS; idx++) {
 		gpmc_base = GPMC_CONFIG_CS0 + (idx * GPMC_CONFIG_WIDTH);
 		switch (config_sel[idx]) {
+#if (CONFIG_COMMANDS & CFG_CMD_FLASH)		
 		case PISMO1_NOR:
 			if (get_board_type() == SDP_4430_VIRTIO) {
 				gpmc_config = gpmc_stnor;
@@ -393,6 +394,7 @@ void gpmc_init(void)
 			base = NOR_FLASH_BANKS_LIST[0];
 			is_flash = 1;
 			break;
+#endif
 #if (CONFIG_COMMANDS & CFG_CMD_NAND)
 		case PISMO1_NAND:
 			base = PISMO1_NAND_BASE;

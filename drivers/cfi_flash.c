@@ -346,6 +346,7 @@ unsigned long flash_init (void)
 	unsigned long size = 0;
 	int i;
 
+	return 0;
 #ifdef CFG_FLASH_PROTECTION
 	char *s = getenv("unlock");
 #endif
