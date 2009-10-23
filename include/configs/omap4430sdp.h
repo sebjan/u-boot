@@ -86,7 +86,7 @@
 #define CFG_NS16550_SERIAL
 #define CFG_NS16550_REG_SIZE     (-4)
 #define CFG_NS16550_CLK          V_NS16550_CLK
-#define CFG_NS16550_COM1         OMAP44XX_UART1
+#define CFG_NS16550_COM3         OMAP44XX_UART3
 
 /*
  * select serial console configuration
@@ -94,7 +94,7 @@
 #define CONFIG_SERIAL1           1    /* UART1 on SDP */
 /* allow to overwrite serial and ethaddr */
 #define CONFIG_ENV_OVERWRITE
-#define CONFIG_CONS_INDEX        1
+#define CONFIG_CONS_INDEX        3
 #define CONFIG_BAUDRATE          115200
 #define CFG_BAUDRATE_TABLE       {4800, 9600, 19200, 38400, 57600, 115200}
 
@@ -140,7 +140,7 @@
 	root=/dev/nfs rw nfsroot=128.247.77.158:/home/a0384864/wtbu/rootfs \
 	ip=dhcp"
 #else
-#define CONFIG_BOOTARGS "root=/dev/ram0 rw mem=128M console=ttyS0,115200n8 \
+#define CONFIG_BOOTARGS "root=/dev/ram0 rw mem=512M console=ttyS2,115200n8 \
 initrd=0x81600000,20M ramdisk_size=20480"
 #endif
 
