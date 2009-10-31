@@ -140,7 +140,7 @@
 	root=/dev/nfs rw nfsroot=128.247.77.158:/home/a0384864/wtbu/rootfs \
 	ip=dhcp"
 #else
-#define CONFIG_BOOTARGS "root=/dev/ram0 rw mem=512M console=ttyS2,115200n8 \
+#define CONFIG_BOOTARGS "root=/dev/ram0 rw mem=256M console=ttyS2,115200n8 \
 initrd=0x81600000,20M ramdisk_size=20480"
 #endif
 
