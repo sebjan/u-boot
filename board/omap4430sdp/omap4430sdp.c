@@ -188,7 +188,7 @@ void s_init(void)
 	int external_boot = 0;
 	int in_sdram = running_in_sdram();
 
-#ifdef CONFIG_4430SDP
+#ifdef CONFIG_4430VIRTIO
 	in_sdram = 0;  /* allow setup from memory for Virtio */
 #endif
 	/* TODO: Disable Watchdog's here if needed.
@@ -204,19 +204,12 @@ void s_init(void)
 #ifndef CONFIG_ICACHE_OFF
 	icache_enable();
 #endif
-
-	set_muxconf_regs();
-#if 0
-	delay(100);
-
-	/* Writing to AuxCR in U-boot using SMI for GP/EMU DEV */
-	/* Currently SMI in Kernel on ES2 devices seems to have an isse
-	 * Once that is resolved, we can postpone this config to kernel
-	 */
-	setup_auxcr(get_device_type(), external_boot);
-#endif
-	prcm_init();
-
+	/* Clock and Mux configerations is already done in x-loader */
+	if(!in_sdram) {
+		set_muxconf_regs();
+		delay(100);
+		prcm_init();
+	}
 }
 
 /*******************************************************
@@ -786,6 +779,6 @@ void nand_init(void)
 {
 	/* REVISIT */
 	return;
-
+}
 #endif
 
