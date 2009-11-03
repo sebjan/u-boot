@@ -319,8 +319,7 @@ int dram_init(void)
 	if ((mtype == DDR_COMBO) || (mtype == DDR_STACKED))
 		do_dmm_init(0x30, NOT_EARLY);
 
-	/* TODO: Read the cotroller */
-	size0 = SZ_256M;
+	size0 = SZ_512M;
 	size1 = 0;
 
 	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;
