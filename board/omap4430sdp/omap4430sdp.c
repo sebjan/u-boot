@@ -303,30 +303,18 @@ void ether_init(void)
  **********************************************/
 int dram_init(void)
 {
-    #define NOT_EARLY 0
-    DECLARE_GLOBAL_DATA_PTR;
-	unsigned int size0 = 0, size1 = 0;
+	DECLARE_GLOBAL_DATA_PTR;
 	u32 mtype, btype;
 
 	btype = get_board_type();
 	mtype = get_mem_type();
 	/* fixme... dont know why this func is crashing in ZeBu */
 	//display_board_info(btype);
-    /* If a second bank of DDR is attached to CS1 this is
-     * where it can be started.  Early init code will init
-     * memory on CS0.
-     */
-	if ((mtype == DDR_COMBO) || (mtype == DDR_STACKED))
-		do_dmm_init(0x30, NOT_EARLY);
-
-	size0 = SZ_512M;
-	size1 = 0;
 
 	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;
-	gd->bd->bi_dram[0].size = size0;
-	gd->bd->bi_dram[1].start = PHYS_SDRAM_1+size0;
-	gd->bd->bi_dram[1].size = size1;
+	gd->bd->bi_dram[0].size = PHYS_SDRAM_1_SIZE;
 
+	printf("Load address: 0x%x\n", TEXT_BASE);
 	return 0;
 }
 

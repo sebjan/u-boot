@@ -190,12 +190,11 @@ initrd=0x81600000,20M ramdisk_size=20480"
 #endif
 
 /*-----------------------------------------------------------------------
- * Physical Memory Map
+ * Physical Memory Map : Two memory parts used in in interleaved mode
  */
-#define CONFIG_NR_DRAM_BANKS	2       /* CS1 may or may not be populated */
+#define CONFIG_NR_DRAM_BANKS	1
 #define PHYS_SDRAM_1		0x80000000
-#define PHYS_SDRAM_1_SIZE	SZ_32M            /* at least 32 meg */
-#define PHYS_SDRAM_2		0xA0000000
+#define PHYS_SDRAM_1_SIZE	SZ_512M
 
 /* SDRAM Bank Allocation method */
 /*#define SDRC_B_R_C		1 */
