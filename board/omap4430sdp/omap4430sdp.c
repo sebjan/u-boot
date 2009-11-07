@@ -191,9 +191,9 @@ void s_init(void)
 #ifdef CONFIG_4430VIRTIO
 	in_sdram = 0;  /* allow setup from memory for Virtio */
 #endif
-	/* Disable Watchdog's here if needed. */
+	/* TODO: Disable Watchdog's here if needed.
 	watchdog_init();
-
+	*/
 #if 0
 	external_boot = (get_boot_type() == 0x1F) ? 1 : 0;
 	/* Right now flushing at low MPU speed. Need to move after clock init */
@@ -240,14 +240,24 @@ void wait_for_command_complete(unsigned int wd_base)
  * Routine: watchdog_init
  * Description: Shut down watch dogs
  *****************************************/
+#if 0
 void watchdog_init(void)
 {
-	volatile unsigned int *WDT_WSPR = (unsigned int *)0x4A314048;
+	/* There are 3 watch dogs WD1=Secure, WD2=MPU, WD3=IVA. WD1 is
+	 * either taken care of by ROM (HS/EMU) or not accessible (GP).
+	 * We need to take care of WD2-MPU or take a PRCM reset.  WD3
+	 * should not be running and does not generate a PRCM reset.
+	 */
 
-	/* Disable WDT2 */
-	(*WDT_WSPR) = 0xAAAA;
-	(*WDT_WSPR) = 0x5555;
+	sr32(CM_FCLKEN_WKUP, 5, 1, 1);
+	sr32(CM_ICLKEN_WKUP, 5, 1, 1);
+	wait_on_value(BIT5, 0x20, CM_IDLEST_WKUP, 5); /* some issue here */
+
+	__raw_writel(WD_UNLOCK1, WD2_BASE + WSPR);
+	wait_for_command_complete(WD2_BASE);
+	__raw_writel(WD_UNLOCK2, WD2_BASE + WSPR);
 }
+#endif
 
 /*******************************************************************
  * Routine:ether_init
