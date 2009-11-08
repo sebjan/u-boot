@@ -104,9 +104,15 @@
 #define NET_CMDS                 (CFG_CMD_DHCP|CFG_CMD_NFS|CFG_CMD_NET)
 
 /* Config CMD*/
-#define CONFIG_COMMANDS          ((CONFIG_CMD_DFL | CFG_CMD_DHCP | \
+#define CONFIG_COMMANDS          ((CFG_CMD_I2C | CONFIG_CMD_DFL | CFG_CMD_DHCP | \
 	CFG_CMD_JFFS2 | CFG_CMD_MMC | CFG_CMD_FAT) &			\
 	(~CFG_CMD_AUTOSCRIPT | CFG_CMD_NAND | CFG_CMD_ONENAND)) 
+
+#define CFG_I2C_SPEED            100
+#define CFG_I2C_SLAVE            1
+#define CFG_I2C_BUS              0
+#define CFG_I2C_BUS_SELECT       1
+#define CONFIG_DRIVER_OMAP44XX_I2C 1
 
 #define CONFIG_BOOTP_MASK        CONFIG_BOOTP_DEFAULT
 

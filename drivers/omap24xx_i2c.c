@@ -22,7 +22,7 @@
 
 #include <common.h>
 
-#if defined(CONFIG_DRIVER_OMAP24XX_I2C) || defined(CONFIG_DRIVER_OMAP34XX_I2C)
+#if defined(CONFIG_DRIVER_OMAP24XX_I2C) || defined(CONFIG_DRIVER_OMAP34XX_I2C) || defined(CONFIG_DRIVER_OMAP44XX_I2C)
 
 #include <asm/arch/i2c.h>
 #include <asm/io.h>
@@ -53,7 +53,7 @@ static void wait_for_bb(void);
 static u16 wait_for_pin(void);
 static void flush_fifo(void);
 
-#ifdef CONFIG_OMAP34XX
+#ifdef CONFIG_OMAP34XX || defined(CONFIG_OMAP44XX)
 #define I2C_NUM_IF 3
 #else
 #define I2C_NUM_IF 2
@@ -66,7 +66,7 @@ int select_bus(int bus, int speed)
 		return -1;
 	}
 
-#if defined(CONFIG_OMAP243X) || defined(CONFIG_OMAP34XX)
+#if defined(CONFIG_OMAP243X) || defined(CONFIG_OMAP34XX) || defined(CONFIG_OMAP44XX)
 	/* Check speed */
 	if ((speed != OMAP_I2C_STANDARD) && (speed != OMAP_I2C_FAST_MODE)
 	    && (speed != OMAP_I2C_HIGH_SPEED)) {
@@ -80,7 +80,7 @@ int select_bus(int bus, int speed)
 	}
 #endif
 
-#if defined(CONFIG_OMAP34XX)
+#if defined(CONFIG_OMAP34XX) || defined(CONFIG_OMAP44XX)
 	if (bus == 2)
 		i2c_base = I2C_BASE3;
 	else 
@@ -99,6 +99,7 @@ void i2c_init(int speed, int slaveadd)
 	int scl_lh = 0;
 	int psc = 0;
 	int iclk = 0;
+	int reset_timeout = 10;
 
 	/* assume clock settings done */
 	/* write to clock regs to enable if and fun clks for board */
@@ -115,14 +116,12 @@ void i2c_init(int speed, int slaveadd)
 	}
 #endif				/* End of 243x code */
 
-	outw(0x2, I2C_SYSC);	/* for ES2 after soft reset */
-	udelay(1000);
-	outw(0x0, I2C_SYSC);	/* will probably self clear but */
-
 	if (inw(I2C_CON) & I2C_CON_EN) {
 		outw(0, I2C_CON);
 		udelay(50000);
 	}
+	outw(I2C_SYSC_SRST, I2C_SYSC);	/* for ES2 after soft reset */
+	udelay(1000);
 	/* compute divisors - dynamic decision based on i/p clock */
 	psc = I2C_PSC_MAX;
 	while (psc >= I2C_PSC_MIN) {
@@ -186,7 +185,15 @@ void i2c_init(int speed, int slaveadd)
 
 	DBG(" speed= %d SysClk=%d, iclk=%d,psc=0x%x[%d],scl_lh=0x%x[%d]\n",
 	       speed, I2C_IP_CLK, iclk, psc, psc, scl_lh, scl_lh);
+	outw(I2C_CON_EN, I2C_CON);
+	while (!(inw(I2C_SYSS) & I2C_SYSS_RDONE) && reset_timeout--) {
+		if (reset_timeout <= 0)
+			printf("ERROR: Timeout while waiting for soft-reset to complete\n");
+		udelay(1000);
+	}
 
+	outw(0, I2C_CON);  /* Disable I2C controller before writing
+                                        to PSC and SCL registers */
 	outw(psc, I2C_PSC);
 	outw(scl_lh, I2C_SCLL);
 	outw(scl_lh, I2C_SCLH);
@@ -235,8 +242,6 @@ static int i2c_read_byte(u8 devaddr, u8 regoffset, u8 * value)
 
 	if (!i2c_error) {
 		int err = 10;
-		/* free bus, otherwise we can't use a combined transction */
-		outw(0, I2C_CON);
 		while (inw(I2C_STAT) || (inw(I2C_CON) & I2C_CON_MST)) {
 			udelay(10000);
 			/* Have to clear pending interrupt to clear I2C_STAT */
@@ -246,7 +251,6 @@ static int i2c_read_byte(u8 devaddr, u8 regoffset, u8 * value)
 			}
 		}
 
-		wait_for_bb();
 		/* set slave address */
 		outw(devaddr, I2C_SA);
 		/* read one byte from slave */
@@ -259,7 +263,7 @@ static int i2c_read_byte(u8 devaddr, u8 regoffset, u8 * value)
 
 		status = wait_for_pin();
 		if (status & I2C_STAT_RRDY) {
-#if defined(CONFIG_OMAP243X) || defined(CONFIG_OMAP34XX)
+#if defined(CONFIG_OMAP243X) || defined(CONFIG_OMAP34XX) || defined(CONFIG_OMAP44XX)
 			*value = inb(I2C_DATA);
 #else
 			*value = inw(I2C_DATA);
@@ -308,7 +312,7 @@ static int i2c_write_byte(u8 devaddr, u8 regoffset, u8 value)
 	status = wait_for_pin();
 
 	if (status & I2C_STAT_XRDY) {
-#if defined(CONFIG_OMAP243X) || defined(CONFIG_OMAP34XX)
+#if defined(CONFIG_OMAP243X) || defined(CONFIG_OMAP34XX) || defined(CONFIG_OMAP44XX)
 		/* send out 1 byte */
 		outb(regoffset, I2C_DATA);
 		outw(I2C_STAT_XRDY, I2C_STAT);
@@ -360,7 +364,7 @@ static void flush_fifo(void)
 	while (1) {
 		stat = inw(I2C_STAT);
 		if (stat == I2C_STAT_RRDY) {
-#if defined(CONFIG_OMAP243X) || defined(CONFIG_OMAP34XX)
+#if defined(CONFIG_OMAP243X) || defined(CONFIG_OMAP34XX) || defined(CONFIG_OMAP44XX)
 			inb(I2C_DATA);
 #else
 			inw(I2C_DATA);
