@@ -64,6 +64,11 @@
 
 /* Use do_reset for fastboot's 'reboot' command */
 extern int do_reset (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
+
+#if (CONFIG_MMC)
+extern int do_mmc(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
+#endif
+
 #if 0
 /* Use do_nand for fastboot's flash commands */
 extern int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[]);
@@ -94,6 +99,7 @@ static unsigned int download_size;
 static unsigned int download_bytes;
 static unsigned int download_bytes_unpadded;
 static unsigned int download_error;
+static unsigned int mmc_controller_no;
 
 static void set_env(char *var, char *val)
 {
@@ -892,29 +898,81 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 			ret = 0;
 		}
 
+
+		/* EMMC Erase
+		   Erase a register flash partition on MMC
+		   Board has to set up flash partitions */
+		if (memcmp(cmdbuf, "mmcerase:", 9) == 0) {
+			struct fastboot_ptentry *ptn;
+
+			/* Save the MMC controller number */
+			mmc_controller_no = simple_strtoul(cmdbuf + 9,
+								NULL, 10);
+			/* Find the partition and erase it */
+			ptn = fastboot_flash_find_ptn(cmdbuf + 11);
+
+			if (ptn == 0) {
+				sprintf(response,
+					"FAIL: partition doesn't exist");
+			} else {
+				/* Call MMC erase function here */
+				/* This is not complete */
+				char start[32], length[32];
+				char slot_no[32];
+
+				char *erase[5]  = { "mmc", NULL, "erase",
+								NULL, NULL, };
+				char *mmc_init[2] = {"mmcinit", NULL,};
+
+				mmc_init[1] = slot_no;
+				erase[1] = slot_no;
+				erase[3] = start;
+				erase[4] = length;
+
+				sprintf(slot_no, "%d", mmc_controller_no);
+				sprintf(length, "0x%x", ptn->length);
+				sprintf(start, "0x%x", ptn->start);
+
+				printf("Initializing '%s'\n", ptn->name);
+				if (do_mmc(NULL, 0, 2, mmc_init)) {
+					sprintf(response, "FAIL: Init of MMC card");
+				} else {
+					sprintf(response, "OKAY");
+				}
+
+				printf("Erasing '%s'\n", ptn->name);
+				if (do_mmc(NULL, 0, 5, erase)) {
+					sprintf(response, "FAIL: Erase partition");
+				} else {
+					sprintf(response, "OKAY");
+				}
+			}
+		}
+
 		/* download
 		   download something .. 
 		   What happens to it depends on the next command after data */
-
 		if(memcmp(cmdbuf, "download:", 9) == 0) {
 
 			/* save the size */
-			download_size = simple_strtoul (cmdbuf + 9, NULL, 16);
+			download_size = simple_strtoul(cmdbuf + 9, NULL, 16);
 			/* Reset the bytes count, now it is safe */
 			download_bytes = 0;
 			/* Reset error */
 			download_error = 0;
 
-			printf ("Starting download of %d bytes\n", download_size);
+			printf("Starting download of %d bytes\n",
+							download_size);
 
 			if (0 == download_size)
 			{
 				/* bad user input */
 				sprintf(response, "FAILdata invalid size");
-			}
-			else if (download_size > interface.transfer_buffer_size)
+			} else if (download_size >
+						interface.transfer_buffer_size)
 			{
-				/* set download_size to 0 because this is an error */
+				/* set download_size to 0
+				 * because this is an error */
 				download_size = 0;
 				sprintf(response, "FAILdata too large");
 			}
@@ -1015,6 +1073,63 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 			sprintf(response, "FAILinvalid boot image");
 			ret = 0;
 		}
+
+		/* mmcwrite
+		   write what was downloaded on MMC*/
+				/* Write to MMC whatever was downloaded */
+		if (memcmp(cmdbuf, "mmcwrite:", 9) == 0) {
+
+			if (download_bytes) {
+
+				struct fastboot_ptentry *ptn;
+
+				/* Save the MMC controller number */
+				mmc_controller_no = simple_strtoul(cmdbuf + 9, NULL, 10);
+
+				/* Next is the partition name */
+				ptn = fastboot_flash_find_ptn(cmdbuf + 11);
+
+				if (ptn == 0) {
+					sprintf(response, "FAILpartition does not exist");
+				} else {
+					char source[32], dest[32], length[32];
+					char slot_no[32];
+
+					printf("writing to partition '%s'\n", ptn->name);
+					char *mmc_write[6]  = {"mmc", NULL, "write", NULL, NULL, NULL};
+					char *mmc_init[2] = {"mmcinit", NULL,};
+
+					mmc_init[1] = slot_no;
+					mmc_write[1] = slot_no;
+					mmc_write[3] = source;
+					mmc_write[4] = dest;
+					mmc_write[5] = length;
+
+					sprintf(slot_no, "%d", mmc_controller_no);
+					sprintf(source, "0x%x",	interface.transfer_buffer);
+					sprintf(dest, "0x%x", ptn->start);
+					sprintf(length, "0x%x", download_bytes);
+
+					printf("Initializing '%s'\n", ptn->name);
+					if (do_mmc(NULL, 0, 2, mmc_init)) {
+						sprintf(response, "FAIL:Init of MMC card");
+					} else {
+						sprintf(response, "OKAY");
+					}
+
+					printf("Writing '%s'\n", ptn->name);
+					if (do_mmc(NULL, 0, 6, mmc_write)) {
+						sprintf(response, "FAIL: Write partition");
+					} else {
+						sprintf(response, "OKAY");
+					}
+				}
+
+			} else {
+				sprintf(response, "FAILno image downloaded");
+			}
+		}
+
 
 		/* flash
 		   Flash what was downloaded */

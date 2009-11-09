@@ -81,6 +81,10 @@ extern int  AT91F_DataflashInit(void);
 extern void dataflash_print_info(void);
 #endif
 
+#ifdef CONFIG_MMC
+extern void board_mmc_init(void);
+#endif
+
 #ifndef CONFIG_IDENT_STRING
 #define CONFIG_IDENT_STRING ""
 #endif
@@ -336,6 +340,12 @@ void start_armboot (void)
 	AT91F_DataflashInit();
 	dataflash_print_info();
 #endif
+
+#if (CONFIG_COMMANDS & CFG_CMD_MMC)
+	/* puts("EMMC partitons init:"); */
+	board_mmc_init();
+#endif
+
 
 	/* initialize environment */
 	env_relocate ();
