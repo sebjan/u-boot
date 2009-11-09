@@ -222,7 +222,6 @@ void set_timer(ulong t)
 /* delay x useconds AND perserve advance timstamp value */
 void udelay(unsigned long usec)
 {
-#ifndef CONFIG_4430SDP
 	ulong tmo, tmp;
 	/* if "big" number, spread normalization to seconds */
 	if (usec >= 1000) {
@@ -246,7 +245,6 @@ void udelay(unsigned long usec)
 		tmo	+= tmp;	/* else, set advancing stamp wake up time */
 	while (get_timer_masked() < tmo)/* loop till event */
 		/*NOP*/;
-#endif
 }
 
 void reset_timer_masked(void)
