@@ -27,69 +27,89 @@
 #if (CONFIG_COMMANDS & CFG_CMD_MMC)
 
 #include <mmc.h>
+int mmc_flag[2] = {0, 0} ;
 
 int do_mmc (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
 	ulong src_addr, dst_addr, size;
 	char *cmd;
+	/*Default Setting to SLOT-0*/
+	int slot_no = 0, mmc_cont = 0;
 
-	if (argc == 1) {
+	if (argc < 2) {
+		goto mmc_cmd_usage;
+	} else if (argc == 2) {
                 if (strncmp(argv[0],"mmcinit",7) !=0) {
                         goto mmc_cmd_usage;
                 } else {
-                        if (mmc_init (1) != 0) {
-                                printf ("No MMC card found\n");
+			slot_no = simple_strtoul(argv[1], NULL, 16);
+			if ((slot_no != 0) && (slot_no != 1))
+				goto mmc_cmd_usage;
+			if (mmc_init(slot_no) != 0) {
+				printf("No MMC card found\n");
                                 return 1;
-                        }
+			} else {
+				mmc_flag[slot_no] = 1;
+			}
                 }
-        }
-        else {
-                cmd = argv[1];
+	} else {
+		mmc_cont = simple_strtoul(argv[1], NULL, 16);
+		if ((mmc_cont != 0) && (mmc_cont != 1))
+			goto mmc_cmd_usage;
+
+		if (!mmc_flag[mmc_cont]) {
+			printf("Try to do init First b4 read/write\n");
+			goto mmc_cmd_usage;
+		}
+
+		cmd = argv[2];
                 if (strncmp(cmd, "read", 4) != 0 && strncmp(cmd, "write", 5) != 0
                                         && strncmp(cmd, "erase", 5) != 0)
                 goto mmc_cmd_usage;
 
                 if (strcmp(cmd, "erase") == 0) {
-                        if (argc != 4) {
-                                goto mmc_cmd_usage;
-                        } else {
-                                src_addr = simple_strtoul(argv[2], NULL, 16);
-                                size = simple_strtoul(argv[3], NULL, 16);
-                                mmc_erase(src_addr,size);
-                        }
-                }
+			if (argc != 5) {
+				goto mmc_cmd_usage;
+			} else {
+				src_addr = simple_strtoul(argv[3], NULL, 16);
+				size = simple_strtoul(argv[4], NULL, 16);
+				mmc_erase(mmc_cont, src_addr, size);
+			}
+		}
                 if (strcmp(cmd, "read") == 0) {
-                        if (argc != 5) {
+			if (argc != 6) {
                                 goto mmc_cmd_usage;
                         } else {
-                                src_addr = simple_strtoul(argv[2], NULL, 16);
-                                dst_addr = simple_strtoul(argv[3], NULL, 16);
-                                size = simple_strtoul(argv[4], NULL, 16);
-                                mmc_read(src_addr, (unsigned char *)dst_addr, size);
-                        }
-                }
-                if (strcmp(cmd, "write") == 0) {
-                        if (argc != 5) {
-                                goto mmc_cmd_usage;
-                        } else {
-                                src_addr = simple_strtoul(argv[2], NULL, 16);
-                                dst_addr = simple_strtoul(argv[3], NULL, 16);
-                                size = simple_strtoul(argv[4], NULL, 16);
-                                mmc_write((unsigned char *)src_addr, dst_addr, size);
-                        }
-                }
-        }
-        return 0;
+				src_addr = simple_strtoul(argv[3], NULL, 16);
+				dst_addr = simple_strtoul(argv[4], NULL, 16);
+				size = simple_strtoul(argv[5], NULL, 16);
+				mmc_read(mmc_cont, src_addr,
+					(unsigned char *)dst_addr, size);
+			}
+		}
+		if (strcmp(cmd, "write") == 0) {
+			if (argc != 6) {
+				goto mmc_cmd_usage;
+			} else {
+				src_addr = simple_strtoul(argv[3], NULL, 16);
+				dst_addr = simple_strtoul(argv[4], NULL, 16);
+				size = simple_strtoul(argv[5], NULL, 16);
+				mmc_write(mmc_cont, (unsigned char *)src_addr,
+							dst_addr, size);
+			}
+		}
+	}
+	return 0;
 
 mmc_cmd_usage:
-        printf ("Usage:\n%s\n", cmdtp->usage);
-        return 1;
+	printf("Usage:\n%s\n", cmdtp->usage);
+	return 1;
 }
 
-U_BOOT_CMD(mmcinit, 5, 1, do_mmc,
-        "mmcinit - init mmc card in FAT Mode\n"
-        "mmc read src dst size - Read MMC src to RAM dst\n"
-        "mmc write src dst size - WRITE RAM src to MMC dst\n"
-        "mmc erase start size - ERASE from start of card till the size\n",
-        NULL);
+U_BOOT_CMD(mmcinit, 6, 1, do_mmc,
+	"mmcinit <controller[0/1]>\n"
+	"mmc <controller[0/1]> read <src> <dst> <size>\n"
+	"mmc <controller[0/1]> write <src> <dst> <size>\n"
+	"mmc <controller[0/1]> erase <start> <size>\n",
+	NULL);
 #endif  /* CFG_CMD_MMC */

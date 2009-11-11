@@ -25,10 +25,9 @@
 #define _MMC_H_
 #include <asm/arch/mmc.h>
 
-int mmc_init(int verbose);
-int mmc_read(unsigned int src, unsigned char *dst, int size);
-int mmc_write(unsigned char *src, unsigned int dst, int size);
-int mmc_erase(unsigned int start, int size);
-int mmc2info(unsigned int addr);
+int mmc_init(int slot);
+int mmc_read(int mmc_cont, unsigned int src, unsigned char *dst, int size);
+int mmc_write(int mmc_cont, unsigned char *src, unsigned long dst, int size);
+int mmc_erase(int mmc_cont, unsigned int start, int size);
 
 #endif /* _MMC_H_ */
