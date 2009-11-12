@@ -143,7 +143,7 @@
 	ip=dhcp"
 #else
 #define CONFIG_BOOTARGS "root=/dev/ram0 rw mem=512M console=ttyS2,115200n8 \
-initrd=0x81600000,20M ramdisk_size=20480"
+initrd=0x81600000,64M ramdisk_size=65536"
 #endif
 
 #define CONFIG_NETMASK           255.255.254.0
