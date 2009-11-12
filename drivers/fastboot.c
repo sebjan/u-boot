@@ -39,6 +39,8 @@
 
 #if defined(CONFIG_FASTBOOT)
 
+#define OTG_INTERFSEL 0x4A0AB40C
+
 #include "usb_debug_macros.h"
 
 #define CONFUSED() printf ("How did we get here %s %d ? \n", __FILE__, __LINE__)
@@ -59,6 +61,8 @@ static volatile u16 *rxcount    = (volatile u16 *) OMAP34XX_USB_RXCOUNT(BULK_END
 static volatile u16 *peri_txcsr = (volatile u16 *) OMAP34XX_USB_TXCSR(BULK_ENDPOINT);
 static volatile u16 *txmaxp     = (volatile u16 *) OMAP34XX_USB_TXMAXP(BULK_ENDPOINT);
 static volatile u8  *bulk_fifo  = (volatile u8  *) OMAP34XX_USB_FIFO(BULK_ENDPOINT);
+
+static volatile u32 *otg_interfsel = (volatile u32  *)OTG_INTERFSEL;
 
 /* This is the TI USB vendor id */
 #define DEVICE_VENDOR_ID  0x0451
@@ -1012,6 +1016,8 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 	fastboot_interface->transfer_buffer_size          = CFG_FASTBOOT_TRANSFER_BUFFER_SIZE;
 
 	fastboot_reset();
+
+	*otg_interfsel &= 0;
 
 	/* Check if device is in b-peripheral mode */
 	devctl = inb (OMAP34XX_USB_DEVCTL);
