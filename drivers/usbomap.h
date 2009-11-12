@@ -18,13 +18,22 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
   */
-#ifndef _OMAP44XX_USB_H_
-#define _OMAP44XX_USB_H_
+#ifndef _OMAP_USB_H_
+#define _OMAP_USB_H_
 
-#include "omap4430.h"
+#if defined(CONFIG_OMAP4430)
+#include <asm/arch/omap4430.h>
+#elif defined(CONFIG_OMAP3430)
+#include <asm/arch/omap3430.h>
+#endif
+
 #include "musb_regs.h"
 
+#if defined(CONFIG_OMAP4430)
 #define OMAP34XX_USB_BASE	   (OMAP44XX_CORE_L4_IO_BASE + 0xAB000)
+#elif defined(CONFIG_OMAP3430)
+#define OMAP34XX_USB_BASE          (OMAP34XX_CORE_L4_IO_BASE + 0xAB000)
+#endif
 
 /* Remap musb */
 

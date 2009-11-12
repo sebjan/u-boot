@@ -27,11 +27,13 @@
 #include <asm/arch/mem.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/arch/sys_info.h>
-#include <asm/arch/usb34xx.h>
+#ifdef CONFIG_OMAP3430
 #include <asm/arch/led.h>
+#endif
 #include <environment.h>
 #include <command.h>
 #include <usbdcore.h>
+#include "usbomap.h"
 #include <fastboot.h>
 #include <twl4030.h>
 
@@ -220,13 +222,16 @@ static void fastboot_bulk_endpoint_reset (void)
 
 static void fastboot_reset (void)
 {
+#ifdef CONFIG_OMAP3430
 	OMAP3_LED_ERROR_ON ();
-
+#endif
 	/* Kill the power */
 	*pwr &= ~MUSB_POWER_SOFTCONN;
 	udelay(2 * 500000); /* 1 sec */
 
+#ifdef CONFIG_OMAP3430
 	OMAP3_LED_ERROR_OFF ();
+#endif
 
 	/* Reset address */
 	faddr = 0xff;
@@ -241,9 +246,9 @@ static void fastboot_reset (void)
 	/* Bulk endpoint fifo */
 	fastboot_bulk_endpoint_reset ();
 	
-
+#ifdef CONFIG_OMAP3430
 	OMAP3_LED_ERROR_ON ();
-
+#endif
 	/* fastboot_db_regs(); */
 }
 
@@ -604,7 +609,9 @@ static int fastboot_poll_h (void)
 
 		if (count0 != 8) 
 		{
+#ifdef CONFIG_OMAP3430
 			OMAP3_LED_ERROR_ON ();
+#endif
 			CONFUSED();
 			ret = 1;
 		}
@@ -746,9 +753,10 @@ static int fastboot_resume (void)
 	{
 		outb (faddr, OMAP34XX_USB_FADDR);
 		set_address = 0;
-
+#ifdef CONFIG_OMAP3430
 		/* If you have gotten here you are mostly ok */
 		OMAP3_LED_OK_ON ();
+#endif
 	}
   
 	return fastboot_poll_h();
@@ -799,7 +807,9 @@ static int fastboot_rx (void)
 
 			/* If the interface did not handle the command */
 			if (err) {
+#ifdef CONFIG_OMAP3430
 				OMAP3_LED_ERROR_ON ();
+#endif
 				CONFUSED();
 			}
 		}
@@ -981,6 +991,8 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 	device_strings[DEVICE_STRING_PRODUCT_INDEX]       = "Zoom2";
 #elif defined (CONFIG_3430LABRADOR)
 	device_strings[DEVICE_STRING_PRODUCT_INDEX]       = "Zoom";
+#elif defined(CONFIG_4430SDP)
+	device_strings[DEVICE_STRING_PRODUCT_INDEX]       = "SDP4";
 #else
 	/* Default, An error message to prompt user */
 #error "Need a product name for fastboot"
