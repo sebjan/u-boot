@@ -50,7 +50,7 @@ OBJS	= 3c589.o 5701rls.o ali512x.o \
 	  videomodes.o w83c553f.o \
 	  ks8695eth.o smsc9118.o \
 	  pxa_pcmcia.o mpc8xx_pcmcia.o tqm8xx_pcmcia.o	\
-	  rpx_pcmcia.o fastboot.o
+	  rpx_pcmcia.o fastboot.o ks885x_interface.o
 
 all:	$(LIB)
 
