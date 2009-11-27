@@ -409,12 +409,6 @@ void start_armboot (void)
 	cs8900_get_enetaddr (gd->bd->bi_enetaddr);
 #endif
 
-#if defined(CONFIG_DRIVER_SMC91111) || defined (CONFIG_DRIVER_LAN91C96)
-	if (getenv ("ethaddr")) {
-		smc_set_mac_addr(gd->bd->bi_enetaddr);
-	}
-#endif /* CONFIG_DRIVER_SMC91111 || CONFIG_DRIVER_LAN91C96 */
-
 	/* Initialize from environment */
 	if ((s = getenv ("loadaddr")) != NULL) {
 		load_addr = simple_strtoul (s, NULL, 16);

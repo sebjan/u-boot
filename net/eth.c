@@ -26,6 +26,15 @@
 #include <net.h>
 #include <miiphy.h>
 
+#include <asm/arch/cpu.h>
+#include <asm/io.h>
+#include <asm/arch/sys_proto.h>
+
+extern int ks8851_eth_init (bd_t * bd);
+extern void ks8851_eth_halt(struct eth_device *dev);
+extern int ks8851_eth_send(struct eth_device *dev, volatile void *packet,int length);
+extern int ks8851_eth_recv(struct eth_device *dev);
+
 #if (CONFIG_COMMANDS & CFG_CMD_NET) && defined(CONFIG_NET_MULTI)
 
 #ifdef CFG_GT_6426x
@@ -54,6 +63,7 @@ extern int scc_initialize(bd_t*);
 extern int skge_initialize(bd_t*);
 extern int tsec_initialize(bd_t*, int, char *);
 extern int npe_initialize(bd_t *);
+extern int ks8851_eth_initialize(bd_t *);
 
 static struct eth_device *eth_devices, *eth_current;
 
@@ -234,6 +244,9 @@ int eth_initialize(bd_t *bis)
 #endif
 #if defined(CONFIG_RTL8169)
 	rtl8169_initialize(bis);
+#endif
+#ifdef CONFIG_MICREL_ETH_KS8851
+        ks8851_eth_initialize(bis);
 #endif
 
 	if (!eth_devices) {
@@ -438,10 +451,33 @@ void eth_set_current(void)
 }
 #endif
 
+#ifdef CONFIG_MICREL_ETH_KS8851
+int ks8851_eth_initialize(bd_t *bis)
+{
+
+	struct eth_device *dev;
+
+	if (!(dev = (struct eth_device *) malloc(sizeof *dev))) {
+		printf("Failed to allocate memory\n");
+		return 0;
+	}
+
+	memset(dev, 0, sizeof(*dev));
+	sprintf(dev->name, "Micrel KS8851SNL");
+	dev->init = ks8851_eth_init;
+	dev->halt = ks8851_eth_halt;
+	dev->send = ks8851_eth_send;
+	dev->recv = ks8851_eth_recv;
+	eth_register(dev);
+	return 1;
+}
+#endif
+
 char *eth_get_name (void)
 {
 	return (eth_current ? eth_current->name : "unknown");
 }
+
 #elif (CONFIG_COMMANDS & CFG_CMD_NET) && !defined(CONFIG_NET_MULTI)
 
 extern int at91rm9200_miiphy_initialize(bd_t *bis);
@@ -471,3 +507,4 @@ int eth_initialize(bd_t *bis)
 	return 0;
 }
 #endif
+

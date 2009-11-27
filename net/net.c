@@ -403,6 +403,7 @@ restart:
 		switch (protocol) {
 		case TFTP:
 			/* always use ARP to get server ethernet address */
+			BootpRequest();
 			TftpStart();
 			break;
 

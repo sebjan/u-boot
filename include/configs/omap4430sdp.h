@@ -100,7 +100,7 @@
 #define NET_CMDS                 (CFG_CMD_DHCP|CFG_CMD_NFS|CFG_CMD_NET)
 
 /* Config CMD*/
-#define CONFIG_COMMANDS          ((CFG_CMD_I2C | CONFIG_CMD_DFL | CFG_CMD_DHCP | \
+#define CONFIG_COMMANDS          ((CFG_CMD_I2C | CONFIG_CMD_DFL | NET_CMDS | \
 	CFG_CMD_JFFS2 | CFG_CMD_MMC | CFG_CMD_FAT) &			\
 	(~CFG_CMD_AUTOSCRIPT | CFG_CMD_NAND | CFG_CMD_ONENAND)) 
 
@@ -115,13 +115,13 @@
 /* this must be included AFTER the definition of CONFIG_COMMANDS (if any) */
 #include <cmd_confdefs.h>
 
+/*  Micrel Inc added for Ethernet support for KS8851SNL driver */
 #if (CONFIG_COMMANDS & CFG_CMD_NET)
-/*
- * SMC91c96 Etherent
- */
-#define CONFIG_DRIVER_LAN91C96
-#define CONFIG_LAN91C96_BASE     (DEBUG_BASE)
-#define CONFIG_LAN91C96_EXT_PHY
+#define CONFIG_MICREL_ETH_KS8851 1
+#define CONFIG_CMD_PING 1
+#define CONFIG_NET_MULTI 1
+#define KS8851_SNL 1
+//#define ET_DEBUG
 #endif
 
 #define NAND_MAX_CHIPS           1
