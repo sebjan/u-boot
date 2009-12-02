@@ -214,7 +214,6 @@ static void spi_init_spi1(void)
 	sr32(0x4A100130, 0, 32, 0x01100118);
 	sr32(0x4A100134, 0, 32, 0x01100110);
 	sr32(0x4A100138, 0, 32, 0x01130110);
-	sr32(0x4A100054, 0, 32, 0x01030103);
 
 	/* Output enable && dataout 1 for gpio 48 to power up ethernet */
 	sr32(0x48055134, 16, 1, 0);
