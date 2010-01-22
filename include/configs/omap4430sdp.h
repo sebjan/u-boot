@@ -109,6 +109,7 @@
 #define CFG_I2C_BUS              0
 #define CFG_I2C_BUS_SELECT       1
 #define CONFIG_DRIVER_OMAP44XX_I2C 1
+#define CONFIG_TWL6030		 1
 
 #define CONFIG_BOOTP_MASK        CONFIG_BOOTP_DEFAULT
 

@@ -30,6 +30,7 @@
 #include <asm/arch/clocks.h>
 #include <asm/arch/mem.h>
 #include <i2c.h>
+#include <twl6030.h>
 #include <asm/mach-types.h>
 #if (CONFIG_COMMANDS & CFG_CMD_NAND) && defined(CFG_NAND_LEGACY)
 #include <linux/mtd/nand_legacy.h>
@@ -220,6 +221,9 @@ int misc_init_r(void)
 {
 #ifdef CONFIG_DRIVER_OMAP44XX_I2C
 	i2c_init(CFG_I2C_SPEED, CFG_I2C_SLAVE);
+#ifdef CONFIG_TWL6030
+	twl6030_init_battery_charging();
+#endif
 #endif
 	return 0;
 }
