@@ -15,7 +15,7 @@
  * no CS pull hign then pull down
  */
 
-#define CLOCK_PARAM	4
+#define CLOCK_PARAM	1
 
 /* the SPI register structure for omap */
 static volatile MCSPI_REGS *gpMCSPIRegs;
