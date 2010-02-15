@@ -268,8 +268,6 @@ initrd=0x81600000,64M ramdisk_size=65536"
 #define CFG_JFFS2_MEM_NAND
 #define CFG_JFFS2_FIRST_BANK	CFG_MAX_FLASH_BANKS /* use flash_info[2] */
 #define CFG_JFFS2_NUM_BANKS	1
-#define CONFIG_LED_INFO
-#define CONFIG_LED_LEN		16
 
 #define ENV_IS_VARIABLE		1
 #endif

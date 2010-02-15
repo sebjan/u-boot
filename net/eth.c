@@ -463,7 +463,7 @@ int ks8851_eth_initialize(bd_t *bis)
 	}
 
 	memset(dev, 0, sizeof(*dev));
-	sprintf(dev->name, "Micrel KS8851SNL");
+	sprintf(dev->name, "KS8851SNL");
 	dev->init = ks8851_eth_init;
 	dev->halt = ks8851_eth_halt;
 	dev->send = ks8851_eth_send;

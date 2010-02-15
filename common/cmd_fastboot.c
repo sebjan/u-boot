@@ -855,7 +855,7 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 			else
 			{
 				char start[32], length[32];
-				int status, repeat, repeat_max;
+				int status = 0, repeat, repeat_max;
 			
 				printf("erasing '%s'\n", ptn->name);   
 
