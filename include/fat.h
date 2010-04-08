@@ -146,7 +146,7 @@ typedef struct volume_info
 	__u8 ext_boot_sign;	/* 0x29 if fields below exist (DOS 3.3+) */
 	__u8 volume_id[4];	/* Volume ID number */
 	char volume_label[11];	/* Volume label */
-	char fs_type[8];	/* Typically FAT12, FAT16, or FAT32 */
+	char fs_type[9];	/* Typically FAT12, FAT16, or FAT32 */
 	/* Boot code comes next, all but 2 bytes to fill up sector */
 	/* Boot sign comes last, 2 bytes */
 } volume_info;
