@@ -36,10 +36,12 @@
 #include "usbomap.h"
 #include <fastboot.h>
 #include <twl4030.h>
+#include <twl6030.h>
 
 #if defined(CONFIG_FASTBOOT)
 
 #define OTG_INTERFSEL 0x4A0AB40C
+#define USBOTGHS_CONTROL 0x4A00233C
 
 #include "usb_debug_macros.h"
 
@@ -63,6 +65,7 @@ static volatile u16 *txmaxp     = (volatile u16 *) OMAP34XX_USB_TXMAXP(BULK_ENDP
 static volatile u8  *bulk_fifo  = (volatile u8  *) OMAP34XX_USB_FIFO(BULK_ENDPOINT);
 
 static volatile u32 *otg_interfsel = (volatile u32  *)OTG_INTERFSEL;
+static volatile u32 *otghs_control = (volatile u32  *)USBOTGHS_CONTROL;
 
 /* This is the TI USB vendor id */
 #define DEVICE_VENDOR_ID  0x0451
@@ -1018,6 +1021,12 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 	fastboot_reset();
 
 	*otg_interfsel &= 0;
+
+	/* Program Phoenix registers VUSB_CFG_STATE and MISC2 */
+	twl6030_usb_device_settings();
+
+	/* Program the control module register */
+	*otghs_control = 0x15;
 
 	/* Check if device is in b-peripheral mode */
 	devctl = inb (OMAP34XX_USB_DEVCTL);

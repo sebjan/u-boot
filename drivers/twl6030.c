@@ -61,4 +61,18 @@ void twl6030_init_battery_charging(void)
 	twl6030_start_usb_charging();
 	return;
 }
+
+void twl6030_usb_device_settings()
+{
+	u8 data = 0;
+
+	/* Select APP Group and set state to ON */
+	twl6030_i2c_write_u8(TWL6030_CHIP_PM, 0x21, VUSB_CFG_STATE);
+
+	twl6030_i2c_read_u8(TWL6030_CHIP_PM, &data, MISC2);
+	data |= 0x10;
+
+	/* Select the input supply for VBUS regulator */
+	twl6030_i2c_write_u8(TWL6030_CHIP_PM, data, MISC2);
+}
 #endif

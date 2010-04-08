@@ -84,6 +84,8 @@
 #define CONTROLLER_CTRL1_EN_CHARGER	(1 << 4)
 #define CONTROLLER_CTRL1_SEL_CHARGER	(1 << 3)
 
+#define VUSB_CFG_STATE		0xA2
+#define MISC2			0xE5
 
 void twl6030_init_battery_charging(void);
-
+void twl6030_usb_device_settings(void);
