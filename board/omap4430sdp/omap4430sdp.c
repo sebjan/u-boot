@@ -468,7 +468,7 @@ int dram_init(void)
 	MV(CP(MCSPI4_CS0),	(PTD | IEN | OFF_EN | OFF_PD | OFF_IN | M0)) /* mcspi4_cs0 */ \
 	MV(CP(UART4_RX),	(IEN | M0)) /* uart4_rx */ \
 	MV(CP(UART4_TX),	(M0)) /* uart4_tx */ \
-	MV(CP(USBB2_ULPITLL_CLK),	(M3)) /* gpio_157 */ \
+	MV(CP(USBB2_ULPITLL_CLK),	(PTD | IEN | M3)) /* gpio_157 */ \
 	MV(CP(USBB2_ULPITLL_STP),	(M5)) /* dispc2_data23 */ \
 	MV(CP(USBB2_ULPITLL_DIR),	(M5)) /* dispc2_data22 */ \
 	MV(CP(USBB2_ULPITLL_NXT),	(M5)) /* dispc2_data21 */ \
@@ -669,7 +669,7 @@ int dram_init(void)
 	MV(CP(MCSPI4_CS0),	(PTD | IEN | OFF_EN | OFF_PD | OFF_IN | M0)) /* mcspi4_cs0 */ \
 	MV(CP(UART4_RX),	(IEN | M0)) /* uart4_rx */ \
 	MV(CP(UART4_TX),	(M0)) /* uart4_tx */ \
-	MV(CP(USBB2_ULPITLL_CLK),	(M3)) /* gpio_157 */ \
+	MV(CP(USBB2_ULPITLL_CLK),	(PTD | IEN | M3)) /* gpio_157 */ \
 	MV(CP(USBB2_ULPITLL_STP),	(M5)) /* dispc2_data23 */ \
 	MV(CP(USBB2_ULPITLL_DIR),	(M5)) /* dispc2_data22 */ \
 	MV(CP(USBB2_ULPITLL_NXT),	(M5)) /* dispc2_data21 */ \
@@ -705,7 +705,7 @@ int dram_init(void)
 	MV(CP(SYS_BOOT0),	(M3_SAFE)) /* gpio_184 */ \
 	MV(CP(SYS_BOOT1),	(M3_SAFE)) /* gpio_185 */ \
 	MV(CP(SYS_BOOT2),	(M3_SAFE)) /* gpio_186 */ \
-	MV(CP(SYS_BOOT3),	(M3_SAFE)) /* gpio_187 */ \
+	MV(CP(SYS_BOOT3),	(PTD | IEN | M3)) /* gpio_187 */ \
 	MV(CP(SYS_BOOT4),	(M3_SAFE)) /* gpio_188 */ \
 	MV(CP(SYS_BOOT5),	(M3_SAFE)) /* gpio_189 */ \
 	MV(CP(DPM_EMU0),	(M0_SAFE)) /* dpm_emu0 */ \
