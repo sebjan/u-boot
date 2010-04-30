@@ -600,8 +600,8 @@ U_BOOT_CMD(
     ((CONFIG_COMMANDS & (CFG_CMD_ENV|CFG_CMD_MMC)) == \
       (CFG_CMD_ENV|CFG_CMD_MMC))
 U_BOOT_CMD(
-	saveenv, 1, 0,	do_saveenv,
-	"saveenv - save environment variables to persistent storage\n",
+	emmcsaveenv, 1, 0,	do_saveenv,
+	"emmcsaveenv - save environment variables to persistent storage\n",
 	NULL
 );
 
