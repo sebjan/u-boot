@@ -35,6 +35,24 @@
 #if (CONFIG_COMMANDS & CFG_CMD_NAND) && defined(CFG_NAND_LEGACY)
 #include <linux/mtd/nand_legacy.h>
 #endif
+#include <environment.h>
+
+extern uchar(*boot_env_get_char_spec) (int index);
+extern int (*boot_env_init) (void);
+extern int (*boot_saveenv) (void);
+extern void (*boot_env_relocate_spec) (void);
+
+/* StrataNor */
+extern uchar mmc_env_get_char_spec(int index);
+extern int mmc_env_init(void);
+extern int mmc_saveenv(void);
+extern void mmc_env_relocate_spec(void);
+extern char *mmc_env_name_spec;
+
+char *env_name_spec;
+/* update these elsewhere */
+env_t *env_ptr;
+
 
 /*******************************************************
  * Routine: delay
@@ -54,7 +72,16 @@ int board_init(void)
 {
 	DECLARE_GLOBAL_DATA_PTR;
 
-	gpmc_init();		/* in SRAM or SDRAM, finish GPMC */
+	/* Intializing env functional pointers with eMMC */
+	boot_env_get_char_spec = mmc_env_get_char_spec;
+	boot_env_init = mmc_env_init;
+	boot_saveenv = mmc_saveenv;
+	boot_env_relocate_spec = mmc_env_relocate_spec;
+	env_ptr = (env_t *) (CFG_FLASH_BASE + CFG_ENV_OFFSET);
+	env_name_spec = mmc_env_name_spec;
+
+	/* REVISIT once if NAND/NOR/OneNAND support is provided OMAP4SDP */
+	gpmc_init(); /* in SRAM or SDRAM, finish GPMC */
 	/* board id for Linux */
 	gd->bd->bi_arch_number = MACH_TYPE_OMAP_4430SDP;
 	gd->bd->bi_boot_params = (0x80000000 + 0x100); /* boot param addr */

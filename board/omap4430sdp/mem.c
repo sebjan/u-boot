@@ -67,11 +67,6 @@ u8 is_flash;
 u8 is_onenand;
 #endif
 
-char *env_name_spec;
-/* update these elsewhere */
-env_t *env_ptr;
-
-
 #endif				/* ENV_IS_VARIABLE */
 
 /* SDP4430 Board CS Organization
@@ -140,12 +135,11 @@ uchar env_get_char_spec(int index)
 }
 int env_init(void)
 {
-/*
- * Nand, Nor and Flash support not there
-*     REVISIT
-*/
-       return 0;
-
+	if (!boot_env_init)
+		puts("ERROR!! boot_env_init not available\n");
+	else
+		return boot_env_init();
+	return -1;
 }
 int saveenv(void)
 {

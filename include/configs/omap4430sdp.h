@@ -226,6 +226,8 @@ initrd=0x81600000,64M ramdisk_size=65536"
 #define PHYS_FLASH_SIZE_SDPV2	SZ_128M
 #define PHYS_FLASH_SIZE		SZ_32M
 
+/* REVISIT if once NAND/NOR/ONENAND support is added on OMAP4SDP */
+#ifdef OMAP4_NAND_NOR_ONENAND
 #define CFG_FLASH_BASE		boot_flash_base
 #define PHYS_FLASH_SECT_SIZE	boot_flash_sec
 /* Dummy declaration of flash banks to get compilation right */
@@ -243,6 +245,19 @@ initrd=0x81600000,64M ramdisk_size=65536"
 #define CFG_ENV_SECT_SIZE	boot_flash_sec
 #define CFG_ENV_OFFSET		boot_flash_off
 #define CFG_ENV_ADDR		boot_flash_env_addr
+#endif
+
+#define CFG_MONITOR_BASE	CFG_FLASH_BASE /* Monitor at start of flash */
+#define CFG_ONENAND_BASE	ONENAND_MAP
+
+/* eMMC Variables */
+#define CFG_ENV_IS_IN_EMMC	1
+#define CFG_FLASH_BASE		0x0
+#define CFG_ENV_SECT_SIZE	SZ_128K
+#define CFG_ENV_OFFSET		0x700
+#define CFG_ENV_ADDR		0x700
+
+#define ENV_IS_VARIABLE		1
 
 /* Fastboot variables */
 #define CFG_FASTBOOT_TRANSFER_BUFFER (PHYS_SDRAM_1 + SZ_16M)
