@@ -42,7 +42,7 @@ static block_dev_desc_t mmc_blk_dev[2];
 block_dev_desc_t *mmc_get_dev(int dev)
 {
 	if ((dev == 0) || (dev == 1))
-		return (block_dev_desc_t *) &mmc_blk_dev;
+		return (block_dev_desc_t *) &mmc_blk_dev[dev];
 	else
 		return NULL;
 }
@@ -764,6 +764,7 @@ int mmc_init(int slot)
 		mmc_blk_dev[slot].lba = 0x10000;
 		mmc_blk_dev[slot].removable = 0;
 		mmc_blk_dev[slot].block_read = mmc_bread;
+		fat_register_device(&mmc_blk_dev[slot], 1);
 		break;
 	default:
 		printf("mmc_init:mmc slot is not supported%d\n", slot);
