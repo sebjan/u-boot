@@ -145,9 +145,9 @@ int ks8851_get_ethaddr (bd_t * bd)
 	HW_READ_WORD(pHardware, REG_MAC_ADDR_0, &ethaddr_rom_data[0]);
 	
 	printf("ethaddr rom: %02X:%02X:%02X:%02X:%02X:%02X\n",
-			ethaddr_rom_data[4], ethaddr_rom_data[5],
-			ethaddr_rom_data[2], ethaddr_rom_data[3],
-			ethaddr_rom_data[0], ethaddr_rom_data[1]);	
+			ethaddr_rom_data[5], ethaddr_rom_data[4],
+			ethaddr_rom_data[3], ethaddr_rom_data[2],
+			ethaddr_rom_data[1], ethaddr_rom_data[0]);
 
 	if (ethaddr_rom_data != sizeof(ethaddr_pattern)) {
 		ethaddr_rom_set = 1;
