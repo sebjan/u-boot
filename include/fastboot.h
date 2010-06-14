@@ -90,6 +90,8 @@
 #define CFG_FASTBOOT_MKBOOTIMAGE_PAGE_SIZE 2048
 #endif
 
+typedef enum { NAND, EMMC } storage_medium_type;
+
 struct cmd_fastboot_interface
 {
 	/* This function is called when a buffer has been 
@@ -121,6 +123,9 @@ struct cmd_fastboot_interface
 
 	   Set by board */
 	char *serial_no;
+
+	/* To determine the storage type NAND or EMMC */
+	storage_medium_type storage_medium;
 
 	/* Nand block size 
 	   Supports the write option WRITE_NEXT_GOOD_BLOCK 
