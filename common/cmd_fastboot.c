@@ -90,6 +90,7 @@ static struct cmd_fastboot_interface interface =
 	.reset_handler         = reset_handler,
 	.product_name          = NULL,
 	.serial_no             = NULL,
+	.storage_medium        = 0,
 	.nand_block_size       = 0,
 	.transfer_buffer       = (unsigned char *)0xffffffff,
 	.transfer_buffer_size  = 0,
@@ -725,32 +726,35 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 				printf ("\ndownloading of %d bytes finished\n",
 					download_bytes);
 
-				/* Pad to block length
-				   In most cases, padding the download to be
-				   block aligned is correct. The exception is
-				   when the following flash writes to the oob
-				   area.  This happens when the image is a
-				   YAFFS image.  Since we do not know what
-				   the download is until it is flashed,
-				   go ahead and pad it, but save the true
-				   size in case if should have
-				   been unpadded */
-				download_bytes_unpadded = download_bytes;
-				if (interface.nand_block_size)
-				{
-					if (download_bytes % 
-					    interface.nand_block_size)
+				/* Padding is required only if storage medium is NAND */
+				if (interface.storage_medium == NAND) {
+					/* Pad to block length
+					   In most cases, padding the download to be
+					   block aligned is correct. The exception is
+					   when the following flash writes to the oob
+					   area.  This happens when the image is a
+					   YAFFS image.  Since we do not know what
+					   the download is until it is flashed,
+					   go ahead and pad it, but save the true
+					   size in case if should have
+					   been unpadded */
+					download_bytes_unpadded = download_bytes;
+					if (interface.nand_block_size)
 					{
-						unsigned int pad = interface.nand_block_size - (download_bytes % interface.nand_block_size);
-						unsigned int i;
-						
-						for (i = 0; i < pad; i++) 
+						if (download_bytes %
+						    interface.nand_block_size)
 						{
-							if (download_bytes >= interface.transfer_buffer_size)
-								break;
-							
-							interface.transfer_buffer[download_bytes] = 0;
-							download_bytes++;
+							unsigned int pad = interface.nand_block_size - (download_bytes % interface.nand_block_size);
+							unsigned int i;
+
+							for (i = 0; i < pad; i++)
+							{
+								if (download_bytes >= interface.transfer_buffer_size)
+									break;
+
+								interface.transfer_buffer[download_bytes] = 0;
+								download_bytes++;
+							}
 						}
 					}
 				}
@@ -845,55 +849,59 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 		   Board has to set up flash partitions */
 
 		if(memcmp(cmdbuf, "erase:", 6) == 0){
-			struct fastboot_ptentry *ptn;
 
-			ptn = fastboot_flash_find_ptn(cmdbuf + 6);
-			if(ptn == 0) 
-			{
-				sprintf(response, "FAILpartition does not exist");
-			}
-			else
-			{
-				char start[32], length[32];
-				int status = 0, repeat, repeat_max;
-			
-				printf("erasing '%s'\n", ptn->name);   
+			if (interface.storage_medium == NAND) {
+				/* storage medium is NAND */
 
-				char *lock[5]   = { "nand", "lock",   NULL, NULL, NULL, };
-				char *unlock[5] = { "nand", "unlock", NULL, NULL, NULL,	};
-				char *erase[5]  = { "nand", "erase",  NULL, NULL, NULL, };
-			
-				lock[2] = unlock[2] = erase[2] = start;
-				lock[3] = unlock[3] = erase[3] = length;
+				struct fastboot_ptentry *ptn;
 
-				repeat_max = 1;
-				if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_REPEAT_MASK)
-					repeat_max = ptn->flags & FASTBOOT_PTENTRY_FLAGS_REPEAT_MASK;
-
-				sprintf (length, "0x%x", ptn->length);
-				for (repeat = 0; repeat < repeat_max; repeat++) 
+				ptn = fastboot_flash_find_ptn(cmdbuf + 6);
+				if (ptn == 0)
 				{
-					sprintf (start, "0x%x", ptn->start + (repeat * ptn->length));
+					sprintf(response, "FAILpartition does not exist");
+				}
+				else
+				{
+					char start[32], length[32];
+					int status = 0, repeat, repeat_max;
+
+					printf("erasing '%s'\n", ptn->name);
+
+					char *lock[5]   = { "nand", "lock",   NULL, NULL, NULL, };
+					char *unlock[5] = { "nand", "unlock", NULL, NULL, NULL,	};
+					char *erase[5]  = { "nand", "erase",  NULL, NULL, NULL, };
+
+					lock[2] = unlock[2] = erase[2] = start;
+					lock[3] = unlock[3] = erase[3] = length;
+
+					repeat_max = 1;
+					if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_REPEAT_MASK)
+						repeat_max = ptn->flags & FASTBOOT_PTENTRY_FLAGS_REPEAT_MASK;
+
+					sprintf (length, "0x%x", ptn->length);
+					for (repeat = 0; repeat < repeat_max; repeat++)
+					{
+						sprintf (start, "0x%x", ptn->start + (repeat * ptn->length));
 #if 0
-					do_nand (NULL, 0, 4, unlock);
-					status = do_nand (NULL, 0, 4, erase);
-					do_nand (NULL, 0, 4, lock);
+						do_nand (NULL, 0, 4, unlock);
+						status = do_nand (NULL, 0, 4, erase);
+						do_nand (NULL, 0, 4, lock);
 #endif
 
-					if (status)
-						break;
-				}
+						if (status)
+							break;
+					}
 
-				if (status)
-				{
-					sprintf(response,"FAILfailed to erase partition");
-				} 
-				else 
-				{
-					printf("partition '%s' erased\n", ptn->name);
-					sprintf(response, "OKAY");
+					if (status)
+					{
+						sprintf(response, "FAILfailed to erase partition");
+					}
+					else
+					{
+						printf("partition '%s' erased\n", ptn->name);
+						sprintf(response, "OKAY");
+					}
 				}
-			
 			}
 			ret = 0;
 		}
@@ -1136,46 +1144,50 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 
 		if(memcmp(cmdbuf, "flash:", 6) == 0) {
 
-			if (download_bytes) 
-			{
-				struct fastboot_ptentry *ptn;
-			
-				ptn = fastboot_flash_find_ptn(cmdbuf + 6);
-				if (ptn == 0) {
-					sprintf(response, "FAILpartition does not exist");
-				} else if ((download_bytes > ptn->length) &&
-					   !(ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_ENV)) {
-					sprintf(response, "FAILimage too large for partition");
-					/* TODO : Improve check for yaffs write */
-				} else {
-					/* Check if this is not really a flash write
-					   but rather a saveenv */
-					if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_ENV) {
-						/* Since the response can only be 64 bytes,
-						   there is no point in having a large error message. */
-						char err_string[32];
-						if (saveenv_to_ptn(ptn, &err_string[0])) {
-							printf("savenv '%s' failed : %s\n", ptn->name, err_string);
-							sprintf(response, "FAIL%s", err_string);
-						} else {
-							printf("partition '%s' saveenv-ed\n", ptn->name);
-							sprintf(response, "OKAY");
-						}
+			if (interface.storage_medium == NAND) {
+				/* storage medium is NAND */
+
+				if (download_bytes)
+				{
+					struct fastboot_ptentry *ptn;
+
+					ptn = fastboot_flash_find_ptn(cmdbuf + 6);
+					if (ptn == 0) {
+						sprintf(response, "FAILpartition does not exist");
+					} else if ((download_bytes > ptn->length) &&
+						   !(ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_ENV)) {
+						sprintf(response, "FAILimage too large for partition");
+						/* TODO : Improve check for yaffs write */
 					} else {
-						/* Normal case */
-						if (write_to_ptn(ptn)) {
-							printf("flashing '%s' failed\n", ptn->name);
-							sprintf(response, "FAILfailed to flash partition");
+						/* Check if this is not really a flash write
+						   but rather a saveenv */
+						if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_ENV) {
+							/* Since the response can only be 64 bytes,
+							   there is no point in having a large error message. */
+							char err_string[32];
+							if (saveenv_to_ptn(ptn, &err_string[0])) {
+								printf("savenv '%s' failed : %s\n", ptn->name, err_string);
+								sprintf(response, "FAIL%s", err_string);
+							} else {
+								printf("partition '%s' saveenv-ed\n", ptn->name);
+								sprintf(response, "OKAY");
+							}
 						} else {
-							printf("partition '%s' flashed\n", ptn->name);
-							sprintf(response, "OKAY");
+							/* Normal case */
+							if (write_to_ptn(ptn)) {
+								printf("flashing '%s' failed\n", ptn->name);
+								sprintf(response, "FAILfailed to flash partition");
+							} else {
+								printf("partition '%s' flashed\n", ptn->name);
+								sprintf(response, "OKAY");
+							}
 						}
 					}
 				}
-			}
-			else
-			{
-				sprintf(response, "FAILno image downloaded");
+				else
+				{
+					sprintf(response, "FAILno image downloaded");
+				}
 			}
 
 			ret = 0;
