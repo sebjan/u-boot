@@ -38,7 +38,6 @@
  *
  **************************************************************************
  */
-
 #include <common.h>
 #include <command.h>
 #include <environment.h>
@@ -542,10 +541,41 @@ int getenv_r (char *name, char *buf, unsigned len)
 int do_saveenv (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
 	extern char * env_name_spec;
+	char c;
 
-	printf ("Saving Environment to %s...\n", env_name_spec);
+	if (argc > 2)
+		goto env_cmd_usage;
 
-	return (saveenv() ? 1 : 0);
+	if (argc == 1) {
+		printf("Type 'y' or 'Y' to Save Environment to %s..\n",
+							env_name_spec);
+		for (;;) {
+			c = serial_getc();
+			switch (c) {
+			case 'y':
+			case 'Y':
+				printf("Saving Environment to %s...\n",
+								env_name_spec);
+				return saveenv() ? 1 : 0;
+			default:
+				printf("Not Saving Environment to %s...\n",
+								env_name_spec);
+				return 1;
+			}
+		}
+	}
+	if (argc == 2) {
+		if (strncmp(argv[1] , "-f", 2) != 0) {
+			goto env_cmd_usage;
+		} else {
+			printf("Saving Environment to %s...\n", env_name_spec);
+			return saveenv() ? 1 : 0;
+		}
+	}
+
+env_cmd_usage:
+	printf("Usage:\n%s\n", cmdtp->usage);
+	return 1;
 }
 
 
@@ -600,9 +630,10 @@ U_BOOT_CMD(
     ((CONFIG_COMMANDS & (CFG_CMD_ENV|CFG_CMD_MMC)) == \
       (CFG_CMD_ENV|CFG_CMD_MMC))
 U_BOOT_CMD(
-	emmcsaveenv, 1, 0,	do_saveenv,
-	"emmcsaveenv - save environment variables to persistent storage\n",
-	NULL
+	saveenv, 2, 0,	do_saveenv,
+	"saveenv - save environment variables to persistent storage\n",
+	"\n"
+	"saveenv -force \n"
 );
 
 #endif	/* CFG_CMD_ENV */

@@ -107,9 +107,9 @@ mmc_cmd_usage:
 }
 
 U_BOOT_CMD(mmcinit, 6, 1, do_mmc,
-	"mmcinit <controller[0/1]>\n"
+	"MMC sub system\n",
+	" <controller[0/1]>\n"
 	"mmc <controller[0/1]> read <src> <dst> <size>\n"
 	"mmc <controller[0/1]> write <src> <dst> <size>\n"
-	"mmc <controller[0/1]> erase <start> <size>\n",
-	NULL);
+	"mmc <controller[0/1]> erase <start> <size>\n");
 #endif  /* CFG_CMD_MMC */
