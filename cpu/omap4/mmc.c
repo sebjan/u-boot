@@ -733,68 +733,82 @@ unsigned long mmc_bread(int dev_num, ulong blknr, ulong blkcnt, ulong *dst)
 
 int mmc_init(int slot)
 {
+	int ret = 1;
+
 	switch (slot) {
 	case 0:
 		configure_controller(&cur_controller_data[slot], slot);
-		configure_mmc(&cur_card_data[slot], &cur_controller_data[slot]);
-		mmc_blk_dev[slot].if_type = IF_TYPE_MMC;
-		mmc_blk_dev[slot].part_type = PART_TYPE_DOS;
-		mmc_blk_dev[slot].dev = cur_controller_data[slot].slot;
-		mmc_blk_dev[slot].lun = 0;
-		mmc_blk_dev[slot].type = 0;
-
-		/* FIXME fill in the correct size (is set to 32MByte) */
-		mmc_blk_dev[slot].blksz = MMCSD_SECTOR_SIZE;
-		mmc_blk_dev[slot].lba = 0x10000;
-		mmc_blk_dev[slot].removable = 0;
-		mmc_blk_dev[slot].block_read = mmc_bread;
-		fat_register_device(&mmc_blk_dev[slot], 1);
+		ret = configure_mmc(&cur_card_data[slot],
+					&cur_controller_data[slot]);
 		break;
 	case 1:
 		configure_controller(&cur_controller_data[slot], slot);
-		configure_mmc(&cur_card_data[slot], &cur_controller_data[slot]);
+		ret = configure_mmc(&cur_card_data[slot],
+					&cur_controller_data[slot]);
+		break;
+	default:
+		printf("mmc_init:mmc slot is not supported%d\n", slot);
+	}
+
+	if (ret != 1) {
+		mmc_blk_dev[slot].dev = -1;
+	} else {
 		mmc_blk_dev[slot].if_type = IF_TYPE_MMC;
 		mmc_blk_dev[slot].part_type = PART_TYPE_DOS;
 		mmc_blk_dev[slot].dev = cur_controller_data[slot].slot;
 		mmc_blk_dev[slot].lun = 0;
 		mmc_blk_dev[slot].type = 0;
-
 		/* FIXME fill in the correct size (is set to 32MByte) */
 		mmc_blk_dev[slot].blksz = MMCSD_SECTOR_SIZE;
 		mmc_blk_dev[slot].lba = 0x10000;
 		mmc_blk_dev[slot].removable = 0;
 		mmc_blk_dev[slot].block_read = mmc_bread;
 		fat_register_device(&mmc_blk_dev[slot], 1);
-		break;
-	default:
-		printf("mmc_init:mmc slot is not supported%d\n", slot);
 	}
   	return 0;
 }
 
 int mmc_read(int mmc_cont, unsigned int src, unsigned char *dst, int size)
 {
-	int ret;
+	int ret = 1;
 
-	ret = omap_mmc_read_sect(src, size, &cur_controller_data[mmc_cont],
+	if (mmc_blk_dev[mmc_cont].dev == -1) {
+		printf("Read not permitted as Card on SLOT-%d \
+						not Initialized\n");
+	} else {
+		ret = omap_mmc_read_sect(src, size,
+			&cur_controller_data[mmc_cont],
 			&cur_card_data[mmc_cont], (unsigned int *)dst);
+	}
 	return ret;
 }
+
 int mmc_write(int mmc_cont, unsigned char *src, unsigned long dst, int size)
 {
-	int ret;
+	int ret = 1;
 
-	ret = omap_mmc_write_sect((unsigned int *)src, size,
-		&cur_controller_data[mmc_cont], &cur_card_data[mmc_cont], dst);
+	if (mmc_blk_dev[mmc_cont].dev == -1) {
+		printf("Write not permitted as Card on SLOT-%d \
+					not Initialized\n");
+	} else {
+		ret = omap_mmc_write_sect((unsigned int *)src, size,
+			&cur_controller_data[mmc_cont],
+			&cur_card_data[mmc_cont], dst);
+	}
 	return ret;
 }
 
 int mmc_erase(int mmc_cont, unsigned int start, int size)
 {
-	int ret;
+	int ret = 1;
 
-	ret = omap_mmc_erase_sect(start, &cur_controller_data[mmc_cont],
-					&cur_card_data[mmc_cont], size);
+	if (mmc_blk_dev[mmc_cont].dev == -1) {
+		printf("Erase not permitted as Card on SLOT-%d \
+					not Initialized\n");
+	} else {
+		ret = omap_mmc_erase_sect(start, &cur_controller_data[mmc_cont],
+						&cur_card_data[mmc_cont], size);
+	}
 	return ret;
 }
 #endif
