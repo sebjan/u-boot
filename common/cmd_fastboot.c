@@ -59,6 +59,7 @@
 #include <command.h>
 #include <nand.h>
 #include <fastboot.h>
+#include <environment.h>
 
 #if (CONFIG_FASTBOOT)
 
@@ -68,6 +69,7 @@ extern int do_reset (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
 #if (CONFIG_MMC)
 extern int do_mmc(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
 #endif
+extern env_t *env_ptr;
 
 #if 0
 /* Use do_nand for fastboot's flash commands */
@@ -902,7 +904,56 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 						sprintf(response, "OKAY");
 					}
 				}
+			} else if (interface.storage_medium == EMMC) {
+				/* storage medium is EMMC */
+
+				struct fastboot_ptentry *ptn;
+
+				/* Save the MMC controller number */
+				mmc_controller_no = 1;
+
+				/* Find the partition and erase it */
+				ptn = fastboot_flash_find_ptn(cmdbuf + 6);
+
+				if (ptn == 0) {
+					sprintf(response,
+					"FAIL: partition doesn't exist");
+				} else {
+					/* Call MMC erase function here */
+					char start[32], length[32];
+					char slot_no[32];
+
+					char *erase[5]  = { "mmc", NULL, "erase",
+							NULL, NULL, };
+					char *mmc_init[2] = {"mmcinit", NULL,};
+
+					mmc_init[1] = slot_no;
+					erase[1] = slot_no;
+					erase[3] = start;
+					erase[4] = length;
+
+					sprintf(slot_no, "%d", mmc_controller_no);
+					sprintf(length, "0x%x", ptn->length);
+					sprintf(start, "0x%x", ptn->start);
+
+					printf("Initializing '%s'\n", ptn->name);
+					if (do_mmc(NULL, 0, 2, mmc_init))
+						sprintf(response, "FAIL: Init of MMC card");
+					else
+						sprintf(response, "OKAY");
+
+
+					printf("Erasing '%s'\n", ptn->name);
+					if (do_mmc(NULL, 0, 5, erase)) {
+						printf("Erasing '%s' FAILED!\n", ptn->name);
+						sprintf(response, "FAIL: Erase partition");
+					} else {
+						printf("Erasing '%s' DONE!\n", ptn->name);
+						sprintf(response, "OKAY");
+					}
+				}
 			}
+
 			ret = 0;
 		}
 
@@ -1186,6 +1237,86 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 				}
 				else
 				{
+					sprintf(response, "FAILno image downloaded");
+				}
+			} else if (interface.storage_medium == EMMC) {
+				/* storage medium is EMMC */
+
+				if (download_bytes) {
+
+					struct fastboot_ptentry *ptn;
+					char *argv[2] = {NULL, "-f"};
+
+					/* Save the MMC controller number */
+					mmc_controller_no = 1;
+
+					/* Next is the partition name */
+					ptn = fastboot_flash_find_ptn(cmdbuf + 6);
+
+					if (ptn == 0) {
+						printf("Partition:'%s' does not exist\n", ptn->name);
+						sprintf(response, "FAILpartition does not exist");
+					} else if ((download_bytes > ptn->length) &&
+						!(ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_ENV)) {
+						printf("Image too large for the partition\n");
+						sprintf(response, "FAILimage too large for partition");
+						} else if (ptn->flags & FASTBOOT_PTENTRY_FLAGS_WRITE_ENV) {
+						/* Check if this is not really a flash write,
+						 * but instead a saveenv
+						 */
+						unsigned int i = 0;
+						/* Env file is expected with a NULL delimeter between
+						 * env variables So replace New line Feeds (0x0a) with
+						 * NULL (0x00)
+						 */
+						for (i = 0; i < download_bytes; i++) {
+							if (interface.transfer_buffer[i] == 0x0a)
+								interface.transfer_buffer[i] = 0x00;
+						}
+						memset(env_ptr->data, 0, ENV_SIZE);
+						memcpy(env_ptr->data, interface.transfer_buffer, download_bytes);
+						do_saveenv(NULL, 0, 2, argv);
+						printf("saveenv to '%s' DONE!\n", ptn->name);
+						sprintf(response, "OKAY");
+					} else {
+						/* Normal case */
+
+						char source[32], dest[32], length[32];
+						char slot_no[32];
+
+						printf("writing to partition '%s'\n", ptn->name);
+						char *mmc_write[6]  = {"mmc", NULL, "write", NULL, NULL, NULL};
+						char *mmc_init[2] = {"mmcinit", NULL,};
+
+						mmc_init[1] = slot_no;
+						mmc_write[1] = slot_no;
+						mmc_write[3] = source;
+						mmc_write[4] = dest;
+						mmc_write[5] = length;
+
+						sprintf(slot_no, "%d", mmc_controller_no);
+						sprintf(source, "0x%x", interface.transfer_buffer);
+						sprintf(dest, "0x%x", ptn->start);
+						sprintf(length, "0x%x", download_bytes);
+
+						printf("Initializing '%s'\n", ptn->name);
+						if (do_mmc(NULL, 0, 2, mmc_init))
+							sprintf(response, "FAIL:Init of MMC card");
+						else
+							sprintf(response, "OKAY");
+
+
+						printf("Writing '%s'\n", ptn->name);
+						if (do_mmc(NULL, 0, 6, mmc_write)) {
+							printf("Writing '%s' FAILED!\n", ptn->name);
+							sprintf(response, "FAIL: Write partition");
+						} else {
+							printf("Writing '%s' DONE!\n", ptn->name);
+							sprintf(response, "OKAY");
+						}
+					}
+
+				} else {
 					sprintf(response, "FAILno image downloaded");
 				}
 			}
