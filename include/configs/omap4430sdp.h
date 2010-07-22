@@ -261,7 +261,7 @@ initrd=0x81600000,64M ramdisk_size=65536"
 
 /* Fastboot variables */
 #define CFG_FASTBOOT_TRANSFER_BUFFER (PHYS_SDRAM_1 + SZ_16M)
-#define CFG_FASTBOOT_TRANSFER_BUFFER_SIZE (SZ_128M - SZ_16M)
+#define CFG_FASTBOOT_TRANSFER_BUFFER_SIZE (SZ_512M - SZ_16M)
 
 
 /*-----------------------------------------------------------------------
