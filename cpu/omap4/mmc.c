@@ -181,18 +181,24 @@ unsigned char mmc_send_cmd(unsigned int base, unsigned int cmd,
 			unsigned int arg, unsigned int *response)
 {
 	unsigned int mmc_stat;
+	unsigned int cmd_index = cmd >> 24;
 
 	while (1) {
 		if ((OMAP_HSMMC_PSTATE(base) & DATI_MASK) != DATI_CMDDIS)
 		break;
 	}
 
-	OMAP_HSMMC_BLK(base) = BLEN_512BYTESLEN | NBLK_STPCNT;
 	OMAP_HSMMC_STAT(base) = 0xFFFFFFFF;
 	OMAP_HSMMC_ARG(base) = arg;
-	OMAP_HSMMC_CMD(base) = cmd | CMD_TYPE_NORMAL | CICE_NOCHECK |
-	    CCCE_NOCHECK | MSBS_SGLEBLK | ACEN_DISABLE | BCE_DISABLE |
-	    DE_DISABLE;
+	if (cmd_index == 0x19) { /* CMD25: Multi block write */
+		OMAP_HSMMC_CMD(base) = cmd | CMD_TYPE_NORMAL | CICE_NOCHECK |
+			CCCE_NOCHECK | MSBS | BCE | ACEN_DISABLE | DE_DISABLE;
+	} else {
+		OMAP_HSMMC_BLK(base) = BLEN_512BYTESLEN | NBLK_STPCNT;
+		OMAP_HSMMC_CMD(base) = cmd | CMD_TYPE_NORMAL | CICE_NOCHECK |
+		CCCE_NOCHECK | MSBS_SGLEBLK | ACEN_DISABLE | BCE_DISABLE |
+			DE_DISABLE;
+	}
 
 	while (1) {
 		do {
@@ -524,6 +530,7 @@ unsigned char omap_mmc_write_sect(unsigned int *input_buf,
 	unsigned int num_sec_val =
 		(num_bytes + (MMCSD_SECTOR_SIZE - 1)) / MMCSD_SECTOR_SIZE;
 	unsigned int sec_inc_val;
+	unsigned int blk_cnt_current_tns;
 
 	if (num_sec_val == 0) {
 		printf("mmc write: Invalid size\n");
@@ -537,19 +544,41 @@ unsigned char omap_mmc_write_sect(unsigned int *input_buf,
 		argument = start_sec * MMCSD_SECTOR_SIZE;
 		sec_inc_val = MMCSD_SECTOR_SIZE;
 	}
-	while (num_sec_val) {
-		err = mmc_send_cmd(mmc_cont_cur->base, MMC_CMD24,
-							argument, resp);
-		if (err != 1)
-			return err;
 
+	while (num_sec_val) {
+		if (num_sec_val > 0xFFFF)
+			/* Max number of blocks per cmd */
+			blk_cnt_current_tns = 0xFFFF;
+		else
+			blk_cnt_current_tns = num_sec_val;
+
+		/* check for Multi Block */
+		if (blk_cnt_current_tns > 1) {
+			err = mmc_send_cmd(mmc_cont_cur->base, MMC_CMD23,
+					blk_cnt_current_tns, resp);
+			if (err != 1)
+				return err;
+
+			OMAP_HSMMC_BLK(mmc_cont_cur->base) = BLEN_512BYTESLEN |
+						(blk_cnt_current_tns << 16);
+
+			err = mmc_send_cmd(mmc_cont_cur->base,
+						MMC_CMD25, argument, resp);
+			if (err != 1)
+				return err;
+		} else {
+			err = mmc_send_cmd(mmc_cont_cur->base, MMC_CMD24,
+								argument, resp);
+			if (err != 1)
+				return err;
+		}
 		err = mmc_write_data(mmc_cont_cur->base, input_buf);
 		if (err != 1)
 			return err;
 
-		input_buf += (MMCSD_SECTOR_SIZE / 4);
-		argument += sec_inc_val;
-		num_sec_val--;
+		input_buf += (MMCSD_SECTOR_SIZE / 4) * blk_cnt_current_tns;
+		argument += sec_inc_val * blk_cnt_current_tns;
+		num_sec_val -= blk_cnt_current_tns;
 	}
 	return 1;
 }
@@ -563,6 +592,7 @@ unsigned char omap_mmc_erase_sect(unsigned int start,
 	unsigned int sec_inc_val;
 	unsigned int resp[4];
 	unsigned int mmc_stat;
+	unsigned int blk_cnt_current_tns;
 
 	if ((start / MMCSD_SECTOR_SIZE) > mmc_c->size ||
 			((start + size) / MMCSD_SECTOR_SIZE) > mmc_c->size) {
@@ -579,10 +609,32 @@ unsigned char omap_mmc_erase_sect(unsigned int start,
 		sec_inc_val = MMCSD_SECTOR_SIZE;
 	}
 	while (num_sec_val) {
-		err = mmc_send_cmd(mmc_cont_cur->base, MMC_CMD24,
-							argument, resp);
-		if (err != 1)
-			return err;
+		if (num_sec_val > 0xFFFF)
+			blk_cnt_current_tns = 0xFFFF;
+		else
+			blk_cnt_current_tns = num_sec_val;
+
+		/* check for Multi Block */
+		if (blk_cnt_current_tns > 1) {
+			err = mmc_send_cmd(mmc_cont_cur->base, MMC_CMD23,
+						blk_cnt_current_tns, resp);
+			if (err != 1)
+				return err;
+
+			OMAP_HSMMC_BLK(mmc_cont_cur->base) = BLEN_512BYTESLEN |
+						(blk_cnt_current_tns << 16);
+
+			err = mmc_send_cmd(mmc_cont_cur->base,
+					MMC_CMD25, argument, resp);
+			if (err != 1)
+				return err;
+
+		} else {
+			err = mmc_send_cmd(mmc_cont_cur->base, MMC_CMD24,
+								argument, resp);
+			if (err != 1)
+				return err;
+		}
 		while (1) {
 			do {
 				mmc_stat = OMAP_HSMMC_STAT(mmc_cont_cur->base);
@@ -609,8 +661,8 @@ unsigned char omap_mmc_erase_sect(unsigned int start,
 				break;
 			}
 		}
-		argument += sec_inc_val;
-		num_sec_val--;
+		argument += sec_inc_val * blk_cnt_current_tns;
+		num_sec_val -= blk_cnt_current_tns;
 	}
 	return 1;
 }
