@@ -758,6 +758,22 @@ unsigned char configure_mmc(mmc_card_data *mmc_card_cur,
 	if (ret_val != 1)
 		return ret_val;
 
+	if (mmc_cont_cur->slot == 1) {
+		/* Switch eMMC on OMAP4 to HS timing */
+		argument = (MMC_SWITCH_MODE_WRITE_BYTE << 24) |
+			(EXT_CSD_HS_TIMING << 16) | (1 << 8) |
+			EXT_CSD_CMD_SET_NORMAL;
+		ret_val = mmc_send_cmd(mmc_cont_cur->base, MMC_CMD6,
+				argument, resp);
+		if (ret_val != 1)
+			return ret_val;
+
+		/* Switch the clock to 48MHz */
+		ret_val = mmc_clock_config(mmc_cont_cur, CLK_MISC, 2);
+		if (ret_val != 1)
+			return ret_val;
+	}
+
 	/* Configure the block length to 512 bytes */
 	argument = MMCSD_SECTOR_SIZE;
 	ret_val = mmc_send_cmd(mmc_cont_cur->base, MMC_CMD16, argument, resp);
@@ -769,6 +785,19 @@ unsigned char configure_mmc(mmc_card_data *mmc_card_cur,
 					mmc_card_cur, &Card_CSD);
 	if (ret_val != 1)
 		return ret_val;
+
+	if (mmc_cont_cur->slot == 1) {
+		/* Switch the eMMC on OMAP4 to 8-bit mode */
+		argument = (MMC_SWITCH_MODE_WRITE_BYTE << 24) |
+			(EXT_CSD_BUS_WIDTH << 16) | (EXT_CSD_BUS_WIDTH_8 << 8) |
+			EXT_CSD_CMD_SET_NORMAL;
+		ret_val = mmc_send_cmd(mmc_cont_cur->base, MMC_CMD6,
+				argument, resp);
+		if (ret_val != 1)
+			return ret_val;
+
+		OMAP_HSMMC_CON(mmc_cont_cur->base) |= (1 << 5);
+	}
 
 	return 1;
 }

@@ -73,6 +73,13 @@
 #define SD_CMD8_CHECK_PATTERN	(0xAA)
 #define SD_CMD8_2_7_3_6_V_RANGE	(0x01 << 8)
 
+#define EXT_CSD_CMD_SET_NORMAL		(1<<0)
+#define EXT_CSD_HS_TIMING		185
+#define MMC_SWITCH_MODE_WRITE_BYTE	0x03
+#define EXT_CSD_BUS_WIDTH		183
+#define MMC_BUS_WIDTH_8			3
+#define EXT_CSD_BUS_WIDTH_8		2
+
 /* Clock Configurations and Macros */
 
 #define MMC_CLOCK_REFERENCE		(96)
