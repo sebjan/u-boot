@@ -301,7 +301,7 @@ extern IPaddr_t		NetOurDNS2IP;	 /* Our 2nd Domain Name Server (0 = unknown)*/
 #endif
 extern char		NetOurNISDomain[32];	/* Our NIS domain		*/
 extern char		NetOurHostName[32];	/* Our hostname			*/
-extern char		NetOurRootPath[64];	/* Our root path		*/
+extern char		NetOurRootPath[1024];	/* Our root path		*/
 extern ushort		NetBootFileSize;	/* Our boot file size in blocks	*/
 /** END OF BOOTP EXTENTIONS **/
 extern ulong		NetBootFileXferSize;	/* size of bootfile in bytes	*/
