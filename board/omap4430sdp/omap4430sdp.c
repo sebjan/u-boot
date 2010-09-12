@@ -322,6 +322,31 @@ void ether_init(void)
 #endif
 }
 
+/*
+ * This function finds the SDRAM size available in the system
+ * based on DMM section configurations
+ * This is needed because the size of memory installed may be
+ * different on different versions of the board
+ */
+u32 sdram_size(void)
+{
+	u32 section, i, total_size = 0, size, addr;
+	for (i = 0; i < 4; i++) {
+		section	= __raw_readl(DMM_LISA_MAP + i*4);
+		addr = section & DMM_LISA_MAP_SYS_ADDR_MASK;
+		/* See if the address is valid */
+		if ((addr >= OMAP44XX_DRAM_ADDR_SPACE_START) &&
+		    (addr < OMAP44XX_DRAM_ADDR_SPACE_END)) {
+			size	= ((section & DMM_LISA_MAP_SYS_SIZE_MASK) >>
+				    DMM_LISA_MAP_SYS_SIZE_SHIFT);
+			size	= 1 << size;
+			size	*= SZ_16M;
+			total_size += size;
+		}
+	}
+	return total_size;
+}
+
 /**********************************************
  * Routine: dram_init
  * Description: sets uboots idea of sdram size
@@ -337,7 +362,7 @@ int dram_init(void)
 	//display_board_info(btype);
 
 	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;
-	gd->bd->bi_dram[0].size = PHYS_SDRAM_1_SIZE;
+	gd->bd->bi_dram[0].size = sdram_size();
 
 	printf("Load address: 0x%x\n", TEXT_BASE);
 	return 0;
