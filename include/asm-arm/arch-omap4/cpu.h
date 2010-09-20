@@ -142,7 +142,10 @@
 #define WD_UNLOCK2		0x5555
 
 /* FIXME */
-#define PRM_RSTCTRL          			0x48307250
+#define PRM_BASE		0x4A306000
+#define PRM_DEVICE_BASE		(PRM_BASE + 0x1B00)
+#define PRM_RSTCTRL		PRM_DEVICE_BASE
+#define PRM_RSTCTRL_RESET	0x01
   /* PRCM */
 #define CM_SYS_CLKSEL				0x4a306110
 
