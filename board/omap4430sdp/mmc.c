@@ -38,64 +38,64 @@ void board_mmc_init(void)
 		{
 			.name   = "mbr",
 			.start  = 0x00, /*Sector Start */
-			.length = 0x200, /*512B */
+			.length = 0x20000, /*128KB */
 			.flags  = 0,
 		},
 		{
 			.name   = "xloader",
 			.start  = 0x100, /*Sector Start */
-			.length = 0x0060000, /*384KB */
+			.length = 0x60000, /*384KB */
 			.flags  = 0,
 		},
 		{
 			.name   = "bootloader",
 			.start  = 0x400, /*Sector Start */
-			.length = 0x0060000, /* 384KB */
+			.length = 0x60000, /* 384KB */
 			.flags  = 0,
 		},
 		{
 			.name   = "environment",
 			.start  = 0x700,  /* Sector Start */
-			.length = 0x0020000, /*128KB */
+			.length = 0x20000, /*128KB */
 			.flags  = FASTBOOT_PTENTRY_FLAGS_WRITE_ENV,
 		},
 		{
+			.name   = "scr",
+			.start  = 0x800, /*Sector Start */
+			.length = 0x100000, /*1MB */
+			.flags  = 0,
+		},
+		{
 			.name   = "kernel",
-			.start  = 0x800,  /* Sector Start */
-			.length = 0x00680000, /*6.5MB */
-			.flags  = 0,
-		},
-		{
-			.name   = "misc",
-			.start  = 0x3C00, /*Sector Start */
-			.length = 0x200, /*512B */
-			.flags  = 0,
-		},
-		{
-			.name   = "system",
-			.start  = 0x3EC1,  /* Sector Start */
-			.length = 0xC800000, /*200MB */
-			.flags  = 0,
-		},
-		{
-			.name   = "userdata",
-			.start  = 0x69E5B,  /* Sector Start */
-			.length = 0x2000000, /*32MB */
-			.flags  = 0,
-		},
-		{
-			.name   = "cache",
-			.start  = 0x7D820,  /* Sector Start */
-			.length = 0x2000000, /*32MB */
+			.start  = 0x1000,  /* Sector Start */
+			.length = 0xE00000, /*14MB */
 			.flags  = 0,
 		},
 		{
 			.name   = "recovery",
-			.start  = 0x911E5, /*Sector Start */
-			.length = 0x12C00000, /*300MB */
+			.start  = 0x8000, /*Sector Start */
+			.length = 0x1F000000, /*496MB */
 			.flags  = 0,
 		},
-		/* Rest of the RAW Partitions can start from Sector start 0x1271E5 */
+		{
+			.name   = "system",
+			.start  = 0x102DC2,  /* Sector Start */
+			.length = 0xFA00000, /*250MB */
+			.flags  = 0,
+		},
+		{
+			.name   = "userdata",
+			.start  = 0x1805E2,  /* Sector Start */
+			.length = 0xFA00000, /*250MB */
+			.flags  = 0,
+		},
+		{
+			.name   = "cache",
+			.start  = 0x1FDE02,  /* Sector Start */
+			.length = 0xFA00000, /*250MB */
+			.flags  = 0,
+		},
+		/* Rest of the RAW Partitions can start from Sector start 0x27B622 */
 	};
 	int i;
 	for (i = 0; i < 10; i++)
