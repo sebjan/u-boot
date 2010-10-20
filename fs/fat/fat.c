@@ -345,7 +345,7 @@ get_contents(fsdata *mydata, dir_entry *dentptr, __u8 *buffer,
 			newclust = get_fatent(mydata, endclust);
 			if((newclust -1)!=endclust)
 				goto getit;
-			if (newclust <= 0x0001 || newclust >= 0xfff0) {
+			if (CHECK_CLUST(newclust, mydata->fatsize)) {
 				FAT_DPRINT("curclust: 0x%x\n", newclust);
 				FAT_DPRINT("Invalid FAT entry\n");
 				return gotsize;
@@ -380,7 +380,7 @@ getit:
 		filesize -= actsize;
 		buffer += actsize;
 		curclust = get_fatent(mydata, endclust);
-		if (curclust <= 0x0001 || curclust >= 0xfff0) {
+		if (CHECK_CLUST(curclust, mydata->fatsize)) {
 			FAT_DPRINT("curclust: 0x%x\n", curclust);
 			FAT_ERROR("Invalid FAT entry\n");
 			return gotsize;
@@ -452,7 +452,7 @@ get_vfatname(fsdata *mydata, int curclust, __u8 *cluster,
 
 		slotptr--;
 		curclust = get_fatent(mydata, curclust);
-		if (curclust <= 0x0001 || curclust >= 0xfff0) {
+		if (CHECK_CLUST(curclust, mydata->fatsize)) {
 			FAT_DPRINT("curclust: 0x%x\n", curclust);
 			FAT_ERROR("Invalid FAT entry\n");
 			return -1;
@@ -645,10 +645,10 @@ static dir_entry *get_dentfromdir (fsdata * mydata, int startsect,
 	    return retdent;
 	}
 	curclust = get_fatent (mydata, curclust);
-	if (curclust <= 0x0001 || curclust >= 0xfff0) {
-	    FAT_DPRINT ("curclust: 0x%x\n", curclust);
-	    FAT_ERROR ("Invalid FAT entry\n");
-	    return NULL;
+	if (CHECK_CLUST(curclust, mydata->fatsize)) {
+		FAT_DPRINT("curclust: 0x%x\n", curclust);
+		FAT_ERROR("Invalid FAT entry\n");
+		return NULL;
 	}
     }
 
@@ -736,16 +736,19 @@ do_fat_read (const char *filename, void *buffer, unsigned long maxsize,
     dir_entry *dentptr;
     __u16 prevcksum = 0xffff;
     char *subname = "";
-    int rootdir_size, cursect;
+	int cursect;
     int idx, isdir = 0;
     int files = 0, dirs = 0;
     long ret = 0;
     int firsttime;
+	int root_cluster;
+	int j;
 
     if (read_bootsectandvi (&bs, &volinfo, &mydata->fatsize)) {
 	FAT_DPRINT ("Error: reading boot sector\n");
 	return -1;
     }
+	root_cluster = bs.root_cluster;
     if (mydata->fatsize == 32) {
 	mydata->fatlength = bs.fat32_length;
     } else {
@@ -756,10 +759,10 @@ do_fat_read (const char *filename, void *buffer, unsigned long maxsize,
 	    = mydata->fat_sect + mydata->fatlength * bs.fats;
     mydata->clust_size = bs.cluster_size;
     if (mydata->fatsize == 32) {
-	rootdir_size = mydata->clust_size;
 	mydata->data_begin = mydata->rootdir_sect   /* + rootdir_size */
 		- (mydata->clust_size * 2);
     } else {
+		int rootdir_size;
 	rootdir_size = ((bs.dir_entries[1] * (int) 256 + bs.dir_entries[0])
 			* sizeof (dir_entry)) / SECTOR_SIZE;
 	mydata->data_begin = mydata->rootdir_sect + rootdir_size
@@ -796,6 +799,7 @@ do_fat_read (const char *filename, void *buffer, unsigned long maxsize,
 	isdir = 1;
     }
 
+	j = 0;
     while (1) {
 	int i;
 
@@ -911,8 +915,34 @@ do_fat_read (const char *filename, void *buffer, unsigned long maxsize,
 
 	    goto rootdir_done;  /* We got a match */
 	}
-	cursect++;
-    }
+
+		/*
+		 * On FAT32 we must fetch the FAT entries for the next
+		 * root directory clusters when a cluster has been
+		 * completely processed.
+		 */
+		if ((mydata->fatsize == 32) && (++j == mydata->clust_size)) {
+			int nxtsect;
+			int nxt_clust;
+
+			nxt_clust = get_fatent(mydata, root_cluster);
+
+			nxtsect = mydata->data_begin +
+				(nxt_clust * mydata->clust_size);
+
+			debug("END LOOP: sect=%d, root_clust=%d, "
+			      "n_sect=%d, n_clust=%d\n",
+			      cursect, root_cluster,
+			      nxtsect, nxt_clust);
+
+			root_cluster = nxt_clust;
+
+			cursect = nxtsect;
+			j = 0;
+		} else {
+			cursect++;
+		}
+	}
   rootdir_done:
 
     firsttime = 1;
