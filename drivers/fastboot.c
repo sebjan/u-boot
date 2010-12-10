@@ -1077,6 +1077,14 @@ int fastboot_preboot(void)
 		udelay(CFG_FASTBOOT_PREBOOT_LOOP_WAIT);
 	}
 #endif
+
+#if defined(CONFIG_OMAP44XX)
+#define KBD_STATEMACHINE	(0x4a31c038)
+
+	/* Any key kept pressed does auto-fastboot */
+	if (__raw_readl(KBD_STATEMACHINE))
+		return 1;
+#endif
 	return 0;
 }
 
