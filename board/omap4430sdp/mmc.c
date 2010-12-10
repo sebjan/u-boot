@@ -66,7 +66,7 @@ void board_mmc_init(void)
 			.flags  = 0,
 		},
 		{
-			.name   = "kernel",
+			.name   = "boot",
 			.start  = 0x1000,  /* Sector Start */
 			.length = 0xE00000, /*14MB */
 			.flags  = 0,
