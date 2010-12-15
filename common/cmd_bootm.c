@@ -64,6 +64,9 @@
 #include <dataflash.h>
 #endif
 
+/* Android mkbootimg format*/
+#include <bootimg.h>
+
 /*
  * Some systems (for example LWMON) have very short watchdog periods;
  * we must make sure to split long operations like memmove() or
@@ -1378,3 +1381,102 @@ do_bootm_lynxkdi (cmd_tbl_t *cmdtp, int flag,
 }
 
 #endif /* CONFIG_LYNXKDI */
+
+
+  /* Section for Android bootimage format support
+   * Refer:
+   * http://android.git.kernel.org/?p=platform/system/core.git;a=blob;f=mkbootimg/bootimg.h
+   */
+
+void
+bootimg_print_image_hdr (boot_img_hdr *hdr)
+{
+#ifdef DEBUG
+	int i;
+	printf ("   Image magic:   %s\n", hdr->magic);
+
+	printf ("   kernel_size:   0x%x\n", hdr->kernel_size);
+	printf ("   kernel_addr:   0x%x\n", hdr->kernel_addr);
+
+	printf ("   rdisk_size:   0x%x\n", hdr->ramdisk_size);
+	printf ("   rdisk_addr:   0x%x\n", hdr->ramdisk_addr);
+
+	printf ("   second_size:   0x%x\n", hdr->second_size);
+	printf ("   second_addr:   0x%x\n", hdr->second_addr);
+
+	printf ("   tags_addr:   0x%x\n", hdr->tags_addr);
+	printf ("   page_size:   0x%x\n", hdr->page_size);
+
+	printf ("   name:      %s\n", hdr->name);
+	printf ("   cmdline:   %s%x\n", hdr->cmdline);
+
+	for (i=0;i<8;i++)
+		printf ("   id[%d]:   0x%x\n", i, hdr->id[i]);
+#endif
+}
+
+boot_img_hdr bootimg_header_data;
+
+int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
+{
+	ulong len;
+	char *addr;
+	unsigned pagemask;
+
+	addr = simple_strtoul(argv[1], NULL, 16);
+
+#ifdef DEBUG
+	printf ("## boot.img @ %08lx ...\n", addr);
+#endif
+
+	memmove (&bootimg_header_data, (char *)addr, sizeof(boot_img_hdr));
+
+	/* print copied header */
+	bootimg_print_image_hdr((boot_img_hdr *)&bootimg_header_data);
+
+	if (strncmp((char *)(bootimg_header_data.magic),BOOT_MAGIC, 8)) {
+		puts ("Bad Magic Number\n");
+		goto err;
+	}
+
+	addr = addr + bootimg_header_data.page_size;
+	len  = bootimg_header_data.kernel_size;
+#ifdef DEBUG
+	printf ("Copying kernel from [%x] len[%x] to [%x]... ",
+					addr, len,
+					bootimg_header_data.kernel_addr);
+#endif
+	/* Kernel moving */
+        memmove ((void *)(bootimg_header_data.kernel_addr), (void *)addr, len);
+
+	/* End of kernel */
+	addr += bootimg_header_data.kernel_size;
+
+	pagemask = bootimg_header_data.page_size - 1;
+
+	/* Point addr to ramdisk start */
+	/* Padding to next page boundary */
+	addr += bootimg_header_data.page_size - (((unsigned long)addr) & pagemask);
+
+#ifdef DEBUG
+	printf("\n --> etc [%x]\n", (((unsigned long)addr) & pagemask));
+	printf("\n --> pad [%x]\n",
+		bootimg_header_data.page_size - (((unsigned long)addr) & pagemask));
+	printf("\n --> param-addr [%x]\n", addr);
+#endif
+
+	do_booti_linux  (addr, &bootimg_header_data);
+
+err:
+	puts ("\n## Control returned to monitor - resetting...\n");
+	do_reset (cmdtp, flag, argc, argv);
+
+	return 1;
+}
+
+U_BOOT_CMD(
+	booti,	2,	1,	do_booti,
+	"booti   - boot android bootimg from memory\n",
+	"<addr>\n    - boot application image stored in memory\n"
+	"\t'addr' should be the address of boot image which is zImage+ramdisk.img\n"
+);

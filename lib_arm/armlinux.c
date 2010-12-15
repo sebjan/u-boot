@@ -29,6 +29,7 @@
 #ifdef CONFIG_HAS_DATAFLASH
 #include <dataflash.h>
 #endif
+#include <bootimg.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -270,6 +271,65 @@ void do_bootm_linux (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[],
 	theKernel (0, bd->bi_arch_number, bd->bi_boot_params);
 }
 
+
+void do_booti_linux (ulong initrd_start_addr, boot_img_hdr *bootimg_header_data)
+{
+	ulong initrd_start, initrd_end;
+	void (*theKernel)(int zero, int arch, uint params);
+	bd_t *bd = gd->bd;
+#ifdef CONFIG_CMDLINE_TAG
+	char *commandline = getenv ("bootargs");
+#endif
+
+	theKernel = (void (*)(int, int, uint))(bootimg_header_data->kernel_addr);
+
+	initrd_start =  initrd_start_addr;;
+	initrd_end = initrd_start + bootimg_header_data->ramdisk_size;
+
+#if defined (CONFIG_SETUP_MEMORY_TAGS) || \
+    defined (CONFIG_CMDLINE_TAG) || \
+    defined (CONFIG_INITRD_TAG) || \
+    defined (CONFIG_SERIAL_TAG) || \
+    defined (CONFIG_REVISION_TAG) || \
+    defined (CONFIG_LCD) || \
+    defined (CONFIG_VFD)
+	setup_start_tag (bd);
+#ifdef CONFIG_SERIAL_TAG
+	setup_serial_tag (&params);
+#endif
+#ifdef CONFIG_REVISION_TAG
+	setup_revision_tag (&params);
+#endif
+#ifdef CONFIG_SETUP_MEMORY_TAGS
+	setup_memory_tags (bd);
+#endif
+#ifdef CONFIG_CMDLINE_TAG
+	setup_commandline_tag (bd, commandline);
+#endif
+#ifdef CONFIG_INITRD_TAG
+	if (initrd_start && initrd_end)
+		setup_initrd_tag (bd, initrd_start, initrd_end);
+#endif
+#if defined (CONFIG_VFD) || defined (CONFIG_LCD)
+	setup_videolfb_tag ((gd_t *) gd);
+#endif
+	setup_end_tag (bd);
+#endif
+
+	/* we assume that the kernel is in place */
+	printf ("\nStarting kernel ...\n\n");
+
+#ifdef CONFIG_USB_DEVICE
+	{
+		extern void udc_disconnect (void);
+		udc_disconnect ();
+	}
+#endif
+
+	cleanup_before_linux ();
+
+	theKernel (0, bd->bi_arch_number, bd->bi_boot_params);
+}
 
 #if defined (CONFIG_SETUP_MEMORY_TAGS) || \
     defined (CONFIG_CMDLINE_TAG) || \
