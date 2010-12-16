@@ -116,7 +116,7 @@ DBGFLAGS= -g # -DDEBUG
 OPTFLAGS= -Os #-fomit-frame-pointer
 ifndef LDSCRIPT
 #LDSCRIPT := $(TOPDIR)/board/$(BOARDDIR)/u-boot.lds.debug
-LDSCRIPT := $(TOPDIR)/board/$(BOARDDIR)/u-boot.lds
+LDSCRIPT := $(TOPDIR)/cpu/$(CPU)/u-boot.lds
 endif
 OBJCFLAGS += --gap-fill=0xff
 

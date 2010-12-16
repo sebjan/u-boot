@@ -27,22 +27,21 @@ include $(TOPDIR)/config.mk
 
 LIB	= lib$(BOARD).a
 
-OBJS	:= omap4430sdp.o mem.o syslib.o sys_info.o clock.o mmc.o spi.o
-SOBJS	:= lowlevel_init.o
+OBJS	:= omap4430sdp.o mmc.o
 
-$(LIB):	$(OBJS) $(SOBJS)
+$(LIB):	$(OBJS)
 	$(AR) crv $@ $^
 
 clean:
-	rm -f $(SOBJS) $(OBJS)
+	rm -f $(OBJS)
 
 distclean:	clean
 	rm -f $(LIB) core *.bak .depend
 
 #########################################################################
 
-.depend:	Makefile $(SOBJS:.o=.S) $(OBJS:.o=.c)
-		$(CC) -M $(CPPFLAGS) $(SOBJS:.o=.S) $(OBJS:.o=.c) > $@
+.depend:	Makefile $(OBJS:.o=.c)
+		$(CC) -M $(CPPFLAGS) $(OBJS:.o=.c) > $@
 
 -include .depend
 
