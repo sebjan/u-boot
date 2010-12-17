@@ -34,15 +34,12 @@
 #define CONFIG_OMAP		1    /* in a TI OMAP core */
 #define CONFIG_OMAP44XX		1    /* which is a 44XX */
 #define CONFIG_OMAP4430		1    /* which is in a 4430 */
-#define CONFIG_4430SDP		1    /* working with SDP */
+#define CONFIG_4430PANDA	1    /* working with Panda */
 #define CONFIG_FASTBOOT		1    /* Using fastboot interface */
 
-/* SDP revisions */
-#define SDP_4430_VIRTIO		0x1
-#define SDP_4430_V1		0x2
-
-/* disabling I Cache for ZeBu */
-/* #define CONFIG_ICACHE_OFF 1 */
+/* Panda revisions */
+#define PANDA_4430_6_LAYER	0x1
+#define PANDA_4430_8_LAYER	0x1
 
 
 //#define CONFIG_OFF_PADCONF	0    /* Enable OFFMODE pad configuration */
@@ -91,7 +88,7 @@
 /*
  * select serial console configuration
  */
-#define CONFIG_SERIAL1           1    /* UART1 on SDP */
+#define CONFIG_SERIAL1           1    /* UART1 on Panda */
 /* allow to overwrite serial and ethaddr */
 #define CONFIG_ENV_OVERWRITE
 #define CONFIG_CONS_INDEX        3
@@ -147,8 +144,11 @@
 	root=/dev/nfs rw nfsroot=128.247.77.158:/home/a0384864/wtbu/rootfs \
 	ip=dhcp"
 #else
-#define CONFIG_BOOTARGS "root=/dev/ram0 rw mem=512M console=ttyS2,115200n8 \
-initrd=0x81600000,64M ramdisk_size=65536"
+
+#define CONFIG_BOOTARGS "root=/dev/mmcblk0p2 rw rootwait \
+mem=463M console=ttyO2,115200n8"
+#define CONFIG_BOOTCOMMAND "mmcinit 0 ; fatload mmc 0:1 0x80300000 uImage ; bootm 0x80300000"
+
 #endif
 
 #define CONFIG_NETMASK           255.255.254.0
@@ -159,7 +159,7 @@ initrd=0x81600000,64M ramdisk_size=65536"
 /*
  * Miscellaneous configurable options
  */
-#define V_PROMPT                 "OMAP44XX SDP # "
+#define V_PROMPT                 "PANDA # "
 
 #define CFG_LONGHELP             /* undef to save memory */
 #define CFG_PROMPT               V_PROMPT
@@ -230,39 +230,13 @@ initrd=0x81600000,64M ramdisk_size=65536"
 #define PHYS_FLASH_SIZE_SDPV2	SZ_128M
 #define PHYS_FLASH_SIZE		SZ_32M
 
-/* REVISIT if once NAND/NOR/ONENAND support is added on OMAP4SDP */
-#ifdef OMAP4_NAND_NOR_ONENAND
-#define CFG_FLASH_BASE		boot_flash_base
-#define PHYS_FLASH_SECT_SIZE	boot_flash_sec
-/* Dummy declaration of flash banks to get compilation right */
-#define CFG_FLASH_BANKS_LIST	{0, 0}
 
-#define CFG_MONITOR_BASE	CFG_FLASH_BASE /* Monitor at start of flash */
-#define CFG_ONENAND_BASE	ONENAND_MAP
-
-#define CFG_ENV_IS_IN_NAND	1
-#define CFG_ENV_IS_IN_ONENAND	1
-#define CFG_ENV_IS_IN_FLASH	1
-#define ONENAND_ENV_OFFSET	0xc0000 /* environment starts here  */
-#define SMNAND_ENV_OFFSET	0xc0000 /* environment starts here  */
-
-#define CFG_ENV_SECT_SIZE	boot_flash_sec
-#define CFG_ENV_OFFSET		boot_flash_off
-#define CFG_ENV_ADDR		boot_flash_env_addr
-#endif
-
-#define CFG_MONITOR_BASE	CFG_FLASH_BASE /* Monitor at start of flash */
-#define CFG_ONENAND_BASE	ONENAND_MAP
-
-/* eMMC Variables */
-#define CFG_ENV_IS_IN_EMMC	1
 #define CFG_FLASH_BASE		0x0
-#define CFG_ENV_SECT_SIZE	SZ_128K
-#define CFG_ENV_OFFSET		0x400
-#define CFG_ENV_ADDR		0x400
 
-#define ENV_IS_VARIABLE		1
+#define CFG_MONITOR_BASE	CFG_FLASH_BASE /* Monitor at start of flash */
+#define CFG_ONENAND_BASE	ONENAND_MAP
 
+#define CFG_ENV_IS_NOWHERE	1
 /* Fastboot variables */
 #define CFG_FASTBOOT_TRANSFER_BUFFER (PHYS_SDRAM_1 + SZ_16M)
 #define CFG_FASTBOOT_TRANSFER_BUFFER_SIZE (SZ_512M - SZ_16M)
@@ -288,7 +262,6 @@ initrd=0x81600000,64M ramdisk_size=65536"
 #define CFG_JFFS2_FIRST_BANK	CFG_MAX_FLASH_BANKS /* use flash_info[2] */
 #define CFG_JFFS2_NUM_BANKS	1
 
-#define ENV_IS_VARIABLE		1
 #endif
 
 #ifndef __ASSEMBLY__

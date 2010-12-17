@@ -1833,6 +1833,9 @@ omap3430zoom2_config :    unconfig
 omap4430sdp_config :    unconfig
 	@./mkconfig $(@:_config=) arm omap4 omap4430sdp
 
+omap4430panda_config :    unconfig
+	@./mkconfig $(@:_config=) arm omap4 omap4430panda
+
 #========================================================================
 # i386
 #========================================================================

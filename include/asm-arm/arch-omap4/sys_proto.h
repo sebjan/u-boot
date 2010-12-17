@@ -19,6 +19,23 @@
   */
 #ifndef _OMAP44XX_SYS_PROTO_H_
 #define _OMAP44XX_SYS_PROTO_H_
+#include <asm/types.h>
+#include <environment.h>
+
+extern uchar(*boot_env_get_char_spec) (int index);
+extern int (*boot_env_init) (void);
+extern int (*boot_saveenv) (void);
+extern void (*boot_env_relocate_spec) (void);
+extern char *mmc_env_name_spec;
+extern env_t *env_ptr;
+extern char *env_name_spec;
+
+/* StrataNor */
+uchar mmc_env_get_char_spec(int index);
+int mmc_env_init(void);
+int mmc_saveenv(void);
+void mmc_env_relocate_spec(void);
+
 
 void prcm_init(void);
 void per_clocks_enable(void);

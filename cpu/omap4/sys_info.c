@@ -27,41 +27,6 @@
 #include <asm/arch/sys_info.h>
 #include <i2c.h>
 
-/****************************************************************************
- * check_fpga_revision number: the rev number should be a or b
- ***************************************************************************/
-inline u16 check_fpga_rev(void)
-{
-	return __raw_readw(FPGA_REV_REGISTER);
-}
-
-/****************************************************************************
- * check_uieeprom_avail: Check FPGA Availability
- * OnBoard DEBUG FPGA registers need to be ready for us to proceed
- * Required to retrieve the bootmode also.
- ***************************************************************************/
-int check_uieeprom_avail(void)
-{
-	volatile unsigned short *ui_brd_name =
-	    (volatile unsigned short *)EEPROM_UI_BRD + 8;
-	int count = 1000;
-
-	/* Check if UI revision Name is already updated.
-	 * if this is not done, we wait a bit to give a chance
-	 * to update. This is nice to do as the Main board FPGA
-	 * gets a chance to know off all it's components and we can continue
-	 * to work normally
-	 * Currently taking 269* udelay(1000) to update this on poweron
-	 * from flash!
-	 */
-	while ((*ui_brd_name == 0x00) && count) {
-		udelay(200);
-		count--;
-	}
-	/* Timed out count will be 0? */
-	return count;
-}
-
 /**************************************************************************
  * get_cpu_type() - Read the FPGA Debug registers and provide the DIP switch
  *    settings
@@ -132,27 +97,6 @@ u32 get_sdr_cs_size(u32 offset)
 	return size;
 }
 
-/***********************************************************************
- * get_board_type() - get board type based on current production stats.
- *  - NOTE-1-: 2 I2C EEPROMs will someday be populated with proper info.
- *    when they are available we can get info from there.  This should
- *    be correct of all known boards up until today.
- *  - NOTE-2- EEPROMs are populated but they are updated very slowly.  To
- *    avoid waiting on them we will use ES version of the chip to get info.
- *    A later version of the FPGA migth solve their speed issue.
- ************************************************************************/
-u32 get_board_type(void)
-{
-#ifdef CONFIG_4430SDP
-	return SDP_4430_VIRTIO;
-#else
-	if (get_cpu_rev() == CPU_4430_ES1)
-		return SDP_4430_V1;
-	else
-		return 0;
-#endif
-}
-
 /******************************************************************
  * get_sysboot_value() - get init word settings
  ******************************************************************/
@@ -196,28 +140,6 @@ u32 get_gpmc0_width(void)
  *************************************************************************/
 u32 get_board_rev(void)
 {
-	/* Currently reading EEPROM reg to get UI board version and try it out
-	 */
-
-#ifndef CONFIG_4430SDP
-	if (!check_uieeprom_avail()) {
-		/* timed out OR fpga rev not found!! */
-		/* Assume 1.0 */
-		return 0x01;
-	}
-	/* Move ahead to name location */
-	ui_brd_name += 0x08;
-	count = sizeof(enhanced_ui_brd_name) - 2;
-	while ((enhanced_ui_brd_name[count] == ui_brd_name[count]) && count)
-		count--;
-
-	/* Match?? */
-	if (!count) {
-		/* Enhanced UI board.. SDP1.1 */
-		return 0x11;
-	}
-#endif
-	/* Legacy UI - hope they are all 1.0 boards.. */
 	return 0x10;
 }
 
@@ -240,7 +162,7 @@ void display_board_info(u32 btype)
 	char cpu_4430s[] = "4430";
 	char db_ver[] = "0.0";	 /* board type */
 	char mem_sdr[] = "mSDR"; /* memory type */
-	char mem_ddr[] = "mDDR";
+	char mem_ddr[] = "lpDDR2";
 	char t_tst[] = "TST";	 /* security level */
 	char t_emu[] = "EMU";
 	char t_hs[] = "HS";
@@ -276,15 +198,7 @@ void display_board_info(u32 btype)
 	cpu = get_cpu_type();
 	sec = get_device_type();
 
-#ifndef CONFIG_4430SDP
-	if (is_mem_sdr())
-		mem_s = mem_sdr;
-	else
-		mem_s = mem_ddr;
-#else
 	mem_s = mem_ddr;
-#endif
-
 
 	cpu_s = cpu_4430s;
 

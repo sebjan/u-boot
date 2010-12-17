@@ -23,7 +23,6 @@
 #include <common.h>
 #include <asm/arch/mux.h>
 #include <asm/io.h>
-#include <asm/arch/sys_proto.h>
 
 #define		OMAP44XX_WKUP_CTRL_BASE		0x4A31E000
 #if 1
@@ -200,6 +199,7 @@
 	MV(CP(DPM_EMU19),	(M5)) /* dispc2_data0 */ \
 	MV1(WK(PAD1_SR_SCL),	(PTU | IEN | M0)) /* sr_scl */ \
 	MV1(WK(PAD0_SR_SDA),	(PTU | IEN | M0)) /* sr_sda */ \
+	//MV1(WK(PAD0_JTAG_NTRST),	(IEN | M0)) /* jtag_ntrst */ \
 	MV1(WK(PAD1_JTAG_TCK),	(IEN | M0)) /* jtag_tck */ \
 	MV1(WK(PAD0_JTAG_RTCK),	(M0)) /* jtag_rtck */ \
 	MV1(WK(PAD1_JTAG_TMS_TMSC),	(IEN | M0)) /* jtag_tms_tmsc */ \
@@ -431,6 +431,7 @@
 	MV1(WK(PAD1_SYS_PWRON_RESET),	(M3_SAFE)) /* gpio_wk29 */ \
 	MV1(WK(PAD0_SYS_BOOT6),	(M3_SAFE)) /* gpio_wk9 */ \
 	MV1(WK(PAD1_SYS_BOOT7),	(M3_SAFE)) /* gpio_wk10 */ \
+	//MV1(WK(PAD0_JTAG_NTRST),	(IEN | M0)) /* jtag_ntrst */ \
 	MV1(WK(PAD1_JTAG_TCK),	(IEN | M0)) /* jtag_tck */ \
 	MV1(WK(PAD0_JTAG_RTCK),	(M0)) /* jtag_rtck */ \
 	MV1(WK(PAD1_JTAG_TMS_TMSC),	(IEN | M0)) /* jtag_tms_tmsc */ \
@@ -471,54 +472,11 @@ int board_init(void)
 {
 	DECLARE_GLOBAL_DATA_PTR;
 
-	/* Intializing env functional pointers with eMMC */
-	boot_env_get_char_spec = mmc_env_get_char_spec;
-	boot_env_init = mmc_env_init;
-	boot_saveenv = mmc_saveenv;
-	boot_env_relocate_spec = mmc_env_relocate_spec;
-	env_ptr = (env_t *) (CFG_FLASH_BASE + CFG_ENV_OFFSET);
-	env_name_spec = mmc_env_name_spec;
-
 	/* board id for Linux */
-	gd->bd->bi_arch_number = MACH_TYPE_OMAP_4430SDP;
+	gd->bd->bi_arch_number = MACH_TYPE_OMAP4_PANDA;
 	gd->bd->bi_boot_params = (0x80000000 + 0x100); /* boot param addr */
 
 	return 0;
-}
-
-/****************************************************************************
- * check_fpga_revision number: the rev number should be a or b
- ***************************************************************************/
-inline u16 check_fpga_rev(void)
-{
-	return __raw_readw(FPGA_REV_REGISTER);
-}
-
-/****************************************************************************
- * check_uieeprom_avail: Check FPGA Availability
- * OnBoard DEBUG FPGA registers need to be ready for us to proceed
- * Required to retrieve the bootmode also.
- ***************************************************************************/
-int check_uieeprom_avail(void)
-{
-	volatile unsigned short *ui_brd_name =
-	    (volatile unsigned short *)EEPROM_UI_BRD + 8;
-	int count = 1000;
-
-	/* Check if UI revision Name is already updated.
-	 * if this is not done, we wait a bit to give a chance
-	 * to update. This is nice to do as the Main board FPGA
-	 * gets a chance to know off all it's components and we can continue
-	 * to work normally
-	 * Currently taking 269* udelay(1000) to update this on poweron
-	 * from flash!
-	 */
-	while ((*ui_brd_name == 0x00) && count) {
-		udelay(200);
-		count--;
-	}
-	/* Timed out count will be 0? */
-	return count;
 }
 
 /***********************************************************************
@@ -532,5 +490,5 @@ int check_uieeprom_avail(void)
  ************************************************************************/
 u32 get_board_type(void)
 {
-	return SDP_4430_V1;
+	return PANDA_4430_8_LAYER;
 }

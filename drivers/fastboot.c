@@ -1100,6 +1100,8 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 	device_strings[DEVICE_STRING_PRODUCT_INDEX]       = "Zoom";
 #elif defined(CONFIG_4430SDP)
 	device_strings[DEVICE_STRING_PRODUCT_INDEX]       = "SDP4";
+#elif defined(CONFIG_4430PANDA)
+	device_strings[DEVICE_STRING_PRODUCT_INDEX]       = "PANDA";
 #else
 	/* Default, An error message to prompt user */
 #error "Need a product name for fastboot"

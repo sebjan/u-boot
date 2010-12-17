@@ -34,6 +34,8 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+char *env_name_spec = "NOWHERE";
+
 env_t *env_ptr = NULL;
 
 extern uchar default_environment[];
@@ -60,6 +62,11 @@ int  env_init(void)
 	gd->env_valid = 0;
 
 	return (0);
+}
+
+int saveenv(void)
+{
+	return -1;
 }
 
 #endif /* CFG_ENV_IS_NOWHERE) */

@@ -26,7 +26,6 @@
 #include <asm/arch/mem.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/arch/sys_info.h>
-#include <environment.h>
 #include <command.h>
 
 /****** DATA STRUCTURES ************/
@@ -42,7 +41,10 @@ unsigned int boot_flash_sec;
 unsigned int boot_flash_type;
 volatile unsigned int boot_flash_env_addr;
 /* help common/env_flash.c */
-#ifdef ENV_IS_VARIABLE
+#ifndef CFG_ENV_IS_NOWHERE
+char *env_name_spec;
+/* update these elsewhere */
+env_t *env_ptr;
 
 ulong NOR_FLASH_BANKS_LIST[CFG_MAX_FLASH_BANKS];
 
@@ -67,7 +69,7 @@ u8 is_flash;
 u8 is_onenand;
 #endif
 
-#endif				/* ENV_IS_VARIABLE */
+#endif	/* #ifndef CFG_ENV_IS_NOWHERE */
 
 /* SDP4430 Board CS Organization
  * Two PISMO connections are specified. PISMO1 is first and default PISMO board
@@ -124,7 +126,7 @@ static u32 gpmc_pismo2[GPMC_MAX_REG] = {
 /********** Functions ****/
 
 /* ENV Functions */
-#ifdef ENV_IS_VARIABLE
+#ifndef CFG_ENV_IS_NOWHERE
 uchar env_get_char_spec(int index)
 {
 	if (!boot_env_get_char_spec)
@@ -275,156 +277,4 @@ void enable_gpmc_config(u32 *gpmc_config, u32 gpmc_base, u32 base, u32 size)
 	__raw_writel((((size & 0xF) << 8) | ((base >> 24) & 0x3F) |
 		      (1 << 6)), GPMC_CONFIG7 + gpmc_base);
 	sdelay(2000);
-}
-
-/*****************************************************
- * gpmc_init(): init gpmc bus
- * Init GPMC for x16, MuxMode (SDRAM in x32).
- * This code can only be executed from SRAM or SDRAM.
- *****************************************************/
-void gpmc_init(void)
-{
-	u32 mux = 0, mwidth;
-	u32 *gpmc_config = NULL;
-	u32 gpmc_base = 0;
-	u32 base = 0;
-	u8 idx = 0;
-	u32 size = 0;
-	u32 f_off = CFG_MONITOR_LEN;
-	u32 f_sec = 0;
-	u32 config = 0;
-	unsigned char *config_sel = NULL;
-	u32 i = 0;
-
-	mux = BIT9;
-	mwidth = get_gpmc0_width();
-
-	/* global settings */
-	__raw_writel(0x10, GPMC_SYSCONFIG);	/* smart idle */
-	__raw_writel(0x0, GPMC_IRQENABLE);	/* isr's sources masked */
-	__raw_writel(0, GPMC_TIMEOUT_CONTROL);	/* timeout disable */
-
-	/* For SDPV2, FPGA uses WAIT1 line in active low mode */
-	if (get_board_type() == SDP_4430_VIRTIO) {
-		config = __raw_readl(GPMC_CONFIG);
-		config &= (~0xf00);
-		__raw_writel(config, GPMC_CONFIG);
-	}
-
-	/* Disable the GPMC0 config set by ROM code
-	 * It conflicts with our MPDB (both at 0x08000000)
-	 */
-	__raw_writel(0 , GPMC_CONFIG7 + GPMC_CONFIG_CS0);
-	sdelay(1000);
-
-	if (get_board_type() == SDP_4430_VIRTIO)
-		gpmc_config = gpmc_mpdb_v2;
-	else
-		goto error;
-
-	/* GPMC3 is always MPDB.. need to know the chip info */
-	gpmc_base = GPMC_CONFIG_CS0 + (3 * GPMC_CONFIG_WIDTH);
-	gpmc_config[0] |= mux;
-	enable_gpmc_config(gpmc_config, gpmc_base, DEBUG_BASE, DBG_MPDB_SIZE);
-
-	/* Look up chip select map */
-	idx = get_gpmc0_type();
-	if (get_board_type() == SDP_4430_VIRTIO)
-		config_sel = (unsigned char *)(chip_sel_sdpv2[idx]);
-	else
-		goto error;
-
-	/* Initialize each chip selects timings (may be to 0) */
-	for (idx = 0; idx < GPMC_MAX_CS; idx++) {
-		gpmc_base = GPMC_CONFIG_CS0 + (idx * GPMC_CONFIG_WIDTH);
-		switch (config_sel[idx]) {
-#if (CONFIG_COMMANDS & CFG_CMD_FLASH)		
-		case PISMO1_NOR:
-			if (get_board_type() == SDP_4430_VIRTIO) {
-				gpmc_config = gpmc_stnor;
-				f_sec = SZ_128K;
-				NOR_MAX_FLASH_BANKS = 2;
-				size = PISMO1_NOR_SIZE;
-				for (i = 0; i < NOR_MAX_FLASH_BANKS; i++)
-					NOR_FLASH_BANKS_LIST[i] =
-					   FLASH_BASE_SDPV2 + PHYS_FLASH_SIZE*i;
-			} else
-				goto error;
-
-			gpmc_config[0] |= mux | TYPE_NOR | mwidth;
-			base = NOR_FLASH_BANKS_LIST[0];
-			is_flash = 1;
-			break;
-#endif
-#if (CONFIG_COMMANDS & CFG_CMD_NAND)
-		case PISMO1_NAND:
-			base = PISMO1_NAND_BASE;
-			size = PISMO1_NAND_SIZE;
-			gpmc_config = gpmc_smnand;
-			nand_cs_base = gpmc_base;
-			f_off = SMNAND_ENV_OFFSET;
-			is_nand = 1;
-			break;
-#endif
-		case PISMO2_CS0:
-		case PISMO2_CS1:
-			base = PISMO2_BASE;
-			size = PISMO2_SIZE;
-			gpmc_config = gpmc_pismo2;
-			gpmc_config[0] |= mux | TYPE_NOR | mwidth;
-			break;
-/* Either OneNand or Normal Nand at a time!! */
-#if (CONFIG_COMMANDS & CFG_CMD_ONENAND)
-		case PISMO1_ONENAND:
-			base = PISMO1_ONEN_BASE;
-			size = PISMO1_ONEN_SIZE;
-			gpmc_config = gpmc_onenand;
-			onenand_cs_base = gpmc_base;
-			f_off = ONENAND_ENV_OFFSET;
-			is_onenand = 1;
-			break;
-#endif
-		default:
-		/* MPDB/Unsupported/Corrupt config- try Next GPMC CS!!!! */
-			continue;
-		}
-
-		/* handle boot CS0 */
-		if (idx == 0) {
-			boot_flash_base = base;
-			boot_flash_off = f_off;
-			boot_flash_sec = f_sec;
-			boot_flash_type = config_sel[idx];
-			boot_flash_env_addr = f_off;
-#ifdef ENV_IS_VARIABLE
-			switch (config_sel[0]) {
-			case PISMO1_NOR:
-
-				break;
-#if (CONFIG_COMMANDS & CFG_CMD_NAND)
-			case PISMO1_NAND:
-
-				break;
-#endif
-#if (CONFIG_COMMANDS & CFG_CMD_ONENAND)
-			case PISMO1_ONENAND:
-
-				break;
-#endif
-			default:
-				/* unknown variant!! */
-				puts("Unknown Boot chip!!!\n");
-				break;
-			}
-#endif				/* ENV_IS_VARIABLE */
-		}
-		enable_gpmc_config(gpmc_config, gpmc_base, base, size);
-	}
-	return;
-error:
-	/* UART is not initialized yet, so can't really log
-	 * error message
-	 */
-	while (1)
-		;
 }
