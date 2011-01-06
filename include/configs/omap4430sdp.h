@@ -254,8 +254,8 @@ initrd=0x81600000,64M ramdisk_size=65536"
 #define CFG_ENV_IS_IN_EMMC	1
 #define CFG_FLASH_BASE		0x0
 #define CFG_ENV_SECT_SIZE	SZ_128K
-#define CFG_ENV_OFFSET		0x700
-#define CFG_ENV_ADDR		0x700
+#define CFG_ENV_OFFSET		0x400
+#define CFG_ENV_ADDR		0x400
 
 #define ENV_IS_VARIABLE		1
 
