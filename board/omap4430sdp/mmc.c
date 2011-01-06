@@ -73,26 +73,26 @@ void board_mmc_init(void)
 		},
 		{
 			.name   = "system",
-			.start  = 0xE800,  /* Sector Start */
+			.start  = 0x11800,  /* Sector Start */
 			.length = 384*1024*1024, /*384MB */
 			.flags  = 0,
 		},
 		{
 			.name   = "userdata",
-			.start  = 0xCE800,  /* Sector Start */
+			.start  = 0xD2000,  /* Sector Start */
 			.length = 512*1024*1024, /*512MB */
 			.flags  = 0,
 		},
 		{
 			.name   = "cache",
-			.start  = 0x1CE800,  /* Sector Start */
+			.start  = 0x1D5000,  /* Sector Start */
 			.length = 128*1024*1024, /*128MB */
 			.flags  = 0,
 		},
 		{
 			.name   = "media",
-			.start  = 0x20E800,  /* Sector Start */
-			.length = 829*1024*1024, /*829MB */
+			.start  = 0x217800,  /* Sector Start */
+			.length = 1024*1024*1024, /*1GB */
 			.flags  = 0,
 		},
 		/* Rest of the RAW Partitions can start from Sector start 0x27B622 */
