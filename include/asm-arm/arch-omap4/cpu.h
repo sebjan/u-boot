@@ -457,6 +457,7 @@
 #define I2C_BASE1		(OMAP44XX_L4_PER + 0x70000)
 #define I2C_BASE2		(OMAP44XX_L4_PER + 0x72000)
 #define I2C_BASE3		(OMAP44XX_L4_PER + 0x60000)
+#define I2C_BASE4		(OMAP44XX_L4_PER + 0x350000)
 
 #ifdef CONFIG_LCD
 	extern void lcd_disable(void);

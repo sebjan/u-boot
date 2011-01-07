@@ -53,7 +53,9 @@ static void wait_for_bb(void);
 static u16 wait_for_pin(void);
 static void flush_fifo(void);
 
-#ifdef CONFIG_OMAP34XX || defined(CONFIG_OMAP44XX)
+#if defined(CONFIG_OMAP44XX)
+#define I2C_NUM_IF 4
+#elif (CONFIG_OMAP34XX)
 #define I2C_NUM_IF 3
 #else
 #define I2C_NUM_IF 2
@@ -80,6 +82,11 @@ int select_bus(int bus, int speed)
 	}
 #endif
 
+#if defined(CONFIG_OMAP44XX)
+	if (bus == 3)
+		i2c_base = I2C_BASE4;
+	else
+#endif
 #if defined(CONFIG_OMAP34XX) || defined(CONFIG_OMAP44XX)
 	if (bus == 2)
 		i2c_base = I2C_BASE3;
