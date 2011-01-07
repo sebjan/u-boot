@@ -164,13 +164,74 @@ u32 get_gpmc0_width(void)
 	return WIDTH_16BIT;
 }
 
+/*******************************************************************
+ * load_mfg_info() - Reading APPS EEPROM, I2C4 bus for Blaze tablet and
+ *                   I2C2 for Blaze/SDP.
+ * Format example: 0100APPS750-2143-002    0A00092010
+ *                 xxxx                       -----------> format designation
+ *                     yyyy                     ---------> board type (4 letters)
+ *                         zzzzzzzzzzzzzzzz      --------> board part number
+ *                                         wwww    ------> board revision
+ *                                             vvvvvv  --> mfg date MMYYYY format
+ *******************************************************************/
+u32 load_mfg_info(void)
+{
+	int j;
+	uint   addr=12;                  /* offset */
+	uint   alen=1;
+	uint   length=4;
+	u_char chip=0x50;               /*EEPROM addr = 0x50*/
+	uint   bus=3;
+	uint   speed=400;               /* OMAP_I2C_FAST_MODE */
+	unsigned char	linebuf[length];
+	unsigned char	*cp;
+	u32	omap4_board_revision = 0x10; /* default = 1.0 */
+
+	if (select_bus(bus,speed) == 0 ) { /* configure I2C4 */
+		if (i2c_read(chip, addr, alen, linebuf, length) == 0) {
+			cp = linebuf;
+			/* Read eeprom is so slow, so only significant bytes are considered */
+			printf("Blaze Tablet Board: 0100APPS750-");
+			for (j=0; j<length; j++) {
+				printf("%c", *cp);
+				cp++;
+			}
+			putc ('\n');
+			/* revision board is changing continously, in the time it is defined,
+			board part number is used instead */
+			omap4_board_revision = simple_strtoul(linebuf, NULL, 10);
+		}
+		else {
+			/* TODO. Because apps eeprom for Blaze is connected to I2C2
+			   and tablet to I2C4, an error here will indicated sw is
+			   running on a Blaze/SDP board. It is a temporal solution
+			   in the time apps eeprom for tablet is connected to I2C2
+			   or a better decision is taken */
+			puts ("Blaze/SDP Board.\n");
+			omap4_board_revision = 0x10;
+		}
+	}
+	else {
+		printf("Setting bus[%d] to Speed[%d]: ", bus, speed);
+		printf("FAILED\n");
+	}
+
+	/* recover default status */
+	if (select_bus(CFG_I2C_BUS,CFG_I2C_SPEED) != 0) {
+		printf("Setting bus[%d] to Speed[%d]: ", CFG_I2C_BUS, CFG_I2C_SPEED);
+		printf("FAILED\n");
+	}
+
+	return omap4_board_revision;
+}
+
 /*************************************************************************
  * get_board_rev() - setup to pass kernel board revision information
  * returns:(bit[0-3] sub version, higher bit[7-4] is higher version)
  *************************************************************************/
 u32 get_board_rev(void)
 {
-	return 0x10;
+	return load_mfg_info();
 }
 
 /*********************************************************************
