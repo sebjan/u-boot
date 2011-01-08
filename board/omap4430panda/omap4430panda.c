@@ -476,6 +476,8 @@ int board_init(void)
 	gd->bd->bi_arch_number = MACH_TYPE_OMAP4_PANDA;
 	gd->bd->bi_boot_params = (0x80000000 + 0x100); /* boot param addr */
 
+	gpmc_init();
+
 	return 0;
 }
 

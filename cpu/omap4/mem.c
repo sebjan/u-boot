@@ -278,3 +278,18 @@ void enable_gpmc_config(u32 *gpmc_config, u32 gpmc_base, u32 base, u32 size)
 		      (1 << 6)), GPMC_CONFIG7 + gpmc_base);
 	sdelay(2000);
 }
+
+/*****************************************************
+ * gpmc_init(): init gpmc bus
+ *****************************************************/
+void gpmc_init(void)
+{
+        u32 cs_base = GPMC_CONFIG_CS0;
+        u8 i;
+
+        /* Disable all Chip Selects as there is
+         * no device on gpmc right now
+         */
+        for (i = 0; i < 8; i++)
+                sr32(cs_base + GPMC_CONFIG7 + 0x30*i, 6, 1, 0);
+}

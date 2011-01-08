@@ -471,6 +471,8 @@ int board_init(void)
 {
 	DECLARE_GLOBAL_DATA_PTR;
 
+	gpmc_init();
+
 	/* Intializing env functional pointers with eMMC */
 	boot_env_get_char_spec = mmc_env_get_char_spec;
 	boot_env_init = mmc_env_init;
