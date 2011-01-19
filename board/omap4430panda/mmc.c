@@ -36,63 +36,63 @@ void board_mmc_init(void)
 	/* Partitons on EMMC preasent on OMAP4SDP required for Fastboot*/
 	fastboot_ptentry ptn[10] = {
 		{
-			.name   = "mbr",
+			.name   = "ptable",
 			.start  = 0x00, /*Sector Start */
-			.length = 0x20000, /*128KB */
+			.length = 128*1024, /*128KB */
 			.flags  = 0,
 		},
 		{
 			.name   = "xloader",
 			.start  = 0x100, /*Sector Start */
-			.length = 0x60000, /*384KB */
+			.length = 128*1024, /*128KB */
 			.flags  = 0,
 		},
 		{
 			.name   = "bootloader",
-			.start  = 0x400, /*Sector Start */
-			.length = 0x60000, /* 384KB */
+			.start  = 0x200, /*Sector Start */
+			.length = 256*1024, /*256KB */
 			.flags  = 0,
 		},
 		{
 			.name   = "environment",
-			.start  = 0x700,  /* Sector Start */
-			.length = 0x20000, /*128KB */
+			.start  = 0x400,  /* Sector Start */
+			.length = 128*1024, /*128KB */
 			.flags  = FASTBOOT_PTENTRY_FLAGS_WRITE_ENV,
 		},
 		{
-			.name   = "scr",
-			.start  = 0x800, /*Sector Start */
-			.length = 0x100000, /*1MB */
-			.flags  = 0,
-		},
-		{
 			.name   = "boot",
-			.start  = 0x1000,  /* Sector Start */
-			.length = 0xE00000, /*14MB */
+			.start  = 0x500,  /* Sector Start */
+			.length = 14*1024*1024, /*14MB */
 			.flags  = 0,
 		},
 		{
 			.name   = "recovery",
-			.start  = 0x8000, /*Sector Start */
-			.length = 0x1F000000, /*496MB */
+			.start  = 0x7500, /*Sector Start */
+			.length = 14*1024*1024, /*14MB */
 			.flags  = 0,
 		},
 		{
 			.name   = "system",
-			.start  = 0x102DC2,  /* Sector Start */
-			.length = 0xFA00000, /*250MB */
+			.start  = 0x11800,  /* Sector Start */
+			.length = 384*1024*1024, /*384MB */
 			.flags  = 0,
 		},
 		{
 			.name   = "userdata",
-			.start  = 0x1805E2,  /* Sector Start */
-			.length = 0xFA00000, /*250MB */
+			.start  = 0xD2000,  /* Sector Start */
+			.length = 512*1024*1024, /*512MB */
 			.flags  = 0,
 		},
 		{
 			.name   = "cache",
-			.start  = 0x1FDE02,  /* Sector Start */
-			.length = 0xFA00000, /*250MB */
+			.start  = 0x1D5000,  /* Sector Start */
+			.length = 128*1024*1024, /*128MB */
+			.flags  = 0,
+		},
+		{
+			.name   = "media",
+			.start  = 0x217800,  /* Sector Start */
+			.length = 1024*1024*1024, /*1GB */
 			.flags  = 0,
 		},
 		/* Rest of the RAW Partitions can start from Sector start 0x27B622 */
