@@ -910,7 +910,13 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 				struct fastboot_ptentry *ptn;
 
 				/* Save the MMC controller number */
+#if  defined(CONFIG_4430PANDA)
+				/* panda board does not have eMMC on mmc1 */
+				mmc_controller_no = 0;
+#else
+				/* blaze has emmc on mmc1 */
 				mmc_controller_no = 1;
+#endif
 
 				/* Find the partition and erase it */
 				ptn = fastboot_flash_find_ptn(cmdbuf + 6);
@@ -1242,13 +1248,20 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 			} else if (interface.storage_medium == EMMC) {
 				/* storage medium is EMMC */
 
+
 				if (download_bytes) {
 
 					struct fastboot_ptentry *ptn;
 					char *argv[2] = {NULL, "-f"};
 
 					/* Save the MMC controller number */
+#if  defined(CONFIG_4430PANDA)
+					/* panda board does not have eMMC on mmc1 */
+					mmc_controller_no = 0;
+#else
+					/* blaze has emmc on mmc1 */
 					mmc_controller_no = 1;
+#endif
 
 					/* Next is the partition name */
 					ptn = fastboot_flash_find_ptn(cmdbuf + 6);
