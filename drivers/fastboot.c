@@ -1116,7 +1116,7 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 	fastboot_interface = interface;
 	fastboot_interface->product_name                  = device_strings[DEVICE_STRING_PRODUCT_INDEX];
 	fastboot_interface->serial_no                     = device_strings[DEVICE_STRING_SERIAL_NUMBER_INDEX];
-#if defined(CONFIG_4430SDP)
+#if defined(CONFIG_4430SDP) || defined(CONFIG_4430PANDA)
 	fastboot_interface->storage_medium                = EMMC;
 #else
 	fastboot_interface->storage_medium                = NAND;
