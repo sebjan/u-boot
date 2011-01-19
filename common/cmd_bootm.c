@@ -1435,7 +1435,9 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	bootimg_print_image_hdr((boot_img_hdr *)&bootimg_header_data);
 
 	if (strncmp((char *)(bootimg_header_data.magic),BOOT_MAGIC, 8)) {
-		puts ("Bad Magic Number\n");
+		puts ("Bad boot image - default to fastboot\n");
+		/* Invalid image: so enter fastboot mode */
+		do_fastboot(NULL, 0, 0, NULL);
 		goto err;
 	}
 
