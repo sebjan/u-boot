@@ -554,11 +554,6 @@ unsigned char omap_mmc_write_sect(unsigned int *input_buf,
 
 		/* check for Multi Block */
 		if (blk_cnt_current_tns > 1) {
-			err = mmc_send_cmd(mmc_cont_cur->base, MMC_CMD23,
-					blk_cnt_current_tns, resp);
-			if (err != 1)
-				return err;
-
 			OMAP_HSMMC_BLK(mmc_cont_cur->base) = BLEN_512BYTESLEN |
 						(blk_cnt_current_tns << 16);
 
@@ -575,6 +570,16 @@ unsigned char omap_mmc_write_sect(unsigned int *input_buf,
 		err = mmc_write_data(mmc_cont_cur->base, input_buf);
 		if (err != 1)
 			return err;
+
+		if (blk_cnt_current_tns > 1) {
+			err = mmc_send_cmd(mmc_cont_cur->base,
+						MMC_CMD12, 0, resp);
+
+			if (err != 1) {
+				printf("MMC_CMD12 failed 0x%x\n", err);
+				return err;
+			}
+		}
 
 		input_buf += (MMCSD_SECTOR_SIZE / 4) * blk_cnt_current_tns;
 		argument += sec_inc_val * blk_cnt_current_tns;
