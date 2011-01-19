@@ -1052,14 +1052,6 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 
 		/* boot
 		   boot what was downloaded
-
-		   WARNING WARNING WARNING
-
-		   This is not what you expect.
-		   The fastboot client does its own packaging of the
-		   kernel.  The layout is defined in the android header
-		   file bootimage.h.  This layeout is copiedlooks like this,
-
 		   **
 		   ** +-----------------+
 		   ** | boot header     | 1 page
@@ -1071,17 +1063,8 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 		   ** | second stage    | o pages
 		   ** +-----------------+
 		   **
-
-		   We only care about the kernel.
-		   So we have to jump past a page.
-
-		   What is a page size ?
-		   The fastboot client uses 2048
-
-		   The is the default value of
-
+		   Pagesize has default value of
 		   CFG_FASTBOOT_MKBOOTIMAGE_PAGE_SIZE
-
 		*/
 
 		if(memcmp(cmdbuf, "boot", 4) == 0) {
@@ -1090,50 +1073,29 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 			    (CFG_FASTBOOT_MKBOOTIMAGE_PAGE_SIZE < download_bytes))
 			{
 				char start[32];
-				char *bootm[3] = { "bootm", NULL, NULL, };
-				char *go[3]    = { "go",    NULL, NULL, };
-
-				/*
-				 * Use this later to determine if a command line was passed
-				 * for the kernel.
-				 */
-				struct fastboot_boot_img_hdr *fb_hdr =
-					(image_header_t *) interface.transfer_buffer;
+				char *booti_args[3] = { "booti", NULL, NULL, };
 
 				/* Skip the mkbootimage header */
-				image_header_t *hdr =
-					(image_header_t *)
-					&interface.transfer_buffer[CFG_FASTBOOT_MKBOOTIMAGE_PAGE_SIZE];
+				//boot_img_hdr *hdr =
+				//	(boot_img_hdr *)
+				//	&interface.transfer_buffer[CFG_FASTBOOT_MKBOOTIMAGE_PAGE_SIZE];
 
-				bootm[1] = go[1] = start;
-				sprintf (start, "0x%x", hdr);
+				booti_args[1] = start;
+				sprintf (start, "0x%x", interface.transfer_buffer);
 
 				/* Execution should jump to kernel so send the response
 				   now and wait a bit.  */
 				sprintf(response, "OKAY");
 				fastboot_tx_status(response, strlen(response));
-				udelay (1000000); /* 1 sec */
 
-				if (ntohl(hdr->ih_magic) == IH_MAGIC) {
-					/* Looks like a kernel.. */
-					printf ("Booting kernel..\n");
+				printf ("Booting kernel..\n");
 
-					/*
-					 * Check if the user sent a bootargs down.
-					 * If not, do not override what is already there
-					 */
-					if (strlen ((char *) &fb_hdr->cmdline[0]))
-						set_env ("bootargs", (char *) &fb_hdr->cmdline[0]);
-
-					do_bootm (NULL, 0, 2, bootm);
-				} else {
-					/* Raw image, maybe another uboot */
-					printf ("Booting raw image..\n");
-
-					do_go (NULL, 0, 2, go);
-				}
-				printf ("ERROR : bootting failed\n");
-				printf ("You should reset the board\n");
+				/* For Future use
+				 *	if (strlen ((char *) &fb_hdr->cmdline[0]))
+				 *		set_env ("bootargs", (char *) &fb_hdr->cmdline[0]);
+				 */
+				/* boot the boot.img */
+				do_booti (NULL, 0, 2, booti_args);
 			}
 			sprintf(response, "FAILinvalid boot image");
 			ret = 0;
@@ -1247,7 +1209,6 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 				}
 			} else if (interface.storage_medium == EMMC) {
 				/* storage medium is EMMC */
-
 
 				if (download_bytes) {
 
