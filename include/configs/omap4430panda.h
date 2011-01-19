@@ -145,9 +145,10 @@
 	ip=dhcp"
 #else
 
-#define CONFIG_BOOTARGS "root=/dev/mmcblk0p2 rw rootwait \
-mem=463M console=ttyO2,115200n8"
-#define CONFIG_BOOTCOMMAND "mmcinit 0 ; fatload mmc 0:1 0x80300000 uImage ; bootm 0x80300000"
+#define CONFIG_BOOTARGS "console=ttyO2,115200n8 mem=512M \
+	init=/init vram=32M omapfb.vram=0:16M androidboot.console=ttyO2"
+
+#define CONFIG_BOOTCOMMAND "mmcinit 0;mmc 0 read 0x500 0x81000000 0x500000;booti 81000000"
 
 #endif
 
