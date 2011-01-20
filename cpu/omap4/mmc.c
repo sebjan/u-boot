@@ -554,6 +554,12 @@ unsigned char omap_mmc_write_sect(unsigned int *input_buf,
 
 		/* check for Multi Block */
 		if (blk_cnt_current_tns > 1) {
+#if !defined(CONFIG_4430PANDA)
+			err = mmc_send_cmd(mmc_cont_cur->base, MMC_CMD23,
+					blk_cnt_current_tns, resp);
+			if (err != 1)
+				return err;
+#endif
 			OMAP_HSMMC_BLK(mmc_cont_cur->base) = BLEN_512BYTESLEN |
 						(blk_cnt_current_tns << 16);
 
@@ -571,6 +577,7 @@ unsigned char omap_mmc_write_sect(unsigned int *input_buf,
 		if (err != 1)
 			return err;
 
+#if defined(CONFIG_4430PANDA)
 		if (blk_cnt_current_tns > 1) {
 			err = mmc_send_cmd(mmc_cont_cur->base,
 						MMC_CMD12, 0, resp);
@@ -580,6 +587,7 @@ unsigned char omap_mmc_write_sect(unsigned int *input_buf,
 				return err;
 			}
 		}
+#endif
 
 		input_buf += (MMCSD_SECTOR_SIZE / 4) * blk_cnt_current_tns;
 		argument += sec_inc_val * blk_cnt_current_tns;
