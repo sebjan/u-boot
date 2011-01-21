@@ -96,7 +96,7 @@ static volatile u32 *peri_dma_count	= (volatile u32 *) OMAP_USB_DMA_COUNT_CH(DMA
    In full speed mode packets are 64 */
 #define RX_ENDPOINT_MAXIMUM_PACKET_SIZE_2_0  (0x0200)
 #define RX_ENDPOINT_MAXIMUM_PACKET_SIZE_1_1  (0x0040)
-#define TX_ENDPOINT_MAXIMUM_PACKET_SIZE      (0x0040)
+#define TX_ENDPOINT_MAXIMUM_PACKET_SIZE      (0x0200)
 
 /* Same, just repackaged as 
    2^(m+3), 64 = 2^6, m = 3 */
