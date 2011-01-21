@@ -1125,28 +1125,37 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 	fastboot_interface->transfer_buffer               = (unsigned char *) CFG_FASTBOOT_TRANSFER_BUFFER;
 	fastboot_interface->transfer_buffer_size          = CFG_FASTBOOT_TRANSFER_BUFFER_SIZE;
 
-	fastboot_reset();
+	if (*otghs_control != 0x15) {
+		fastboot_reset();
 
-	*otg_interfsel &= 0;
+		*otg_interfsel &= 0;
 
-	/* Program Phoenix registers VUSB_CFG_STATE and MISC2 */
-	twl6030_usb_device_settings();
+		/* Program Phoenix registers VUSB_CFG_STATE and MISC2 */
+		twl6030_usb_device_settings();
 
-	/* Program the control module register */
-	*otghs_control = 0x15;
+		/* Program the control module register */
+		*otghs_control = 0x15;
+
+	} else {
+		/* HACK */
+		fastboot_bulk_endpoint_reset();
+		/* Keeping USB cable attached and booting causes
+		 * ROM code to reconfigure USB, and then
+		 * re-enumeration never happens
+		 * Setting this SRP bit helps - Cannot see why !!
+		 * MUSB spec says : Session bit is used only for SRP
+		 */
+		outb(0x1,OMAP34XX_USB_DEVCTL);
+	}
 
 	/* Check if device is in b-peripheral mode */
 	devctl = inb (OMAP34XX_USB_DEVCTL);
-	if (!(devctl & MUSB_DEVCTL_BDEVICE) ||
-	    (devctl & MUSB_DEVCTL_HM)) 
-	{
+	if (!(devctl & MUSB_DEVCTL_BDEVICE) || (devctl & MUSB_DEVCTL_HM)) {
 		printf ("ERROR : Unsupport USB mode\n");
 		printf ("Check that mini-B USB cable is attached to the device\n");
-	}
-	else
-	{
+	} else
 		ret = 0;
-	}
+
 	return ret;
 }
 
