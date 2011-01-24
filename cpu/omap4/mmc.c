@@ -633,10 +633,6 @@ unsigned char omap_mmc_erase_sect(unsigned int start,
 
 		/* check for Multi Block */
 		if (blk_cnt_current_tns > 1) {
-			err = mmc_send_cmd(mmc_cont_cur->base, MMC_CMD23,
-						blk_cnt_current_tns, resp);
-			if (err != 1)
-				return err;
 
 			OMAP_HSMMC_BLK(mmc_cont_cur->base) = BLEN_512BYTESLEN |
 						(blk_cnt_current_tns << 16);
@@ -678,6 +674,17 @@ unsigned char omap_mmc_erase_sect(unsigned int start,
 				break;
 			}
 		}
+
+		if (blk_cnt_current_tns > 1) {
+			err = mmc_send_cmd(mmc_cont_cur->base,
+						MMC_CMD12, 0, resp);
+
+			if (err != 1) {
+				printf("MMC_CMD12 failed 0x%x\n", err);
+				return err;
+			}
+		}
+
 		argument += sec_inc_val * blk_cnt_current_tns;
 		num_sec_val -= blk_cnt_current_tns;
 	}
