@@ -32,6 +32,7 @@
 #include <zlib.h>
 #include <bzlib.h>
 #include <environment.h>
+#include <fastboot.h>
 #include <asm/byteorder.h>
 
  /*cmd_boot.c*/
@@ -1440,7 +1441,56 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		do_fastboot(NULL, 0, 0, NULL);
 		goto err;
 	}
+#if defined(CONFIG_4430PANDA)
+	else {
+		/* copy now the whole image: now that we know its clean */
+		char source[32], dest[32], length[32];
+		char slot_no[32];
+		u32 image_size;
+		char *mmc_read[6]  = {"mmc", NULL, "read", NULL, NULL, NULL};
+		char *mmc_init[2] = {"mmcinit", NULL,};
+		struct fastboot_ptentry *ptn;
 
+		mmc_init[1] = slot_no;
+		mmc_read[1] = slot_no;
+		mmc_read[3] = source;
+		mmc_read[4] = dest;
+		mmc_read[5] = length;
+
+		/* Find the boot partition pointer */
+		ptn = fastboot_flash_find_ptn("boot");
+		if(!ptn)
+			printf("\n cannot find partition.... boot\n");
+
+		image_size = sizeof(boot_img_hdr) +
+					bootimg_header_data.kernel_size +
+					bootimg_header_data.ramdisk_size + 3*bootimg_header_data.page_size;
+
+		sprintf(slot_no, "%d", 0);
+		sprintf(source, "0x%x", ptn->start);
+		sprintf(dest, "0x%x", 0x81000000);
+		sprintf(length, "0x%x", image_size);
+
+		if (do_mmc(NULL, 0, 2, mmc_init))
+			printf("MMC%s: FAIL:Init of MMC", mmc_init[1]);
+		else
+			printf("MMC%s: init success", mmc_init[1]);
+
+		if (do_mmc(NULL, 0, 6, mmc_read))
+			printf("MMC%s: FAIL:write", mmc_init[1]);
+		else
+			printf("MMC%s: init success", mmc_init[1]);
+
+		addr = 0x81000000;
+		memmove (&bootimg_header_data, (char *)addr, sizeof(boot_img_hdr));
+		if (strncmp((char *)(bootimg_header_data.magic),BOOT_MAGIC, 8)) {
+			puts ("Bad boot image - default to fastboot\n");
+			/* Invalid image: so enter fastboot mode */
+			do_fastboot(NULL, 0, 0, NULL);
+			goto err;
+		}
+	}
+#endif
 	addr = addr + bootimg_header_data.page_size;
 	len  = bootimg_header_data.kernel_size;
 #ifdef DEBUG

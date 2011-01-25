@@ -148,7 +148,7 @@
 #define CONFIG_BOOTARGS "console=ttyO2,115200n8 mem=512M \
 	init=/init vram=32M omapfb.vram=0:16M androidboot.console=ttyO2"
 
-#define CONFIG_BOOTCOMMAND "mmcinit 0;mmc 0 read 0x500 0x81000000 0x500000;booti 81000000"
+#define CONFIG_BOOTCOMMAND "mmcinit 0;mmc 0 read 0x500 0x81000000 0x260;booti 81000000"
 
 #endif
 
