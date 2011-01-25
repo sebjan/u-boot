@@ -193,6 +193,10 @@ unsigned char mmc_send_cmd(unsigned int base, unsigned int cmd,
 	if (cmd_index == 0x19) { /* CMD25: Multi block write */
 		OMAP_HSMMC_CMD(base) = cmd | CMD_TYPE_NORMAL | CICE_NOCHECK |
 			CCCE_NOCHECK | MSBS | BCE | ACEN_DISABLE | DE_DISABLE;
+	} else if (cmd_index == 0xC) {
+		OMAP_HSMMC_CMD(base) = cmd | 0x3 << 22 | CICE_NOCHECK |
+		CCCE_NOCHECK | ACEN_DISABLE | BCE_DISABLE |
+			DE_DISABLE;
 	} else {
 		OMAP_HSMMC_BLK(base) = BLEN_512BYTESLEN | NBLK_STPCNT;
 		OMAP_HSMMC_CMD(base) = cmd | CMD_TYPE_NORMAL | CICE_NOCHECK |
