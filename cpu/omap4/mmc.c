@@ -879,8 +879,8 @@ int mmc_read(int mmc_cont, unsigned int src, unsigned char *dst, int size)
 	int ret = 1;
 
 	if (mmc_blk_dev[mmc_cont].dev == -1) {
-		printf("Read not permitted as Card on SLOT-%d \
-						not Initialized\n");
+		printf("Read not permitted as Card on SLOT-%d"
+				" not Initialized\n", mmc_cont);
 	} else {
 		ret = omap_mmc_read_sect(src, size,
 			&cur_controller_data[mmc_cont],
@@ -894,8 +894,8 @@ int mmc_write(int mmc_cont, unsigned char *src, unsigned long dst, int size)
 	int ret = 1;
 
 	if (mmc_blk_dev[mmc_cont].dev == -1) {
-		printf("Write not permitted as Card on SLOT-%d \
-					not Initialized\n");
+		printf("Write not permitted as Card on SLOT-%d"
+					" not Initialized\n", mmc_cont);
 	} else {
 		ret = omap_mmc_write_sect((unsigned int *)src, size,
 			&cur_controller_data[mmc_cont],
@@ -909,8 +909,8 @@ int mmc_erase(int mmc_cont, unsigned int start, int size)
 	int ret = 1;
 
 	if (mmc_blk_dev[mmc_cont].dev == -1) {
-		printf("Erase not permitted as Card on SLOT-%d \
-					not Initialized\n");
+		printf("Erase not permitted as Card on SLOT-%d"
+					" not Initialized\n", mmc_cont);
 	} else {
 		ret = omap_mmc_erase_sect(start, &cur_controller_data[mmc_cont],
 						&cur_card_data[mmc_cont], size);
