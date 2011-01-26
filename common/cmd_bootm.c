@@ -1442,7 +1442,7 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		goto err;
 	}
 #if defined(CONFIG_4430PANDA)
-	else {
+	else if (strncmp(argv[2], "boot", 4)) {
 		/* copy now the whole image: now that we know its clean */
 		char source[32], dest[32], length[32];
 		char slot_no[32];
@@ -1489,7 +1489,8 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 			do_fastboot(NULL, 0, 0, NULL);
 			goto err;
 		}
-	}
+	} else
+		puts("Case: fastboot boot system.img\n");
 #endif
 	/* Poison the boot-imge header:
 	 * This way a reset pressed on board will not load stale image

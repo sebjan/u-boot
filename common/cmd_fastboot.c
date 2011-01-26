@@ -1073,7 +1073,7 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 			    (CFG_FASTBOOT_MKBOOTIMAGE_PAGE_SIZE < download_bytes))
 			{
 				char start[32];
-				char *booti_args[3] = { "booti", NULL, NULL, };
+				char *booti_args[4] = { "booti", NULL, "boot", NULL };
 
 				/* Skip the mkbootimage header */
 				//boot_img_hdr *hdr =
