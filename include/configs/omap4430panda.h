@@ -140,13 +140,13 @@
 #endif /*CONFIG_4430ZEBU */
 
 #ifdef NFS_BOOT_DEFAULTS
-#define CONFIG_BOOTARGS "mem=64M console=ttyS0,115200n8 noinitrd \
-	root=/dev/nfs rw nfsroot=128.247.77.158:/home/a0384864/wtbu/rootfs \
-	ip=dhcp"
+#define CONFIG_BOOTARGS "mem=64M console=ttyS0,115200n8 noinitrd" \
+	" root=/dev/nfs rw nfsroot=128.247.77.158:/home/a0384864/wtbu/rootfs" \
+	" ip=dhcp"
 #else
 
-#define CONFIG_BOOTARGS "console=ttyO2,115200n8 mem=512M \
-	init=/init vram=32M omapfb.vram=0:16M androidboot.console=ttyO2"
+#define CONFIG_BOOTARGS "console=ttyO2,115200n8 mem=512M" \
+	" init=/init vram=32M omapfb.vram=0:16M androidboot.console=ttyO2"
 
 #define CONFIG_BOOTCOMMAND "mmcinit 0;mmc 0 read 0x500 0x81000000 0x260;booti 81000000"
 
