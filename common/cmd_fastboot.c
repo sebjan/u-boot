@@ -59,6 +59,7 @@
 #include <command.h>
 #include <nand.h>
 #include <fastboot.h>
+#include <sparse.h>
 #include <environment.h>
 
 #if (CONFIG_FASTBOOT)
@@ -1274,30 +1275,44 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 						sprintf(length, "0x%x", download_bytes);
 
 						printf("Initializing '%s'\n", ptn->name);
-						if (do_mmc(NULL, 0, 2, mmc_init))
+						if (do_mmc(NULL, 0, 2, mmc_init)) {
 							sprintf(response, "FAIL:Init of MMC card");
-						else
+							goto done;
+						} else
 							sprintf(response, "OKAY");
 
-
-						printf("Writing '%s'\n", ptn->name);
-						if (do_mmc(NULL, 0, 6, mmc_write)) {
-							printf("Writing '%s' FAILED!\n", ptn->name);
-							sprintf(response, "FAIL: Write partition");
+						/* Check if we have sparse compressed image */
+						if ( ((sparse_header_t *)interface.transfer_buffer)->magic
+								== SPARSE_HEADER_MAGIC) {
+							printf("fastboot: %s is in sparse format\n", ptn->name);
+							if (!do_unsparse(interface.transfer_buffer,
+									ptn->start,
+									slot_no)) {
+								printf("Writing sparsed: '%s' DONE!\n", ptn->name);
+							} else {
+								printf("Writing sparsed '%s' FAILED!\n", ptn->name);
+								sprintf(response, "FAIL: Sparsed Write");
+							}
 						} else {
-							printf("Writing '%s' DONE!\n", ptn->name);
-							sprintf(response, "OKAY");
+							/* Normal image: no sparse */
+							printf("Writing '%s'\n", ptn->name);
+							if (do_mmc(NULL, 0, 6, mmc_write)) {
+								printf("Writing '%s' FAILED!\n", ptn->name);
+								sprintf(response, "FAIL: Write partition");
+							} else {
+								printf("Writing '%s' DONE!\n", ptn->name);
+							}
 						}
-					}
+					} /* Normal Case */
 
 				} else {
 					sprintf(response, "FAILno image downloaded");
 				}
-			}
+			} /* EMMC */
 
 			ret = 0;
-		}
-
+		} /* fastboot flash ... */
+done:
 		fastboot_tx_status(response, strlen(response));
 
 	} /* End of command */
