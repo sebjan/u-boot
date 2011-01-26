@@ -1491,6 +1491,11 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		}
 	}
 #endif
+	/* Poison the boot-imge header:
+	 * This way a reset pressed on board will not load stale image
+	 */
+	memcpy(addr, "POISONED", 8);
+
 	addr = addr + bootimg_header_data.page_size;
 	len  = bootimg_header_data.kernel_size;
 #ifdef DEBUG
