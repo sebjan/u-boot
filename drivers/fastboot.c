@@ -202,6 +202,14 @@ static void fastboot_bulk_endpoint_reset (void)
 	 * The extent is now double and must be considered if another fifo is
 	 * added to the end of this one.
 	 */
+#if defined(CONFIG_4430PANDA)
+	if (high_speed)
+		*rxfifosz =
+			RX_ENDPOINT_MAXIMUM_PACKET_SIZE_BITS_2_0;
+	else
+		*rxfifosz =
+			RX_ENDPOINT_MAXIMUM_PACKET_SIZE_BITS_1_1;
+#else
 	if (high_speed)
 		*rxfifosz =
 			RX_ENDPOINT_MAXIMUM_PACKET_SIZE_BITS_2_0 |
@@ -210,6 +218,7 @@ static void fastboot_bulk_endpoint_reset (void)
 		*rxfifosz =
 			RX_ENDPOINT_MAXIMUM_PACKET_SIZE_BITS_1_1 |
 			MUSB_RXFIFOSZ_DPB;
+#endif
 
 	/* restore index */
 	*index = old_index;
@@ -859,14 +868,7 @@ static int fastboot_rx (void)
 			 * of the end packet simple, just do it by manually
 			 * reading the fifo
 			 */
-#if defined(CONFIG_4430PANDA)
-			/* On panda DMA is not working in case you boot
-			 * with USB as power supply
-			 */
-			if (0) {
-#else
 			if (fifo_size == count) {
-#endif
 				/* Mode 1
 				 *
 				 * The setup is not as simple as
