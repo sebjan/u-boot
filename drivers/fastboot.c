@@ -40,6 +40,7 @@
 
 #if defined(CONFIG_FASTBOOT)
 
+#define OTG_SYSCONFIG 0x4A0AB404
 #define OTG_INTERFSEL 0x4A0AB40C
 #define USBOTGHS_CONTROL 0x4A00233C
 
@@ -64,6 +65,7 @@ static volatile u16 *peri_txcsr = (volatile u16 *) OMAP34XX_USB_TXCSR(BULK_ENDPO
 static volatile u16 *txmaxp     = (volatile u16 *) OMAP34XX_USB_TXMAXP(BULK_ENDPOINT);
 static volatile u8  *bulk_fifo  = (volatile u8  *) OMAP34XX_USB_FIFO(BULK_ENDPOINT);
 
+static volatile u32 *otg_sysconfig = (volatile u32  *)OTG_SYSCONFIG;
 static volatile u32 *otg_interfsel = (volatile u32  *)OTG_INTERFSEL;
 static volatile u32 *otghs_control = (volatile u32  *)USBOTGHS_CONTROL;
 
@@ -102,7 +104,7 @@ static volatile u32 *peri_dma_count	= (volatile u32 *) OMAP_USB_DMA_COUNT_CH(DMA
    2^(m+3), 64 = 2^6, m = 3 */
 #define RX_ENDPOINT_MAXIMUM_PACKET_SIZE_BITS_2_0 (6)
 #define RX_ENDPOINT_MAXIMUM_PACKET_SIZE_BITS_1_1 (3)
-#define TX_ENDPOINT_MAXIMUM_PACKET_SIZE_BITS (3)
+#define TX_ENDPOINT_MAXIMUM_PACKET_SIZE_BITS (6)
 
 #define CONFIGURATION_NORMAL      1
 
@@ -122,7 +124,7 @@ static u16 fastboot_fifo_used = 0;
 static unsigned int set_address = 0;
 static u8 faddr = 0xff;
 
-static unsigned int high_speed = 0;
+static unsigned int high_speed = 1;
 
 static unsigned int deferred_rx = 0;
 
@@ -188,12 +190,18 @@ static void fastboot_bulk_endpoint_reset (void)
 	/* save old index */
 	old_index = *index;
 
+	*index = 0;
+	*rxfifoadd = 0;
+	*txfifoadd = 0;
+	*rxfifosz = 3; /* 64 bytes */
+	*txfifosz = 3;
+
 	/* set index to endpoint */
 	*index = BULK_ENDPOINT;
-  
+
 	/* Address starts at the end of EP0 fifo, shifted right 3 (8 bytes) */
 	*txfifoadd = MUSB_EP0_FIFOSIZE >> 3;
-	*rxfifoadd = (MUSB_EP0_FIFOSIZE + TX_ENDPOINT_MAXIMUM_PACKET_SIZE_BITS) >> 3;
+	*rxfifoadd = (MUSB_EP0_FIFOSIZE + 512) >> 3;
 
 	/* Size depends on the mode.  Do not double buffer */
 	*txfifosz = TX_ENDPOINT_MAXIMUM_PACKET_SIZE_BITS;
@@ -222,7 +230,7 @@ static void fastboot_bulk_endpoint_reset (void)
 
 	/* restore index */
 	*index = old_index;
-  
+
 	/* Setup Rx endpoint for Bulk OUT */
 	*rxmaxp = fastboot_fifo_size();
 
@@ -236,7 +244,7 @@ static void fastboot_bulk_endpoint_reset (void)
 	*peri_rxcsr &= ~(MUSB_RXCSR_DMAENAB | MUSB_RXCSR_P_ISO);
 	/* reset endpoint data */
 	*peri_rxcsr |= MUSB_RXCSR_CLRDATATOG;
-  
+
 	/* Setup Tx endpoint for Bulk IN */
 	/* Set max packet size per usb 1.1 / 2.0 */
 	*txmaxp = TX_ENDPOINT_MAXIMUM_PACKET_SIZE;
@@ -247,7 +255,7 @@ static void fastboot_bulk_endpoint_reset (void)
 		*peri_txcsr |= MUSB_TXCSR_FLUSHFIFO;
 		udelay(1);
 	}
-  
+
 	/* No dma, enable bulkout, no underflow */
 	*peri_txcsr &= ~(MUSB_TXCSR_DMAENAB | MUSB_TXCSR_P_ISO | MUSB_TXCSR_P_UNDERRUN);
 	/* reset endpoint data, shared fifo with rx */
@@ -306,6 +314,8 @@ static int read_bulk_fifo_dma(u8 *buf, u32 size)
 {
 	int ret = 0;
 
+	*peri_dma_cntl = 0;
+
 	/* Set the address */
 	*peri_dma_addr = (u32) buf;
 	/* Set the transfer size */
@@ -318,9 +328,10 @@ static int read_bulk_fifo_dma(u8 *buf, u32 size)
 	*peri_dma_cntl =
 		MUSB_DMA_CNTL_BUSRT_MODE_3 |
 		MUSB_DMA_CNTL_END_POINT(BULK_ENDPOINT) |
-		MUSB_DMA_CNTL_MODE_1 |
-		MUSB_DMA_CNTL_WRITE |
-		MUSB_DMA_CNTL_ENABLE;
+		MUSB_DMA_CNTL_INTERRUPT_ENABLE |
+		MUSB_DMA_CNTL_WRITE;
+
+	*peri_dma_cntl |= MUSB_DMA_CNTL_ENABLE;
 
 	while (1) {
 
@@ -332,6 +343,7 @@ static int read_bulk_fifo_dma(u8 *buf, u32 size)
 		if (0 == *peri_dma_count)
 			break;
 	}
+
 	return ret;
 }
 
@@ -1134,6 +1146,12 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 	fastboot_interface->transfer_buffer               = (unsigned char *) CFG_FASTBOOT_TRANSFER_BUFFER;
 	fastboot_interface->transfer_buffer_size          = CFG_FASTBOOT_TRANSFER_BUFFER_SIZE;
 
+	/* Reset Mentor USB block */
+	/* soft reset */
+	*otg_sysconfig |= (1<<1);
+	/* now set better defaults */
+	*otg_sysconfig = (0x1008);
+
 	if (*otghs_control != 0x15) {
 		fastboot_reset();
 
@@ -1148,6 +1166,9 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 	} else {
 		/* HACK */
 		fastboot_bulk_endpoint_reset();
+
+		*otg_interfsel &= 0;
+
 		/* Keeping USB cable attached and booting causes
 		 * ROM code to reconfigure USB, and then
 		 * re-enumeration never happens
