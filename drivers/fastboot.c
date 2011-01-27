@@ -78,7 +78,7 @@ static volatile u32 *peri_dma_count	= (volatile u32 *) OMAP_USB_DMA_COUNT_CH(DMA
 /* This is the TI USB vendor id */
 #define DEVICE_VENDOR_ID  0x0451
 /* This is just made up.. */
-#define DEVICE_PRODUCT_ID 0xCAFE
+#define DEVICE_PRODUCT_ID 0xD022
 /* This is just made up.. */
 #define DEVICE_BCD        0x0311;
 
