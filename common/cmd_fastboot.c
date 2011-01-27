@@ -1096,7 +1096,7 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 				 *		set_env ("bootargs", (char *) &fb_hdr->cmdline[0]);
 				 */
 				/* boot the boot.img */
-				do_booti (NULL, 0, 2, booti_args);
+				do_booti (NULL, 0, 3, booti_args);
 			}
 			sprintf(response, "FAILinvalid boot image");
 			ret = 0;

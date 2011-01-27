@@ -1436,13 +1436,13 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	bootimg_print_image_hdr((boot_img_hdr *)&bootimg_header_data);
 
 	if (strncmp((char *)(bootimg_header_data.magic),BOOT_MAGIC, 8)) {
-		puts ("Bad boot image - default to fastboot\n");
+		puts ("booti: Bad boot image - default to fastboot\n");
 		/* Invalid image: so enter fastboot mode */
 		do_fastboot(NULL, 0, 0, NULL);
 		goto err;
 	}
 #if defined(CONFIG_4430PANDA)
-	else if (strncmp(argv[2], "boot", 4)) {
+	else if (2 == argc) { /* booti <address> */
 		/* copy now the whole image: now that we know its clean */
 		char source[32], dest[32], length[32];
 		char slot_no[32];
@@ -1460,7 +1460,7 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		/* Find the boot partition pointer */
 		ptn = fastboot_flash_find_ptn("boot");
 		if(!ptn)
-			printf("\n cannot find partition.... boot\n");
+			printf("booti: cannot find partition.... boot\n");
 
 		image_size = sizeof(boot_img_hdr) +
 					bootimg_header_data.kernel_size +
@@ -1472,25 +1472,27 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		sprintf(length, "0x%x", image_size);
 
 		if (do_mmc(NULL, 0, 2, mmc_init))
-			printf("MMC%s: FAIL:Init of MMC", mmc_init[1]);
+			printf("booti: MMC%s: FAIL:Init of MMC\n", mmc_init[1]);
 		else
-			printf("MMC%s: init success", mmc_init[1]);
+			printf("booti: MMC%s: init success\n", mmc_init[1]);
 
 		if (do_mmc(NULL, 0, 6, mmc_read))
-			printf("MMC%s: FAIL:write", mmc_init[1]);
+			printf("booti: MMC%s: FAIL:read\n", mmc_init[1]);
 		else
-			printf("MMC%s: init success", mmc_init[1]);
+			printf("booti: MMC%s: read success\n", mmc_init[1]);
 
 		addr = 0x81000000;
 		memmove (&bootimg_header_data, (char *)addr, sizeof(boot_img_hdr));
 		if (strncmp((char *)(bootimg_header_data.magic),BOOT_MAGIC, 8)) {
-			puts ("Bad boot image - default to fastboot\n");
+			puts ("booti: Bad boot image - default to fastboot\n");
 			/* Invalid image: so enter fastboot mode */
 			do_fastboot(NULL, 0, 0, NULL);
 			goto err;
 		}
-	} else
-		puts("Case: fastboot boot system.img\n");
+	} else if (3 == argc) {
+		/* case: fastboot boot boot.img */
+		puts("booti: Case: fastboot boot system.img\n");
+	}
 #endif
 	/* Poison the boot-imge header:
 	 * This way a reset pressed on board will not load stale image
@@ -1500,7 +1502,7 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	addr = addr + bootimg_header_data.page_size;
 	len  = bootimg_header_data.kernel_size;
 #ifdef DEBUG
-	printf ("Copying kernel from [%x] len[%x] to [%x]... ",
+	printf ("booti: Copying kernel from [%x] len[%x] to [%x]... ",
 					addr, len,
 					bootimg_header_data.kernel_addr);
 #endif
@@ -1517,16 +1519,16 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	addr += bootimg_header_data.page_size - (((unsigned long)addr) & pagemask);
 
 #ifdef DEBUG
-	printf("\n --> etc [%x]\n", (((unsigned long)addr) & pagemask));
-	printf("\n --> pad [%x]\n",
+	printf("booti: etc [%x]\n", (((unsigned long)addr) & pagemask));
+	printf("booti: pad [%x]\n",
 		bootimg_header_data.page_size - (((unsigned long)addr) & pagemask));
-	printf("\n --> param-addr [%x]\n", addr);
+	printf("booti: param-addr [%x]\n", addr);
 #endif
 
 	do_booti_linux  (addr, &bootimg_header_data);
 
 err:
-	puts ("\n## Control returned to monitor - resetting...\n");
+	puts ("booti: Control returned to monitor - resetting...\n");
 	do_reset (cmdtp, flag, argc, argv);
 
 	return 1;
