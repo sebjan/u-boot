@@ -27,7 +27,7 @@ include $(TOPDIR)/config.mk
 
 LIB	= lib$(BOARD).a
 
-OBJS	:= omap4430panda.o mmc.o
+OBJS	:= omap4430panda.o
 
 $(LIB):	$(OBJS)
 	$(AR) crv $@ $^

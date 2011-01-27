@@ -37,6 +37,8 @@
 #define CONFIG_4430PANDA	1    /* working with Panda */
 #define CONFIG_FASTBOOT		1    /* Using fastboot interface */
 
+#define BOARD_LATE_INIT 1
+
 /* Panda revisions */
 #define PANDA_4430_6_LAYER	0x1
 #define PANDA_4430_8_LAYER	0x1
