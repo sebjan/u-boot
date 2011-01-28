@@ -1329,7 +1329,7 @@ int do_fastboot (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	/* Initialize the board specific support */
 	if (0 == fastboot_init(&interface))
 	{
-		printf ("Disconnect USB cable to finish fastboot..\n");
+		printf ("Fastboot entered...\n");
 		
 		/* If we got this far, we are a success */
 		ret = 0;
