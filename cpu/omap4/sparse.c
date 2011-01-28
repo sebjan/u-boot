@@ -22,103 +22,92 @@
 #include <config.h>
 #include <common.h>
 #include <sparse.h>
+#include <mmc.h>
 
 //#define DEBUG
 
 #define SPARSE_HEADER_MAJOR_VER 1
 
 u8
-do_unsparse(unsigned char *source,
-		u32 sector,
-		char *slot_no)
+do_unsparse(unsigned char *source, u32 sector, char *slot_no)
 {
-	sparse_header_t sparse_header;
+	sparse_header_t *header = (void*) source;
+	unsigned mmcc;
 	u32 i, outlen = 0;
 
-	char src[32], dest[32], length[32];
-	char *mmc_write[6]  = {"mmc", NULL, "write", NULL, NULL, NULL};
-	mmc_write[1] = slot_no;
-	mmc_write[3] = src;
-	mmc_write[4] = dest;
-	mmc_write[5] = length;
+	mmcc = simple_strtoul(slot_no, NULL, 16);
 
-	printf("sparse: write to mmc slot[%s]\n", slot_no);
+	printf("sparse: write to mmc slot[%d] @ %d\n", mmcc, sector);
 
-	/* Decode sparse header */
-	sparse_header = *((sparse_header_t *)source);
-
-	if (sparse_header.magic != SPARSE_HEADER_MAGIC) {
-		printf("sparse: Bad Magic \n");
+	if (header->magic != SPARSE_HEADER_MAGIC) {
+		printf("sparse: bad magic\n");
 		return 1;
 	}
 
-	if (sparse_header.major_version != SPARSE_HEADER_MAJOR_VER) {
-		printf("sparse: Unknown major number\n");
+	if ((header->major_version != SPARSE_HEADER_MAJOR_VER) ||
+	    (header->file_hdr_sz != sizeof(sparse_header_t)) ||
+	    (header->chunk_hdr_sz != sizeof(chunk_header_t))) {
+		printf("sparse: incompatible format\n");
 		return 1;
 	}
+	/* todo: ensure image will fit */
 
 	/* Skip the header now */
-	source += sparse_header.file_hdr_sz;
+	source += header->file_hdr_sz;
 
-	for (i=0; i<sparse_header.total_chunks; i++) {
+	for (i=0; i < header->total_chunks; i++) {
 		unsigned int len = 0;
-		chunk_header_t chunk_header;
+		int r;
+		chunk_header_t *chunk = (void*) source;
 
-		chunk_header = *((chunk_header_t *)source);
 		/* move to next chunk */
-		source += sparse_header.chunk_hdr_sz;
+		source += sizeof(chunk_header_t);
 
-		switch (chunk_header.chunk_type) {
-			case CHUNK_TYPE_RAW:
-			if (chunk_header.total_sz != (sparse_header.chunk_hdr_sz +
-				  (chunk_header.chunk_sz * sparse_header.blk_sz)) ) {
+		switch (chunk->chunk_type) {
+		case CHUNK_TYPE_RAW:
+			len = chunk->chunk_sz * header->blk_sz;
+
+			if (chunk->total_sz != (len + sizeof(chunk_header_t))) {
 				printf("sparse: bad chunk size for chunk %d, type Raw\n", i);
 				return 1;
 			}
 
-			len = chunk_header.chunk_sz * sparse_header.blk_sz;
-
 			outlen += len;
-			sprintf(src, "0x%x", source);
-			sprintf(dest, "0x%x", sector);
-			sprintf(length, "0x%x", len);
 
 #ifdef DEBUG
-			printf("sparse: writing chunksz[%d] blk_sz[%d]\n", chunk_header.chunk_sz, sparse_header.blk_sz);
-				printf("\n\t--->sparse: src-%s dest-%s lenght-%s\n", src, dest, length);
+			printf("sparse: RAW blk=%d bsz=%d: write(sector=%d,len=%d)\n",
+			       chunk->chunk_sz, header->blk_sz, sector, len);
 #endif
-			if (do_mmc(NULL, 0, 6, mmc_write)) {
-				printf("sparse: mmc Writing FAILED!\n");
+			r = mmc_write(mmcc, source, sector, len);
+			if (r < 0) {
+				printf("sparse: mmc write failed\n");
 				return 1;
 			}
 
-			sector += (len/512);
+			sector += (len / 512);
 			source += len;
 			break;
 
-			case CHUNK_TYPE_DONT_CARE:
-			if (chunk_header.total_sz != sparse_header.chunk_hdr_sz) {
-				printf("sparse: bad chunk size for chunk %d,"
-						" type Dont Care\n", i);
+		case CHUNK_TYPE_DONT_CARE:
+			if (chunk->total_sz != sizeof(chunk_header_t)) {
+				printf("sparse: bogus DONT CARE chunk\n");
 				return 1;
 			}
-			len = chunk_header.chunk_sz * sparse_header.blk_sz;
+			len = chunk->chunk_sz * header->blk_sz;
 #ifdef DEBUG
-			printf("sparse: writing chunksz[%d] blk_sz[%d]\n", chunk_header.chunk_sz, sparse_header.blk_sz);
-				printf("\n\t -->sparse: skipping sector[0x%x] len[%d]\n", sector, len);
+			printf("sparse: DONT_CARE blk=%d bsz=%d: skip(sector=%d,len=%d)\n",
+			       chunk->chunk_sz, header->blk_sz, sector, len);
 #endif
 
 			outlen += len;
-			sector += (len/512);
+			sector += (len / 512);
 			break;
 
-			default:
-				printf("sparse: bad chunk, outlen(0x%x)\n", outlen);
-				return 1;
-			break;
-		}/* chunk-type */
-
-	}/* each chunk */
+		default:
+			printf("sparse: unknown chunk ID %04x\n", chunk->chunk_type);
+			return 1;
+		}
+	}
 
 	printf("\nsparse: out-length-0x%d MB\n", outlen/(1024*1024));
 	return 0;
