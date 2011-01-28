@@ -1105,6 +1105,15 @@ int fastboot_preboot(void)
 	/* Any key kept pressed does auto-fastboot */
 	if (__raw_readl(KBD_STATEMACHINE))
 		return 1;
+
+	/* On Panda: GPIO_121 button pressed causes to enter fastboot */
+#if defined(CONFIG_4430PANDA)
+	if (!(__raw_readl(OMAP44XX_GPIO4_BASE + DATA_IN_OFFSET) & (1<<25))){
+		printf("Panda: GPIO_121 pressed: entering fastboot....\n");
+		return 1;
+	}
+#endif
+
 #endif
 	return 0;
 }
