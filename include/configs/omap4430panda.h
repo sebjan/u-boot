@@ -137,7 +137,7 @@
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"bootcmd=go 0x80008000\0"
 #else
-#define CONFIG_BOOTDELAY         1
+#define CONFIG_BOOTDELAY         0
 
 #endif /*CONFIG_4430ZEBU */
 
@@ -150,7 +150,7 @@
 #define CONFIG_BOOTARGS "console=ttyO2,115200n8 mem=512M" \
 	" init=/init vram=32M omapfb.vram=0:16M androidboot.console=ttyO2"
 
-#define CONFIG_BOOTCOMMAND "mmcinit 0;mmc 0 read 0x500 0x81000000 0x260;booti 81000000"
+#define CONFIG_BOOTCOMMAND "booti mmc0"
 
 #endif
 

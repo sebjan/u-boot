@@ -34,6 +34,7 @@
 #include <environment.h>
 #include <fastboot.h>
 #include <asm/byteorder.h>
+#include <mmc.h>
 
  /*cmd_boot.c*/
  extern int do_reset (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
@@ -1416,126 +1417,100 @@ bootimg_print_image_hdr (boot_img_hdr *hdr)
 #endif
 }
 
-boot_img_hdr bootimg_header_data;
+static unsigned char boothdr[512];
 
+#define ALIGN(n,pagesz) ((n + (pagesz - 1)) & (~(pagesz - 1)))
+
+/* booti <addr> [ mmc0 | mmc1 [ <partition> ] ] */
 int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
-	ulong len;
-	char *addr;
-	unsigned pagemask;
+	unsigned addr;
+	char *ptn = "boot";
+	int mmcc = -1;
+	boot_img_hdr *hdr = (void*) boothdr;
 
-	addr = simple_strtoul(argv[1], NULL, 16);
+	if (argc < 2)
+		return -1;
 
-#ifdef DEBUG
-	printf ("## boot.img @ %08lx ...\n", addr);
-#endif
-
-	memmove (&bootimg_header_data, (char *)addr, sizeof(boot_img_hdr));
-
-	/* print copied header */
-	bootimg_print_image_hdr((boot_img_hdr *)&bootimg_header_data);
-
-	if (strncmp((char *)(bootimg_header_data.magic),BOOT_MAGIC, 8)) {
-		puts ("booti: Bad boot image - default to fastboot\n");
-		/* Invalid image: so enter fastboot mode */
-		do_fastboot(NULL, 0, 0, NULL);
-		goto err;
+	if (!strcmp(argv[1],"mmc0")) {
+		mmcc = 0;
+	} else if (!strcmp(argv[1],"mmc1")) {
+		mmcc = 1;
+	} else {
+		addr = simple_strtoul(argv[1], NULL, 16);
 	}
-#if defined(CONFIG_4430PANDA)
-	else if (2 == argc) { /* booti <address> */
-		/* copy now the whole image: now that we know its clean */
-		char source[32], dest[32], length[32];
-		char slot_no[32];
-		u32 image_size;
-		char *mmc_read[6]  = {"mmc", NULL, "read", NULL, NULL, NULL};
-		char *mmc_init[2] = {"mmcinit", NULL,};
-		struct fastboot_ptentry *ptn;
 
-		mmc_init[1] = slot_no;
-		mmc_read[1] = slot_no;
-		mmc_read[3] = source;
-		mmc_read[4] = dest;
-		mmc_read[5] = length;
+	if (argc > 2)
+		ptn = argv[3];
 
-		/* Find the boot partition pointer */
-		ptn = fastboot_flash_find_ptn("boot");
-		if(!ptn)
-			printf("booti: cannot find partition.... boot\n");
+	if (mmcc != -1) {
+#if (CONFIG_MMC)
+		struct fastboot_ptentry *pte;
+		unsigned sector;
 
-		image_size = sizeof(boot_img_hdr) +
-					bootimg_header_data.kernel_size +
-					bootimg_header_data.ramdisk_size + 3*bootimg_header_data.page_size;
-
-		sprintf(slot_no, "%d", 0);
-		sprintf(source, "0x%x", ptn->start);
-		sprintf(dest, "0x%x", 0x81000000);
-		sprintf(length, "0x%x", image_size);
-
-		if (do_mmc(NULL, 0, 2, mmc_init))
-			printf("booti: MMC%s: FAIL:Init of MMC\n", mmc_init[1]);
-		else
-			printf("booti: MMC%s: init success\n", mmc_init[1]);
-
-		if (do_mmc(NULL, 0, 6, mmc_read))
-			printf("booti: MMC%s: FAIL:read\n", mmc_init[1]);
-		else
-			printf("booti: MMC%s: read success\n", mmc_init[1]);
-
-		addr = 0x81000000;
-		memmove (&bootimg_header_data, (char *)addr, sizeof(boot_img_hdr));
-		if (strncmp((char *)(bootimg_header_data.magic),BOOT_MAGIC, 8)) {
-			puts ("booti: Bad boot image - default to fastboot\n");
-			/* Invalid image: so enter fastboot mode */
-			do_fastboot(NULL, 0, 0, NULL);
-			goto err;
+		pte = fastboot_flash_find_ptn(ptn);
+		if (!pte) {
+			printf("booti: cannot find '%s' partition\n", ptn);
+			return -1;
 		}
-	} else if (3 == argc) {
-		/* case: fastboot boot boot.img */
-		puts("booti: Case: fastboot boot system.img\n");
+		if (mmc_init(mmcc)) {
+			printf("mmc%d init failed\n", mmcc);
+			return -1;
+		}
+		if (mmc_read(mmcc, pte->start, (void*) hdr, 512) != 1) {
+			printf("booti: mmc failed to read bootimg header\n");
+			return -1;
+		}
+		if (memcmp(hdr->magic, BOOT_MAGIC, 8)) {
+			printf("booti: bad boot image magic\n");
+			return do_fastboot(NULL, 0, 0, NULL);
+		}
+
+		sector = pte->start + (hdr->page_size / 512);
+		if (mmc_read(mmcc, sector, (void*) hdr->kernel_addr,
+			     hdr->kernel_size) != 1) {
+			printf("booti: failed to read kernel\n");
+			return -1;
+		}
+
+		sector += ALIGN(hdr->kernel_size, hdr->page_size) / 512;
+		if (mmc_read(mmcc, sector, (void*) hdr->ramdisk_addr,
+			     hdr->ramdisk_size) != 1) {
+			printf("booti: failed to read ramdisk\n");
+			return -1;
+		}
+#else
+		return -1;
+#endif
+	} else {
+		/* set this aside somewhere safe */
+		memcpy(hdr, (void*) addr, sizeof(*hdr));
+
+		if (memcmp(hdr->magic, BOOT_MAGIC, 8)) {
+			printf("booti: bad boot image magic\n");
+			return do_fastboot(NULL, 0, 0, NULL);
+		}
+
+		memmove((void*) hdr->kernel_addr,
+			(void*) (addr + hdr->page_size),
+			hdr->kernel_size);
+		memmove((void*) hdr->ramdisk_addr,
+			(void*) (addr + hdr->page_size + 
+				 ALIGN(hdr->kernel_size, hdr->page_size)),
+			hdr->ramdisk_size);
 	}
-#endif
-	/* Poison the boot-imge header:
-	 * This way a reset pressed on board will not load stale image
-	 */
-	memcpy(addr, "POISONED", 8);
 
-	addr = addr + bootimg_header_data.page_size;
-	len  = bootimg_header_data.kernel_size;
-#ifdef DEBUG
-	printf ("booti: Copying kernel from [%x] len[%x] to [%x]... ",
-					addr, len,
-					bootimg_header_data.kernel_addr);
-#endif
-	/* Kernel moving */
-        memmove ((void *)(bootimg_header_data.kernel_addr), (void *)addr, len);
 
-	/* End of kernel */
-	addr += bootimg_header_data.kernel_size;
+	bootimg_print_image_hdr(hdr);
+	do_booti_linux(hdr->ramdisk_addr, hdr);
 
-	pagemask = bootimg_header_data.page_size - 1;
-
-	/* Point addr to ramdisk start */
-	/* Padding to next page boundary */
-	addr += bootimg_header_data.page_size - (((unsigned long)addr) & pagemask);
-
-#ifdef DEBUG
-	printf("booti: etc [%x]\n", (((unsigned long)addr) & pagemask));
-	printf("booti: pad [%x]\n",
-		bootimg_header_data.page_size - (((unsigned long)addr) & pagemask));
-	printf("booti: param-addr [%x]\n", addr);
-#endif
-
-	do_booti_linux  (addr, &bootimg_header_data);
-
-err:
 	puts ("booti: Control returned to monitor - resetting...\n");
 	do_reset (cmdtp, flag, argc, argv);
-
 	return 1;
 }
 
 U_BOOT_CMD(
-	booti,	2,	1,	do_booti,
+	booti,	3,	1,	do_booti,
 	"booti   - boot android bootimg from memory\n",
 	"<addr>\n    - boot application image stored in memory\n"
 	"\t'addr' should be the address of boot image which is zImage+ramdisk.img\n"
