@@ -27,6 +27,7 @@
 #include <asm/arch/mem.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/arch/sys_info.h>
+#include <asm/arch/mux.h>
 #ifdef CONFIG_OMAP3430
 #include <asm/arch/led.h>
 #endif
@@ -953,6 +954,26 @@ int fastboot_poll(void)
 	u8 intrusb;
 	u16 intrtx;
 	u16 intrrx;
+	static u32 blink = 0;
+
+	/* On panda blink the D1 LED in fastboot mode */
+#if defined(CONFIG_4430PANDA)
+	#define OMAP44XX_WKUP_CTRL_BASE 0x4A31E000
+	#define PRECEPTION_FACTOR 100000
+
+	if (blink  == 0x7fff + PRECEPTION_FACTOR)
+		__raw_writew((PTU | M3),
+			OMAP44XX_WKUP_CTRL_BASE + CONTROL_WKUP_PAD1_FREF_CLK4_REQ);
+
+	if (blink  == (0xffff + PRECEPTION_FACTOR)) {
+		__raw_writew((M3),
+			OMAP44XX_WKUP_CTRL_BASE + CONTROL_WKUP_PAD1_FREF_CLK4_REQ);
+		blink = 0;
+	}
+
+	blink ++ ;
+#endif
+
 
 	/* Look at the interrupt registers */
 	intrusb = inb (OMAP34XX_USB_INTRUSB);
