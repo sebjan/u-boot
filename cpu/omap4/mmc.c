@@ -265,9 +265,10 @@ unsigned char mmc_read_data(unsigned int base, unsigned int *output_buf)
 	return 1;
 }
 
-unsigned char mmc_write_data(unsigned int base, unsigned int *input_buf)
+int mmc_write_data(unsigned int base, unsigned int *input_buf)
 {
 	unsigned int mmc_stat;
+	int count = 0;
 
 	/*
 	 * Start Polled Write
@@ -277,8 +278,10 @@ unsigned char mmc_write_data(unsigned int base, unsigned int *input_buf)
 			mmc_stat = OMAP_HSMMC_STAT(base);
 		} while (mmc_stat == 0);
 
-		if ((mmc_stat & ERRI_MASK) != 0)
-			return (unsigned char)mmc_stat;
+		if ((mmc_stat & ERRI_MASK) != 0) {
+			printf("mmc write error %08x\n", mmc_stat);
+			return -1;
+		}
 
 		if (mmc_stat & BWR_MASK) {
 			unsigned int k;
@@ -288,6 +291,7 @@ unsigned char mmc_write_data(unsigned int base, unsigned int *input_buf)
 				OMAP_HSMMC_DATA(base) = *input_buf;
 				input_buf++;
 			}
+			count++;
 		}
 
 		if (mmc_stat & BRR_MASK)
@@ -298,7 +302,7 @@ unsigned char mmc_write_data(unsigned int base, unsigned int *input_buf)
 			break;
 		}
 	}
-	return 1;
+	return count;
 }
 
 unsigned char mmc_detect_card(mmc_card_data *mmc_card_cur,
@@ -535,6 +539,7 @@ unsigned char omap_mmc_write_sect(unsigned int *input_buf,
 		(num_bytes + (MMCSD_SECTOR_SIZE - 1)) / MMCSD_SECTOR_SIZE;
 	unsigned int sec_inc_val;
 	unsigned int blk_cnt_current_tns;
+	int r;
 
 	if (num_sec_val == 0) {
 		printf("mmc write: Invalid size\n");
@@ -577,9 +582,10 @@ unsigned char omap_mmc_write_sect(unsigned int *input_buf,
 			if (err != 1)
 				return err;
 		}
-		err = mmc_write_data(mmc_cont_cur->base, input_buf);
-		if (err != 1)
-			return err;
+		r = mmc_write_data(mmc_cont_cur->base, input_buf);
+		if (r < 0)
+			return 1;
+		blk_cnt_current_tns = r;
 
 #if defined(CONFIG_4430PANDA)
 		if (blk_cnt_current_tns > 1) {
