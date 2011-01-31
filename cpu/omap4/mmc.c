@@ -445,7 +445,7 @@ unsigned char mmc_read_cardsize(unsigned int base, mmc_card_data *mmc_dev_data,
 			    ((((mmc_sd2_csd_reg_t *) cur_csd)->
 			      c_size_msb & MMC_SD2_CSD_C_SIZE_MSB_MASK)
 			     << MMC_SD2_CSD_C_SIZE_MSB_OFFSET);
-			mmc_dev_data->size = card_size * 1024;
+			mmc_dev_data->size = (card_size + 1) * 1024;
 			if (mmc_dev_data->size == 0)
 				return 0;
 		} else {
@@ -916,5 +916,14 @@ int mmc_erase(int mmc_cont, unsigned int start, int size)
 						&cur_card_data[mmc_cont], size);
 	}
 	return ret;
+}
+
+int mmc_info(int mmc_cont, unsigned int *blksize, unsigned int *sectors)
+{
+	if (blksize)
+		*blksize = mmc_blk_dev[mmc_cont].blksz;
+	if (sectors)
+		*sectors = cur_card_data[mmc_cont].size;
+	return 0;
 }
 #endif

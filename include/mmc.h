@@ -29,5 +29,6 @@ int mmc_init(int slot);
 int mmc_read(int mmc_cont, unsigned int src, unsigned char *dst, int size);
 int mmc_write(int mmc_cont, unsigned char *src, unsigned long dst, int size);
 int mmc_erase(int mmc_cont, unsigned int start, int size);
+int mmc_info(int mmc_count, unsigned int *blksize, unsigned int *sectors);
 
 #endif /* _MMC_H_ */
