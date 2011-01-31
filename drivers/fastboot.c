@@ -881,7 +881,12 @@ static int fastboot_rx (void)
 			 * of the end packet simple, just do it by manually
 			 * reading the fifo
 			 */
+#if defined(CONFIG_4430PANDA)
+			/* DMA is causing problems on this target */
+			if (0) {
+#else
 			if (fifo_size == count) {
+#endif
 				/* Mode 1
 				 *
 				 * The setup is not as simple as
