@@ -28,14 +28,33 @@
 
 #define SPARSE_HEADER_MAJOR_VER 1
 
-u8
-do_unsparse(unsigned char *source, u32 sector, char *slot_no)
+int mmc_compare(unsigned mmcc, unsigned char *src, unsigned sector, unsigned len)
+{
+	u8 data[512];
+
+	while (len > 0) {
+		if (mmc_read(mmcc, sector, data, 512) != 1) {
+			printf("mmc read error sector %d\n", sector);
+			return -1;
+		}
+		if (memcmp(data, src, 512)) {
+			printf("mmc data mismatch sector %d\n", sector);
+			return -1;
+		}
+		len -= 512;
+		sector++;
+		src += 512;
+	}
+	return 0;
+}
+
+
+int _unsparse(unsigned char *source, u32 sector, unsigned mmcc,
+	      int (*WRITE)(unsigned mwcc, unsigned char *src,
+			   unsigned sector, unsigned len))
 {
 	sparse_header_t *header = (void*) source;
-	unsigned mmcc;
 	u32 i, outlen = 0;
-
-	mmcc = simple_strtoul(slot_no, NULL, 16);
 
 	printf("sparse: write to mmc slot[%d] @ %d\n", mmcc, sector);
 
@@ -73,12 +92,11 @@ do_unsparse(unsigned char *source, u32 sector, char *slot_no)
 			}
 
 			outlen += len;
-
 #ifdef DEBUG
 			printf("sparse: RAW blk=%d bsz=%d: write(sector=%d,len=%d)\n",
 			       chunk->chunk_sz, header->blk_sz, sector, len);
 #endif
-			r = mmc_write(mmcc, source, sector, len);
+			r = WRITE(mmcc, source, sector, len);
 			if (r < 0) {
 				printf("sparse: mmc write failed\n");
 				return 1;
@@ -112,3 +130,16 @@ do_unsparse(unsigned char *source, u32 sector, char *slot_no)
 	printf("\nsparse: out-length-0x%d MB\n", outlen/(1024*1024));
 	return 0;
 }
+
+u8 do_unsparse(unsigned char *source, u32 sector, char *slot_no)
+{
+	unsigned mmcc = simple_strtoul(slot_no, NULL, 16);
+	if (_unsparse(source, sector, mmcc, mmc_write))
+		return 1;
+#if DEBUG
+	if (_unsparse(source, sector, mmcc, mmc_compare))
+		return 1;
+#endif
+	return 0;
+}
+			
