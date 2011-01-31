@@ -1483,6 +1483,8 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		return -1;
 #endif
 	} else {
+		unsigned kaddr, raddr;
+
 		/* set this aside somewhere safe */
 		memcpy(hdr, (void*) addr, sizeof(*hdr));
 
@@ -1491,18 +1493,19 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 			return do_fastboot(NULL, 0, 0, NULL);
 		}
 
-		memmove((void*) hdr->kernel_addr,
-			(void*) (addr + hdr->page_size),
-			hdr->kernel_size);
-		memmove((void*) hdr->ramdisk_addr,
-			(void*) (addr + hdr->page_size + 
-				 ALIGN(hdr->kernel_size, hdr->page_size)),
-			hdr->ramdisk_size);
+		bootimg_print_image_hdr(hdr);
+
+		kaddr = addr + hdr->page_size;
+		raddr = kaddr + ALIGN(hdr->kernel_size, hdr->page_size);
+
+		memmove((void*) hdr->kernel_addr, kaddr, hdr->kernel_size);
+		memmove((void*) hdr->ramdisk_addr, raddr, hdr->ramdisk_size);
 	}
 
-
-	bootimg_print_image_hdr(hdr);
-	do_booti_linux(hdr->ramdisk_addr, hdr);
+	printf("kernel   @ %08x (%d)\n", hdr->kernel_addr, hdr->kernel_size);
+	printf("ramdisk  @ %08x (%d)\n", hdr->ramdisk_addr, hdr->ramdisk_size);
+	
+	do_booti_linux(hdr);
 
 	puts ("booti: Control returned to monitor - resetting...\n");
 	do_reset (cmdtp, flag, argc, argv);

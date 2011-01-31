@@ -272,7 +272,7 @@ void do_bootm_linux (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[],
 }
 
 
-void do_booti_linux (ulong initrd_start_addr, boot_img_hdr *bootimg_header_data)
+void do_booti_linux (boot_img_hdr *hdr)
 {
 	ulong initrd_start, initrd_end;
 	void (*theKernel)(int zero, int arch, uint params);
@@ -281,18 +281,12 @@ void do_booti_linux (ulong initrd_start_addr, boot_img_hdr *bootimg_header_data)
 	char *commandline = getenv ("bootargs");
 #endif
 
-	theKernel = (void (*)(int, int, uint))(bootimg_header_data->kernel_addr);
+	theKernel = (void (*)(int, int, uint))(hdr->kernel_addr);
 
-	initrd_start =  initrd_start_addr;;
-	initrd_end = initrd_start + bootimg_header_data->ramdisk_size;
+	initrd_start = hdr->ramdisk_addr;
+	initrd_end = initrd_start + hdr->ramdisk_size;
 
-#if defined (CONFIG_SETUP_MEMORY_TAGS) || \
-    defined (CONFIG_CMDLINE_TAG) || \
-    defined (CONFIG_INITRD_TAG) || \
-    defined (CONFIG_SERIAL_TAG) || \
-    defined (CONFIG_REVISION_TAG) || \
-    defined (CONFIG_LCD) || \
-    defined (CONFIG_VFD)
+#if defined (CONFIG_SETUP_MEMORY_TAGS)
 	setup_start_tag (bd);
 #ifdef CONFIG_SERIAL_TAG
 	setup_serial_tag (&params);
@@ -307,7 +301,7 @@ void do_booti_linux (ulong initrd_start_addr, boot_img_hdr *bootimg_header_data)
 	setup_commandline_tag (bd, commandline);
 #endif
 #ifdef CONFIG_INITRD_TAG
-	if (initrd_start && initrd_end)
+	if (hdr->ramdisk_size)
 		setup_initrd_tag (bd, initrd_start, initrd_end);
 #endif
 #if defined (CONFIG_VFD) || defined (CONFIG_LCD)
