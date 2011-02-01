@@ -847,6 +847,17 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 
 		}
 
+		if (memcmp(cmdbuf, "oem ", 4) == 0) {
+			int r = fastboot_oem(cmdbuf + 4);
+			if (r < 0) {
+				strcpy(response,"FAIL");
+			} else {
+				strcpy(response,"OKAY");
+			}
+			ret = 0;
+			goto done;
+		}
+
 		/* erase
 		   Erase a register flash partition
 		   Board has to set up flash partitions */

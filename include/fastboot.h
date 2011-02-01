@@ -277,6 +277,9 @@ extern int fastboot_tx_status(const char *buffer, unsigned int buffer_size);
    Returns 1 on failure */
 extern int fastboot_getvar(const char *rx_buffer, char *tx_buffer);
 
+/* board-specific fastboot commands */
+extern int fastboot_oem(const char *command);
+
 /* The Android-style flash handling */
 
 /* tools to populate and query the partition table */
