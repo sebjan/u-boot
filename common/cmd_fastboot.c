@@ -1361,6 +1361,11 @@ U_BOOT_CMD(
 static fastboot_ptentry ptable[MAX_PTN];
 static unsigned int pcount = 0;
 
+void fastboot_flash_reset_ptn(void)
+{
+	pcount = 0;
+}
+
 void fastboot_flash_add_ptn(fastboot_ptentry *ptn)
 {
     if(pcount < MAX_PTN){

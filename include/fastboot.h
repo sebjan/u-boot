@@ -281,6 +281,7 @@ extern int fastboot_getvar(const char *rx_buffer, char *tx_buffer);
 
 /* tools to populate and query the partition table */
 extern void fastboot_flash_add_ptn(fastboot_ptentry *ptn);
+extern void fastboot_flash_reset_ptn(void);
 extern fastboot_ptentry *fastboot_flash_find_ptn(const char *name);
 extern fastboot_ptentry *fastboot_flash_get_ptn(unsigned n);
 extern unsigned int fastboot_flash_get_ptn_count(void);
