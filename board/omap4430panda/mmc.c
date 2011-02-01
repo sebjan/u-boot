@@ -250,6 +250,11 @@ static int do_format(void)
 	unsigned next;
 	int n;
 
+	if (mmc_init(0)) {
+		printf("mmc init failed?\n");
+		return -1;
+	}
+
 	mmc_info(0, &sector_sz, &blocks);
 	printf("blocks %d\n", blocks);
 
