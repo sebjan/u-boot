@@ -197,6 +197,32 @@ void import_efi_partition(struct efi_entry *entry)
 		printf("%8d %7dK %s\n", e.start, e.length/0x400, e.name);
 }
 
+static int load_ptbl(void)
+{
+	static unsigned char data[512];
+	static struct efi_entry entry[4];
+	int n,m,r;
+	r = mmc_read(0, 1, data, 512);
+	if (r != 1) {
+		printf("error reading partition table\n");
+		return -1;
+	}
+	if (memcmp(data, "EFI PART", 8)) {
+		printf("efi partition table not found\n");
+		return -1;
+	}
+	for (n = 0; n < (128/4); n++) {
+		r = mmc_read(0, 1 + n, (void*) entry, 512);
+		if (r != 1) {
+			printf("partition read failed\n");
+			return 1;
+		}
+		for (m = 0; m < 4; m ++)
+			import_efi_partition(entry + m);
+	}
+	return 0;
+}
+
 struct partition {
 	const char *name;
 	unsigned size_kb;
@@ -244,8 +270,12 @@ static int do_format(void)
 	}
 	end_ptbl(ptbl);
 
+	fastboot_flash_reset_ptn();
 	if (mmc_write(0, (void*) ptbl, 0, sizeof(struct ptable)) != 1)
 		return -1;
+
+	printf("\nnew partition table:\n");
+	load_ptbl();
 
 	return 0;
 }
@@ -264,40 +294,12 @@ void board_mmc_init(void)
 
 int board_late_init(void)
 {
-	static fastboot_ptentry ptable = {
-		.name = "ptable",
-		.start = 0,
-		.length = 128*1024,
-		.flags = 0,
-	};
-	static unsigned char data[512];
-	static struct efi_entry entry[4];
-	int n,m,r;
-
-	fastboot_flash_add_ptn(&ptable);
 	if (mmc_init(0)) {
 		printf("mmc init failed?\n");
 		return 1;
 	}
-	r = mmc_read(0, 1, data, 512);
-	if (r != 1) {
-		printf("error reading partition table\n");
-		return 1;
-	}
-	if (memcmp(data, "EFI PART", 8)) {
-		printf("efi partition table not found\n");
-		return 1;
-	}
-	for (n = 0; n < (128/4); n++) {
-		r = mmc_read(0, 1 + n, (void*) entry, 512);
-		if (r != 1) {
-			printf("partition read failed\n");
-			return 1;
-		}
-		for (m = 0; m < 4; m ++)
-			import_efi_partition(entry + m);
-	}
-	return 0;
+	printf("\nefi partition table:\n");
+	return load_ptbl();
 }
 
 
