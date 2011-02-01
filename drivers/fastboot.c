@@ -329,7 +329,6 @@ static int read_bulk_fifo_dma(u8 *buf, u32 size)
 	*peri_dma_cntl =
 		MUSB_DMA_CNTL_BUSRT_MODE_3 |
 		MUSB_DMA_CNTL_END_POINT(BULK_ENDPOINT) |
-		MUSB_DMA_CNTL_INTERRUPT_ENABLE |
 		MUSB_DMA_CNTL_WRITE;
 
 	*peri_dma_cntl |= MUSB_DMA_CNTL_ENABLE;
@@ -881,12 +880,7 @@ static int fastboot_rx (void)
 			 * of the end packet simple, just do it by manually
 			 * reading the fifo
 			 */
-#if defined(CONFIG_4430PANDA)
-			/* DMA is causing problems on this target */
-			if (0) {
-#else
 			if (fifo_size == count) {
-#endif
 				/* Mode 1
 				 *
 				 * The setup is not as simple as
