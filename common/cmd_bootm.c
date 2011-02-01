@@ -1451,33 +1451,33 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		pte = fastboot_flash_find_ptn(ptn);
 		if (!pte) {
 			printf("booti: cannot find '%s' partition\n", ptn);
-			return -1;
+			goto fail;
 		}
 		if (mmc_init(mmcc)) {
 			printf("mmc%d init failed\n", mmcc);
-			return -1;
+			goto fail;
 		}
 		if (mmc_read(mmcc, pte->start, (void*) hdr, 512) != 1) {
 			printf("booti: mmc failed to read bootimg header\n");
-			return -1;
+			goto fail;
 		}
 		if (memcmp(hdr->magic, BOOT_MAGIC, 8)) {
 			printf("booti: bad boot image magic\n");
-			return do_fastboot(NULL, 0, 0, NULL);
+			goto fail;
 		}
 
 		sector = pte->start + (hdr->page_size / 512);
 		if (mmc_read(mmcc, sector, (void*) hdr->kernel_addr,
 			     hdr->kernel_size) != 1) {
 			printf("booti: failed to read kernel\n");
-			return -1;
+			goto fail;
 		}
 
 		sector += ALIGN(hdr->kernel_size, hdr->page_size) / 512;
 		if (mmc_read(mmcc, sector, (void*) hdr->ramdisk_addr,
 			     hdr->ramdisk_size) != 1) {
 			printf("booti: failed to read ramdisk\n");
-			return -1;
+			goto fail;
 		}
 #else
 		return -1;
@@ -1490,7 +1490,7 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 
 		if (memcmp(hdr->magic, BOOT_MAGIC, 8)) {
 			printf("booti: bad boot image magic\n");
-			return do_fastboot(NULL, 0, 0, NULL);
+			return 1;
 		}
 
 		bootimg_print_image_hdr(hdr);
@@ -1510,6 +1510,9 @@ int do_booti (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	puts ("booti: Control returned to monitor - resetting...\n");
 	do_reset (cmdtp, flag, argc, argv);
 	return 1;
+
+fail:
+	return do_fastboot(NULL, 0, 0, NULL);
 }
 
 U_BOOT_CMD(
