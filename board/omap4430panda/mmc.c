@@ -27,16 +27,23 @@
  */
 
 #include <common.h>
+#include <mmc.h>
 #include <fastboot.h>
 
+#define EFI_VERSION 0x00010000
 #define EFI_ENTRIES 128
 #define EFI_NAMELEN 36
 
-const u8 partition_type[16] = {
+static const u8 partition_type[16] = {
 	0xa2, 0xa0, 0xd0, 0xeb, 0xe5, 0xb9, 0x33, 0x44,
 	0x87, 0xc0, 0x68, 0xb6, 0xb7, 0x26, 0x99, 0xc7,
 };
 
+static const u8 random_uuid[16] = {
+	0xff, 0x1f, 0xf2, 0xf9, 0xd4, 0xa8, 0x0e, 0x5f,
+	0x97, 0x46, 0x59, 0x48, 0x69, 0xae, 0xc3, 0x4e,
+};
+	
 struct efi_entry {
 	u8 type_uuid[16];
 	u8 uniq_uuid[16];
@@ -45,6 +52,127 @@ struct efi_entry {
 	u64 attr;
 	u16 name[EFI_NAMELEN];
 };
+
+struct efi_header {
+	u8 magic[8];
+
+	u32 version;
+	u32 header_sz;
+
+	u32 crc32;
+	u32 reserved;
+
+	u64 header_lba;
+	u64 backup_lba;
+	u64 first_lba;
+	u64 last_lba;
+
+	u8 volume_uuid[16];
+
+	u64 entries_lba;
+
+	u32 entries_count;
+	u32 entries_size;
+	u32 entries_crc32;
+} __attribute__((packed));
+
+struct ptable {
+	u8 mbr[512];
+	union {
+		struct efi_header header;
+		u8 block[512];
+	};
+	struct efi_entry entry[EFI_ENTRIES];	
+};
+
+static void init_mbr(u8 *mbr, u32 blocks)
+{
+	mbr[0x1be] = 0x00; // nonbootable
+	mbr[0x1bf] = 0xFF; // bogus CHS
+	mbr[0x1c0] = 0xFF;
+	mbr[0x1c1] = 0xFF;
+
+	mbr[0x1c2] = 0xEE; // GPT partition
+	mbr[0x1c3] = 0xFF; // bogus CHS
+	mbr[0x1c4] = 0xFF;
+	mbr[0x1c5] = 0xFF;
+
+	mbr[0x1c6] = 0x01; // start
+	mbr[0x1c7] = 0x00;
+	mbr[0x1c8] = 0x00;
+	mbr[0x1c9] = 0x00;
+
+	memcpy(mbr + 0x1ca, &blocks, sizeof(u32));
+
+	mbr[0x1fe] = 0x55;
+	mbr[0x1ff] = 0xaa;
+}
+
+static void start_ptbl(struct ptable *ptbl, unsigned blocks)
+{
+	struct efi_header *hdr = &ptbl->header;
+
+	memset(ptbl, 0, sizeof(*ptbl));
+
+	init_mbr(ptbl->mbr, blocks - 1);
+
+	memcpy(hdr->magic, "EFI PART", 8);
+	hdr->version = EFI_VERSION;
+	hdr->header_sz = sizeof(struct efi_header);
+	hdr->header_lba = 1;
+	hdr->backup_lba = blocks - 1;
+	hdr->first_lba = 34;
+	hdr->last_lba = blocks - 1;
+	memcpy(hdr->volume_uuid, random_uuid, 16);
+	hdr->entries_lba = 2;
+	hdr->entries_count = EFI_ENTRIES;
+	hdr->entries_size = sizeof(struct efi_entry);
+}
+
+static void end_ptbl(struct ptable *ptbl)
+{
+	struct efi_header *hdr = &ptbl->header;
+	u32 n;
+
+	n = crc32(0, 0, 0);
+	n = crc32(n, (void*) ptbl->entry, sizeof(ptbl->entry));
+	hdr->entries_crc32 = n;
+
+	n = crc32(0, 0, 0);
+	n = crc32(0, (void*) &ptbl->header, sizeof(ptbl->header));
+	hdr->crc32 = n;
+}
+
+int add_ptn(struct ptable *ptbl, u64 first, u64 last, const char *name)
+{
+	struct efi_header *hdr = &ptbl->header;
+	struct efi_entry *entry = ptbl->entry;
+	unsigned n;
+
+	if (first < 34) {
+		printf("partition '%s' overlaps partition table\n", name);
+		return -1;
+	}
+
+	if (last > hdr->last_lba) {
+		printf("partition '%s' does not fit\n", name);
+		return -1;
+	}
+	for (n = 0; n < EFI_ENTRIES; n++, entry++) {
+		if (entry->last_lba)
+			continue;
+		memcpy(entry->type_uuid, partition_type, 16);
+		memcpy(entry->uniq_uuid, random_uuid, 16);
+		entry->uniq_uuid[0] = n;
+		entry->first_lba = first;
+		entry->last_lba = last;
+		for (n = 0; (n < EFI_NAMELEN) && *name; n++)
+			entry->name[n] = *name++;
+		return 0;
+	}
+	printf("out of partition table entries\n");
+	return -1;
+}
 
 void import_efi_partition(struct efi_entry *entry)
 {
@@ -67,6 +195,66 @@ void import_efi_partition(struct efi_entry *entry)
 		printf("%8d %7dM %s\n", e.start, e.length/0x100000, e.name);
 	else
 		printf("%8d %7dK %s\n", e.start, e.length/0x400, e.name);
+}
+
+struct partition {
+	const char *name;
+	unsigned size_kb;
+};
+
+static struct partition partitions[] = {
+	{ "-", 128 },
+	{ "xloader", 128 },
+	{ "bootloader", 256 },
+	{ "-", 512 },
+	{ "boot", 8*1024 },
+	{ "system", 256*1024 },
+	{ "cache", 256*1024 },
+	{ "userdata", 512*1024},
+	{ "media", 0 },
+	{ 0, 0 },
+};
+
+static struct ptable the_ptable;
+
+static int do_format(void)
+{
+	struct ptable *ptbl = &the_ptable;
+	unsigned sector_sz, blocks;
+	unsigned next;
+	int n;
+
+	mmc_info(0, &sector_sz, &blocks);
+	printf("blocks %d\n", blocks);
+
+	start_ptbl(ptbl, blocks);
+	n = 0;
+	next = 0;
+	for (n = 0, next = 0; partitions[n].name; n++) {
+		unsigned sz = partitions[n].size_kb * 2;
+		if (!strcmp(partitions[n].name,"-")) {
+			next += sz;
+			continue;
+		}
+		if (sz == 0)
+			sz = blocks - next;
+		if (add_ptn(ptbl, next, next + sz - 1, partitions[n].name))
+			return -1;
+		next += sz;
+	}
+	end_ptbl(ptbl);
+
+	if (mmc_write(0, (void*) ptbl, 0, sizeof(struct ptable)) != 1)
+		return -1;
+
+	return 0;
+}
+
+int fastboot_oem(const char *cmd)
+{
+	if (!strcmp(cmd,"format"))
+		return do_format();
+	return -1;
 }
 
 void board_mmc_init(void)
