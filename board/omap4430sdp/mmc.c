@@ -102,3 +102,10 @@ void board_mmc_init(void)
 		fastboot_flash_add_ptn(&ptn[i]);
 #endif
 }
+
+int fastboot_oem(const char *cmd)
+{
+	if (!strcmp(cmd,"format"))
+		printf("\nBlze: format oem : not implemented yet\n");
+	return -1;
+}
