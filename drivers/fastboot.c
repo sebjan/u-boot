@@ -80,8 +80,7 @@ static volatile u32 *peri_dma_count	= (volatile u32 *) OMAP_USB_DMA_COUNT_CH(DMA
 #define DEVICE_VENDOR_ID  0x0451
 /* This is just made up.. */
 #define DEVICE_PRODUCT_ID 0xD022
-/* This is just made up.. */
-#define DEVICE_BCD        0x0311;
+#define DEVICE_BCD        0x0100;
 
 /* String 0 is the language id */
 #define DEVICE_STRING_PRODUCT_INDEX       1
@@ -480,9 +479,9 @@ static int do_usb_req_get_descriptor(void)
 #else
 			d.bcdUSB             = 0x200;
 #endif
-			d.bDeviceClass       = 0xff;
-			d.bDeviceSubClass    = 0xff;
-			d.bDeviceProtocol    = 0xff;
+			d.bDeviceClass       = 0x00;
+			d.bDeviceSubClass    = 0x00;
+			d.bDeviceProtocol    = 0x00;
 			d.bMaxPacketSize0    = 0x40;
 			d.idVendor           = DEVICE_VENDOR_ID;
 			d.idProduct          = DEVICE_PRODUCT_ID;
@@ -602,8 +601,10 @@ static int do_usb_req_get_descriptor(void)
 				   2    : type
 				   2*sl : string */
 				unsigned char bLength = 2 + (2 * sl);
-				bLength = MIN(bLength, req.wLength);
-		  
+				unsigned char numbytes_to_send;
+
+				numbytes_to_send = MIN(bLength, req.wLength);
+
 				fastboot_fifo[0] = bLength;        /* length */
 				fastboot_fifo[1] = USB_DT_STRING;  /* descriptor = string */
 	      
@@ -614,7 +615,7 @@ static int do_usb_req_get_descriptor(void)
 					fastboot_fifo[2+ 2*s + 1] = 0;
 				}
 
-				for (byteLoop = 0; byteLoop < bLength; byteLoop++) 
+				for (byteLoop = 0; byteLoop < numbytes_to_send; byteLoop++)
 					write_fifo_8 (fastboot_fifo[byteLoop]);
 
 				TX_LAST();
