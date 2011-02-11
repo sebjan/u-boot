@@ -124,6 +124,7 @@ static u16 fastboot_fifo_used = 0;
 
 static unsigned int set_address = 0;
 static u8 faddr = 0xff;
+static unsigned int current_config = 0;
 
 static unsigned int high_speed = 1;
 
@@ -428,12 +429,14 @@ static int do_usb_req_set_configuration(void)
 		if (0 == req.wValue) {
 			/* spec says to go to address state.. */
 			faddr = 0xff;
+			current_config = req.wValue;
 			ACK_REQ();
 		} else if (CONFIGURATION_NORMAL == req.wValue) {
 			/* This is the one! */
 
 			/* Bulk endpoint fifo */
 			fastboot_bulk_endpoint_reset();
+			current_config = req.wValue;
 
 			ACK_REQ();
 		} else {
@@ -649,6 +652,21 @@ static int do_usb_req_get_descriptor(void)
 	return ret;
 }
 
+static int do_usb_req_get_configuration(void)
+{
+	int ret = 0;
+
+	if (0 == req.wLength) {
+		printf ("Get config with length 0 is unexpected\n");
+		NAK_REQ();
+	} else {
+		write_fifo_8 (current_config);
+		TX_LAST();
+	}
+
+	return ret;
+}
+
 static int do_usb_req_get_status(void)
 {
 	int ret = 0;
@@ -761,6 +779,10 @@ static int fastboot_poll_h (void)
 
 						case USB_REQ_GET_STATUS:
 							ret = do_usb_req_get_status();
+							break;
+
+						case USB_REQ_GET_CONFIGURATION:
+							ret = do_usb_req_get_configuration();
 							break;
 
 						default:

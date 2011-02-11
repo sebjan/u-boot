@@ -154,6 +154,8 @@
     printf ("\t\tSET_FEATURE\n");	                                         \
   else if (r.bRequest == USB_REQ_GET_DESCRIPTOR)                                 \
     printf ("\t\tGET_DESCRIPTOR\n");	                                         \
+  else if (r.bRequest == USB_REQ_GET_CONFIGURATION)				 \
+    printf ("\t\tGET_CONFIGURATION\n");						 \
   else if (r.bRequest == USB_REQ_SET_CONFIGURATION)                              \
     printf ("\t\tSET_CONFIGURATION\n");	                                         \
   else if (r.bRequest == USB_REQ_SET_INTERFACE)                                  \
