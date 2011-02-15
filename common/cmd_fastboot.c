@@ -820,27 +820,25 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 		   Board has a chance to handle other variables */
 		if(memcmp(cmdbuf, "getvar:", 7) == 0) 
 		{
+			int get_var_length = strlen("getvar:");
+
 			strcpy(response,"OKAY");
-        
-			if(!strcmp(cmdbuf + strlen("version"), "version")) 
-			{
+
+			if(!strcmp(cmdbuf + get_var_length, "version")) {
 				strcpy(response + 4, FASTBOOT_VERSION);
-			} 
-			else if(!strcmp(cmdbuf + strlen("product"), "product")) 
-			{
-				if (interface.product_name) 
+
+			} else if(!strcmp(cmdbuf + get_var_length, "product")) {
+				if (interface.product_name)
 					strcpy(response + 4, interface.product_name);
-			
-			} else if(!strcmp(cmdbuf + strlen("serialno"), "serialno")) {
-				if (interface.serial_no) 
+
+			} else if(!strcmp(cmdbuf + get_var_length, "serialno")) {
+				if (interface.serial_no)
 					strcpy(response + 4, interface.serial_no);
 
-			} else if(!strcmp(cmdbuf + strlen("downloadsize"), "downloadsize")) {
+			} else if(!strcmp(cmdbuf + get_var_length, "downloadsize")) {
 				if (interface.transfer_buffer_size) 
-					sprintf(response + 4, "08x", interface.transfer_buffer_size);
-			} 
-			else 
-			{
+					sprintf(response + 4, "%08x", interface.transfer_buffer_size);
+			} else {
 				fastboot_getvar(cmdbuf + 7, response + 4);
 			}
 			ret = 0;
