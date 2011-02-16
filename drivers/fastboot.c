@@ -88,7 +88,8 @@ static volatile u32 *peri_dma_count	= (volatile u32 *) OMAP_USB_DMA_COUNT_CH(DMA
 #define DEVICE_STRING_CONFIG_INDEX        3
 #define DEVICE_STRING_INTERFACE_INDEX     4
 #define DEVICE_STRING_MANUFACTURER_INDEX  5
-#define DEVICE_STRING_MAX_INDEX           DEVICE_STRING_MANUFACTURER_INDEX
+#define DEVICE_STRING_PROC_REVISION       6
+#define DEVICE_STRING_MAX_INDEX           DEVICE_STRING_PROC_REVISION
 #define DEVICE_STRING_LANGUAGE_ID         0x0409 /* English (United States) */
 
 /* Define this to use 1.1 / fullspeed */
@@ -139,7 +140,7 @@ static struct usb_device_request req;
    must be word aligned */
 static u8 fastboot_bulk_fifo[0x0200] __attribute__ ((aligned(0x4)));
 
-static char *device_strings[DEVICE_STRING_MANUFACTURER_INDEX+1];
+static char *device_strings[DEVICE_STRING_MAX_INDEX+1];
 
 static struct cmd_fastboot_interface *fastboot_interface = NULL;
 
@@ -1165,6 +1166,7 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 {
 	int ret = 1;
 	u8 devctl;
+	int cpu_rev = 0;
 
 	device_strings[DEVICE_STRING_MANUFACTURER_INDEX]  = "Texas Instruments";
 #if defined (CONFIG_3430ZOOM2)
@@ -1185,18 +1187,42 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 	device_strings[DEVICE_STRING_CONFIG_INDEX]        = "Android Fastboot";
 	device_strings[DEVICE_STRING_INTERFACE_INDEX]     = "Android Fastboot";
 
+#if defined(CONFIG_4430SDP) || defined(CONFIG_4430PANDA)
+	cpu_rev = get_cpu_rev();
+	switch (cpu_rev) {
+		case CPU_4430_ES1:
+			device_strings[DEVICE_STRING_PROC_REVISION]  = "ES1.0";
+			break;
+		case CPU_4430_ES20:
+			device_strings[DEVICE_STRING_PROC_REVISION]  = "ES2.0";
+			break;
+		case CPU_4430_ES21:
+			device_strings[DEVICE_STRING_PROC_REVISION]  = "ES2.1";
+			break;
+		case CPU_4430_ES22:
+			device_strings[DEVICE_STRING_PROC_REVISION]  = "ES2.2";
+			break;
+		default:
+			device_strings[DEVICE_STRING_PROC_REVISION]  = "Unknown";
+			break;
+	}
+
+#endif
+
 	/* The interface structure */
 	fastboot_interface = interface;
 	fastboot_interface->product_name                  = device_strings[DEVICE_STRING_PRODUCT_INDEX];
 	fastboot_interface->serial_no                     = device_strings[DEVICE_STRING_SERIAL_NUMBER_INDEX];
 #if defined(CONFIG_4430SDP) || defined(CONFIG_4430PANDA)
 	fastboot_interface->storage_medium                = EMMC;
+	fastboot_interface->proc_rev			  = device_strings[DEVICE_STRING_PROC_REVISION];
 #else
 	fastboot_interface->storage_medium                = NAND;
 #endif
 	fastboot_interface->nand_block_size               = 2048;
 	fastboot_interface->transfer_buffer               = (unsigned char *) CFG_FASTBOOT_TRANSFER_BUFFER;
 	fastboot_interface->transfer_buffer_size          = CFG_FASTBOOT_TRANSFER_BUFFER_SIZE;
+
 
 	/* Reset Mentor USB block */
 	/* soft reset */

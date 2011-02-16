@@ -54,12 +54,42 @@ u32 get_cpu_type(void)
     return CPU_4430;
 }
 
+unsigned int cortex_a9_rev(void)
+{
+
+	unsigned int i;
+
+	/* turn off I/D-cache */
+	asm ("mrc p15, 0, %0, c0, c0, 0" : "=r" (i));
+
+	return i;
+}
+
 /******************************************
  * get_cpu_rev(void) - extract version info
  ******************************************/
 u32 get_cpu_rev(void)
 {
-	return CPU_4430_ES1;
+	u32 omap_rev_reg = 0;
+	u32 idcode = 0;
+
+	idcode = cortex_a9_rev();
+	if (((idcode >> 4) & 0xfff) == 0xc09) {
+		idcode &= 0xf;
+		switch (idcode) {
+		case 1:
+			return CPU_4430_ES1;
+		case 2:
+			omap_rev_reg = (__raw_readl(CONTROL_ID_CODE)  >> 28);
+			if (omap_rev_reg == 0x3)
+				return CPU_4430_ES21;
+			else if (omap_rev_reg >= 0x4)
+				return CPU_4430_ES22;
+			else
+				return CPU_4430_ES20;
+		}
+	}
+	return CPU_4430_ES22;
 
 }
 

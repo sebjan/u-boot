@@ -124,6 +124,12 @@ struct cmd_fastboot_interface
 	   Set by board */
 	char *serial_no;
 
+	/* A getvar string for the processor revision
+	   It can have a maximum of 60 characters
+
+	   Set by board */
+	char *proc_rev;
+
 	/* To determine the storage type NAND or EMMC */
 	storage_medium_type storage_medium;
 

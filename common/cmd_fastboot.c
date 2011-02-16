@@ -838,6 +838,9 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 			} else if(!strcmp(cmdbuf + get_var_length, "downloadsize")) {
 				if (interface.transfer_buffer_size) 
 					sprintf(response + 4, "%08x", interface.transfer_buffer_size);
+			} else if(!strcmp(cmdbuf + get_var_length, "cpurev")) {
+				if (interface.proc_rev)
+					strcpy(response + 4, interface.proc_rev);
 			} else {
 				fastboot_getvar(cmdbuf + 7, response + 4);
 			}
