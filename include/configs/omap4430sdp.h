@@ -139,7 +139,7 @@
 	"bootcmd=go 0x80008000\0"
 #else
 #define CONFIG_BOOTDELAY         3
-
+#define CONFIG_ZERO_BOOTDELAY_CHECK     /* check for keypress on bootdelay==0 */
 #endif /*CONFIG_4430ZEBU */
 
 #ifdef NFS_BOOT_DEFAULTS
