@@ -337,6 +337,6 @@ u32 get_boot_type(void)
 u32 get_device_type(void)
 {
 	int mode;
-	mode = __raw_readl(CONTROL_STATUS) & (DEVICE_MASK);
+	mode = __raw_readl(SECURE_ID_CODE) & (DEVICE_MASK);
 	return mode >>= 8;
 }

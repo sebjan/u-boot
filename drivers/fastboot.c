@@ -89,7 +89,8 @@ static volatile u32 *peri_dma_count	= (volatile u32 *) OMAP_USB_DMA_COUNT_CH(DMA
 #define DEVICE_STRING_INTERFACE_INDEX     4
 #define DEVICE_STRING_MANUFACTURER_INDEX  5
 #define DEVICE_STRING_PROC_REVISION       6
-#define DEVICE_STRING_MAX_INDEX           DEVICE_STRING_PROC_REVISION
+#define DEVICE_STRING_PROC_TYPE           7
+#define DEVICE_STRING_MAX_INDEX           DEVICE_STRING_PROC_TYPE
 #define DEVICE_STRING_LANGUAGE_ID         0x0409 /* English (United States) */
 
 /* Define this to use 1.1 / fullspeed */
@@ -1167,6 +1168,7 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 	int ret = 1;
 	u8 devctl;
 	int cpu_rev = 0;
+	int cpu_type = 0;
 
 	device_strings[DEVICE_STRING_MANUFACTURER_INDEX]  = "Texas Instruments";
 #if defined (CONFIG_3430ZOOM2)
@@ -1206,6 +1208,21 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 			device_strings[DEVICE_STRING_PROC_REVISION]  = "Unknown";
 			break;
 	}
+	cpu_type = get_device_type();
+	switch (cpu_type) {
+		case CPU_4430_GP:
+			device_strings[DEVICE_STRING_PROC_TYPE]  = "GP";
+			break;
+		case  CPU_4430_EMU:
+			device_strings[DEVICE_STRING_PROC_TYPE]  = "EMU";
+			break;
+		case  CPU_4430_HS:
+			device_strings[DEVICE_STRING_PROC_TYPE]  = "HS";
+			break;
+		default:
+			device_strings[DEVICE_STRING_PROC_TYPE]  = "Unknown";
+			break;
+	}
 
 #endif
 
@@ -1216,6 +1233,7 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 #if defined(CONFIG_4430SDP) || defined(CONFIG_4430PANDA)
 	fastboot_interface->storage_medium                = EMMC;
 	fastboot_interface->proc_rev			  = device_strings[DEVICE_STRING_PROC_REVISION];
+	fastboot_interface->proc_type			  = device_strings[DEVICE_STRING_PROC_TYPE];
 #else
 	fastboot_interface->storage_medium                = NAND;
 #endif

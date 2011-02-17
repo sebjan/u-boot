@@ -50,9 +50,9 @@
 #define CPU_4430_ES21		3
 #define CPU_4430_ES22		4
 
-#define CPU_4430_GP		1
-#define CPU_4430_EMU		2
-#define CPU_4430_HS		3
+#define CPU_4430_GP		3
+#define CPU_4430_HS		2
+#define CPU_4430_EMU		1
 
 /* Currently Virtio models this one */
 #define CPU_4430_CHIPID		0x0B68A000

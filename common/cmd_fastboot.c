@@ -841,6 +841,9 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 			} else if(!strcmp(cmdbuf + get_var_length, "cpurev")) {
 				if (interface.proc_rev)
 					strcpy(response + 4, interface.proc_rev);
+			} else if(!strcmp(cmdbuf + get_var_length, "secure")) {
+				if (interface.proc_type)
+					strcpy(response + 4, interface.proc_type);
 			} else {
 				fastboot_getvar(cmdbuf + 7, response + 4);
 			}

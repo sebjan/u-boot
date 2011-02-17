@@ -130,6 +130,13 @@ struct cmd_fastboot_interface
 	   Set by board */
 	char *proc_rev;
 
+	/* A getvar string for the processor type
+	   this can be GP, EMU or HS
+	   It can have a maximum of 60 characters
+
+	   Set by board */
+	char *proc_type;
+
 	/* To determine the storage type NAND or EMMC */
 	storage_medium_type storage_medium;
 
