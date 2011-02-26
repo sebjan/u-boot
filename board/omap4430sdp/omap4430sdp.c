@@ -473,6 +473,7 @@ int board_init(void)
 
 	gpmc_init();
 
+#if 0 /* No eMMC env partition for now */
 	/* Intializing env functional pointers with eMMC */
 	boot_env_get_char_spec = mmc_env_get_char_spec;
 	boot_env_init = mmc_env_init;
@@ -480,6 +481,7 @@ int board_init(void)
 	boot_env_relocate_spec = mmc_env_relocate_spec;
 	env_ptr = (env_t *) (CFG_FLASH_BASE + CFG_ENV_OFFSET);
 	env_name_spec = mmc_env_name_spec;
+#endif
 
 	/* board id for Linux */
 	gd->bd->bi_arch_number = MACH_TYPE_OMAP_4430SDP;

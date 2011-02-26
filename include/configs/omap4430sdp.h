@@ -37,6 +37,8 @@
 #define CONFIG_4430SDP		1    /* working with SDP */
 #define CONFIG_FASTBOOT		1    /* Using fastboot interface */
 
+#define BOARD_LATE_INIT 1
+
 /* SDP revisions */
 #define SDP_4430_VIRTIO		0x1
 #define SDP_4430_V1		0x2
@@ -147,8 +149,12 @@
 	root=/dev/nfs rw nfsroot=128.247.77.158:/home/a0384864/wtbu/rootfs \
 	ip=dhcp"
 #else
-#define CONFIG_BOOTARGS "root=/dev/ram0 rw mem=512M console=ttyS2,115200n8 \
-initrd=0x81600000,64M ramdisk_size=65536"
+
+#define CONFIG_BOOTARGS "console=ttyO2,115200n8 mem=456M@0x80000000 mem=512M@0xA0000000" \
+			" init=/init vram=10M omapfb.vram=0:4M androidboot.console=ttyO2"
+
+#define CONFIG_BOOTCOMMAND "booti mmc1"
+
 #endif
 
 #define CONFIG_NETMASK           255.255.254.0
@@ -230,39 +236,13 @@ initrd=0x81600000,64M ramdisk_size=65536"
 #define PHYS_FLASH_SIZE_SDPV2	SZ_128M
 #define PHYS_FLASH_SIZE		SZ_32M
 
-/* REVISIT if once NAND/NOR/ONENAND support is added on OMAP4SDP */
-#ifdef OMAP4_NAND_NOR_ONENAND
-#define CFG_FLASH_BASE		boot_flash_base
-#define PHYS_FLASH_SECT_SIZE	boot_flash_sec
-/* Dummy declaration of flash banks to get compilation right */
-#define CFG_FLASH_BANKS_LIST	{0, 0}
 
-#define CFG_MONITOR_BASE	CFG_FLASH_BASE /* Monitor at start of flash */
-#define CFG_ONENAND_BASE	ONENAND_MAP
-
-#define CFG_ENV_IS_IN_NAND	1
-#define CFG_ENV_IS_IN_ONENAND	1
-#define CFG_ENV_IS_IN_FLASH	1
-#define ONENAND_ENV_OFFSET	0xc0000 /* environment starts here  */
-#define SMNAND_ENV_OFFSET	0xc0000 /* environment starts here  */
-
-#define CFG_ENV_SECT_SIZE	boot_flash_sec
-#define CFG_ENV_OFFSET		boot_flash_off
-#define CFG_ENV_ADDR		boot_flash_env_addr
-#endif
-
-#define CFG_MONITOR_BASE	CFG_FLASH_BASE /* Monitor at start of flash */
-#define CFG_ONENAND_BASE	ONENAND_MAP
-
-/* eMMC Variables */
-#define CFG_ENV_IS_IN_EMMC	1
 #define CFG_FLASH_BASE		0x0
-#define CFG_ENV_SECT_SIZE	SZ_128K
-#define CFG_ENV_OFFSET		0x400
-#define CFG_ENV_ADDR		0x400
 
-#define ENV_IS_VARIABLE		1
+#define CFG_MONITOR_BASE	CFG_FLASH_BASE /* Monitor at start of flash */
+#define CFG_ONENAND_BASE	ONENAND_MAP
 
+#define CFG_ENV_IS_NOWHERE	1
 /* Fastboot variables */
 #define CFG_FASTBOOT_TRANSFER_BUFFER (PHYS_SDRAM_1 + SZ_16M)
 #define CFG_FASTBOOT_TRANSFER_BUFFER_SIZE (SZ_512M - SZ_16M)
@@ -288,7 +268,6 @@ initrd=0x81600000,64M ramdisk_size=65536"
 #define CFG_JFFS2_FIRST_BANK	CFG_MAX_FLASH_BANKS /* use flash_info[2] */
 #define CFG_JFFS2_NUM_BANKS	1
 
-#define ENV_IS_VARIABLE		1
 #endif
 
 #ifndef __ASSEMBLY__
