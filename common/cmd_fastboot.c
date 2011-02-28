@@ -1318,6 +1318,7 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 							printf("fastboot: %s is in sparse format\n", ptn->name);
 							if (!do_unsparse(interface.transfer_buffer,
 									ptn->start,
+									ptn->length,
 									slot_no)) {
 								printf("Writing sparsed: '%s' DONE!\n", ptn->name);
 							} else {

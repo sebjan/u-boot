@@ -49,7 +49,8 @@ int mmc_compare(unsigned mmcc, unsigned char *src, unsigned sector, unsigned len
 }
 
 
-int _unsparse(unsigned char *source, u32 sector, unsigned mmcc,
+int _unsparse(unsigned char *source, u32 sector, u32 section_size,
+	      unsigned mmcc,
 	      int (*WRITE)(unsigned mwcc, unsigned char *src,
 			   unsigned sector, unsigned len))
 {
@@ -57,6 +58,12 @@ int _unsparse(unsigned char *source, u32 sector, unsigned mmcc,
 	u32 i, outlen = 0;
 
 	printf("sparse: write to mmc slot[%d] @ %d\n", mmcc, sector);
+
+	if ((header->total_blks * header->blk_sz) > section_size) {
+		printf("sparse: section size %d MB limit: exceeded\n",
+				section_size/(1024*1024));
+		return 1;
+	}
 
 	if (header->magic != SPARSE_HEADER_MAGIC) {
 		printf("sparse: bad magic\n");
@@ -92,6 +99,10 @@ int _unsparse(unsigned char *source, u32 sector, unsigned mmcc,
 			}
 
 			outlen += len;
+			if (outlen > section_size) {
+				printf("sparse: section size %d MB limit: exceeded\n", section_size/(1024*1024));
+				return 1;
+			}
 #ifdef DEBUG
 			printf("sparse: RAW blk=%d bsz=%d: write(sector=%d,len=%d)\n",
 			       chunk->chunk_sz, header->blk_sz, sector, len);
@@ -118,6 +129,10 @@ int _unsparse(unsigned char *source, u32 sector, unsigned mmcc,
 #endif
 
 			outlen += len;
+			if (outlen > section_size) {
+				printf("sparse: section size %d MB limit: exceeded\n", section_size/(1024*1024));
+				return 1;
+			}
 			sector += (len / 512);
 			break;
 
@@ -131,13 +146,13 @@ int _unsparse(unsigned char *source, u32 sector, unsigned mmcc,
 	return 0;
 }
 
-u8 do_unsparse(unsigned char *source, u32 sector, char *slot_no)
+u8 do_unsparse(unsigned char *source, u32 sector, u32 section_size, char *slot_no)
 {
 	unsigned mmcc = simple_strtoul(slot_no, NULL, 16);
-	if (_unsparse(source, sector, mmcc, mmc_write))
+	if (_unsparse(source, sector, section_size, mmcc, mmc_write))
 		return 1;
 #if DEBUG
-	if (_unsparse(source, sector, mmcc, mmc_compare))
+	if (_unsparse(source, sector, section_size, mmcc, mmc_compare))
 		return 1;
 #endif
 	return 0;
