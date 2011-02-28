@@ -536,4 +536,4 @@ _loop_forever:
 rstctl:
 	.word	PRM_RSTCTRL
 rstbit:
-	.word	PRM_RSTCTRL_RESET
+	.word	PRM_RSTCTRL_RESET_COLD_BIT

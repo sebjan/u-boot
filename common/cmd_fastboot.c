@@ -55,6 +55,7 @@
  * SUCH DAMAGE.
  */
 #include <asm/byteorder.h>
+#include <asm/io.h>
 #include <common.h>
 #include <command.h>
 #include <nand.h>
@@ -801,6 +802,21 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 
 		/* reboot 
 		   Reboot the board. */
+		if(memcmp(cmdbuf, "reboot-bootloader", 17) == 0)
+		{
+			sprintf(response,"OKAY");
+			fastboot_tx_status(response, strlen(response));
+
+			/* Clear all reset reasons */
+			__raw_writel(0xfff, PRM_RSTST);
+
+			udelay (1000000); /* 1 sec */
+
+			/* now warm reset the silicon */
+			__raw_writel(PRM_RSTCTRL_RESET_WARM_BIT,
+					PRM_RSTCTRL);
+			return 0;
+		}
 
 		if(memcmp(cmdbuf, "reboot", 6) == 0) 
 		{

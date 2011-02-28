@@ -1159,6 +1159,14 @@ int fastboot_preboot(void)
 	}
 #endif
 
+	/* Warm reset case:
+	 * fastboot reboot-bootloader
+	 */
+	if (__raw_readl(PRM_RSTST) & PRM_RSTST_RESET_WARM_BIT) {
+		printf("\n Case: \%fastboot reboot-bootloader\n");
+		return 1;
+	}
+
 #endif
 	return 0;
 }
