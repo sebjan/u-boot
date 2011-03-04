@@ -277,9 +277,6 @@ void do_booti_linux (boot_img_hdr *hdr)
 	ulong initrd_start, initrd_end;
 	void (*theKernel)(int zero, int arch, uint params);
 	bd_t *bd = gd->bd;
-#ifdef CONFIG_CMDLINE_TAG
-	char *commandline = getenv ("bootargs");
-#endif
 
 	theKernel = (void (*)(int, int, uint))(hdr->kernel_addr);
 
@@ -298,7 +295,7 @@ void do_booti_linux (boot_img_hdr *hdr)
 	setup_memory_tags (bd);
 #endif
 #ifdef CONFIG_CMDLINE_TAG
-	setup_commandline_tag (bd, commandline);
+	setup_commandline_tag (bd, hdr->cmdline);
 #endif
 #ifdef CONFIG_INITRD_TAG
 	if (hdr->ramdisk_size)
