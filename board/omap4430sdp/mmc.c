@@ -233,6 +233,7 @@ static struct partition partitions[] = {
 	{ "xloader", 128 },
 	{ "bootloader", 256 },
 	{ "-", 512 },
+	{ "recovery", 8*1024 },
 	{ "boot", 8*1024 },
 	{ "system", 512*1024 },
 	{ "cache", 256*1024 },
