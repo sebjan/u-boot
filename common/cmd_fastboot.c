@@ -810,7 +810,7 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 			/* Clear all reset reasons */
 			__raw_writel(0xfff, PRM_RSTST);
 
-			udelay (1000000); /* 1 sec */
+			strcpy(PUBLIC_SAR_RAM_1_FREE, "reboot-bootloader");
 
 			/* now warm reset the silicon */
 			__raw_writel(PRM_RSTCTRL_RESET_WARM_BIT,
@@ -822,8 +822,7 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 		{
 			sprintf(response,"OKAY");
 			fastboot_tx_status(response, strlen(response));
-			udelay (1000000); /* 1 sec */
-			
+
 			do_reset (NULL, 0, 0, NULL);
 			
 			/* This code is unreachable,

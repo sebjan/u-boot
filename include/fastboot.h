@@ -62,6 +62,12 @@
 #include <common.h>
 #include <command.h>
 
+
+/* Use this as the scratchpad memory to communicate
+ * to bootloader from kernel for warm-reset cases
+ */
+#define PUBLIC_SAR_RAM_1_FREE  (0x4a326000 + 0xA0C)
+
 /* This is the interface file between the common cmd_fastboot.c and 
    the board specific support.  
 

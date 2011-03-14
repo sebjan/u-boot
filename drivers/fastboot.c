@@ -39,6 +39,7 @@
 #include <twl4030.h>
 #include <twl6030.h>
 
+
 #if defined(CONFIG_FASTBOOT)
 
 #define OTG_SYSCONFIG 0x4A0AB404
@@ -1127,8 +1128,12 @@ int fastboot_getvar(const char *rx_buffer, char *tx_buffer)
 	return 0;
 }
 
+extern int
+do_booti(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
+
 int fastboot_preboot(void)
 {
+	char cmd[3][15];
 #if (defined(CONFIG_TWL4030_KEYPAD) && (CONFIG_TWL4030_KEYPAD))
 	int i;
 	unsigned char key1, key2;
@@ -1166,11 +1171,38 @@ int fastboot_preboot(void)
 	}
 #endif
 
-	/* Warm reset case:
-	 * fastboot reboot-bootloader
-	 */
 	if (__raw_readl(PRM_RSTST) & PRM_RSTST_RESET_WARM_BIT) {
-		printf("\n Case: \%fastboot reboot-bootloader\n");
+
+		printf("\n reboot command [%s]", PUBLIC_SAR_RAM_1_FREE);
+		/* Warm reset case:
+		* %adb reboot recovery
+		*/
+		if (!strcmp(PUBLIC_SAR_RAM_1_FREE, "recovery")) {
+
+			printf("\n Case: \%reboot recovery\n");
+
+			/* pass: booti mmci<N> recovery */
+			strcpy(cmd[0], "booti");
+#if defined(CONFIG_4430PANDA)
+			strcpy(cmd[1], "mmc0");
+#else
+			strcpy(cmd[1], "mmc1");
+#endif
+			strcpy(cmd[2], "recovery");
+
+			do_booti(NULL, 0, 3, cmd);
+			/* returns if recovery.img is bad
+			 * Default to normal boot
+			 */
+			printf("\nfastboot: Error: Invalid recovery img\n");
+			return 0;
+		}
+
+		/* Warm reset case
+		 * Case: %fastboot reboot-bootloader
+		 * Case: %adb reboot bootloader
+		 * Case: %adb reboot reboot-bootloader
+		 */
 		return 1;
 	}
 
