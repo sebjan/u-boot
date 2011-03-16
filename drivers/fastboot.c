@@ -82,6 +82,13 @@ static volatile u32 *peri_dma_count	= (volatile u32 *) OMAP_USB_DMA_COUNT_CH(DMA
 #define DEVICE_PRODUCT_ID 0xD022
 #define DEVICE_BCD        0x0100;
 
+/* This is used to get the serial number */
+#if defined(CONFIG_4430SDP) || defined(CONFIG_4430PANDA)
+#define DIE_ID_REG_BASE		(OMAP44XX_L4_IO_BASE + 0x2000)
+#define DIE_ID_REG_OFFSET		0x200
+#define MAX_USB_SERIAL_NUM              17
+#endif
+
 /* String 0 is the language id */
 #define DEVICE_STRING_PRODUCT_INDEX       1
 #define DEVICE_STRING_SERIAL_NUMBER_INDEX 2
@@ -1192,8 +1199,26 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 #error "Need a product name for fastboot"
 
 #endif
+
+#if defined(CONFIG_4430SDP) || defined(CONFIG_4430PANDA)
+	unsigned int val[4] = { 0 };
+	unsigned int reg;
+	static char device_serial[MAX_USB_SERIAL_NUM];
+
+	reg = DIE_ID_REG_BASE + DIE_ID_REG_OFFSET;
+
+	val[0] = __raw_readl(reg);
+	val[1] = __raw_readl(reg + 0x8);
+	val[2] = __raw_readl(reg + 0xC);
+	val[3] = __raw_readl(reg + 0x10);
+	printf("Device Serial Number: %08X%08X\n", val[3], val[2]);
+	sprintf(device_serial, "%08X%08X", val[3], val[2]);
+
+	device_strings[DEVICE_STRING_SERIAL_NUMBER_INDEX] = device_serial;
+#else
 	/* These are just made up */
 	device_strings[DEVICE_STRING_SERIAL_NUMBER_INDEX] = "00123";
+#endif
 	device_strings[DEVICE_STRING_CONFIG_INDEX]        = "Android Fastboot";
 	device_strings[DEVICE_STRING_INTERFACE_INDEX]     = "Android Fastboot";
 
