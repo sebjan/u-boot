@@ -1191,7 +1191,10 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 #elif defined (CONFIG_3430LABRADOR)
 	device_strings[DEVICE_STRING_PRODUCT_INDEX]       = "Zoom";
 #elif defined(CONFIG_4430SDP)
-	device_strings[DEVICE_STRING_PRODUCT_INDEX]       = "SDP4";
+	if (get_board_rev() != 0x10)
+		device_strings[DEVICE_STRING_PRODUCT_INDEX] = "Blaze_Tablet";
+	else
+		device_strings[DEVICE_STRING_PRODUCT_INDEX] = "Blaze";
 #elif defined(CONFIG_4430PANDA)
 	device_strings[DEVICE_STRING_PRODUCT_INDEX]       = "PANDA";
 #else
