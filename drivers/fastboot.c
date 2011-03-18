@@ -1133,7 +1133,7 @@ do_booti(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
 
 int fastboot_preboot(void)
 {
-	char cmd[3][15];
+	char *cmd[3];
 #if (defined(CONFIG_TWL4030_KEYPAD) && (CONFIG_TWL4030_KEYPAD))
 	int i;
 	unsigned char key1, key2;
@@ -1181,6 +1181,10 @@ int fastboot_preboot(void)
 
 			printf("\n Case: \%reboot recovery\n");
 
+			cmd[0] = malloc(10);
+			cmd[1] = malloc(10);
+			cmd[2] = malloc(10);
+
 			/* pass: booti mmci<N> recovery */
 			strcpy(cmd[0], "booti");
 #if defined(CONFIG_4430PANDA)
@@ -1194,6 +1198,10 @@ int fastboot_preboot(void)
 			/* returns if recovery.img is bad
 			 * Default to normal boot
 			 */
+			free(cmd[0]);
+			free(cmd[1]);
+			free(cmd[2]);
+
 			printf("\nfastboot: Error: Invalid recovery img\n");
 			return 0;
 		}
