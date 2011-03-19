@@ -180,4 +180,7 @@
 
 #define CONFIG_OF_LIBFDT
 
+/* Erratum */
+#define CONFIG_SYS_FSL_ERRATUM_ESDHC111
+
 #endif				/* __CONFIG_H */
