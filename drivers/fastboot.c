@@ -1157,11 +1157,25 @@ int fastboot_preboot(void)
 #endif
 
 #if defined(CONFIG_OMAP44XX)
+#define KBD_IRQSTATUS		(0x4a31c018)
 #define KBD_STATEMACHINE	(0x4a31c038)
-
+#define KBD_FULLCODE31_0	(0x4a31c044)
 	/* Any key kept pressed does auto-fastboot */
-	if (__raw_readl(KBD_STATEMACHINE))
-		return 1;
+	if (__raw_readl(KBD_STATEMACHINE)) {
+
+		switch (__raw_readl(KBD_FULLCODE31_0)) {
+			case 0x800: /* Blaze GREEN key pressed */
+				printf("\n Green key press == Recovery mode \n");
+				/* Clear any key status */
+				while (__raw_readl(KBD_IRQSTATUS))
+					__raw_writel(0xf, KBD_IRQSTATUS);
+				goto start_recovery;
+			break;
+			default:
+				return 1;
+			break;
+		}
+	}
 
 	/* On Panda: GPIO_121 button pressed causes to enter fastboot */
 #if defined(CONFIG_4430PANDA)
@@ -1173,14 +1187,15 @@ int fastboot_preboot(void)
 
 	if (__raw_readl(PRM_RSTST) & PRM_RSTST_RESET_WARM_BIT) {
 
-		printf("\n reboot command [%s]", PUBLIC_SAR_RAM_1_FREE);
+		printf("\n reboot command [%s]\n", PUBLIC_SAR_RAM_1_FREE);
 		/* Warm reset case:
 		* %adb reboot recovery
 		*/
 		if (!strcmp(PUBLIC_SAR_RAM_1_FREE, "recovery")) {
 
 			printf("\n Case: \%reboot recovery\n");
-
+start_recovery:
+			printf("\n Starting recovery img.....\n");
 			cmd[0] = malloc(10);
 			cmd[1] = malloc(10);
 			cmd[2] = malloc(10);
