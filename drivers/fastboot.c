@@ -771,6 +771,21 @@ static int fastboot_poll_h (void)
 							break;
 						}
 					}
+					else if (USB_RECIP_ENDPOINT == (req.bmRequestType & USB_REQ_RECIPIENT_MASK))
+					{
+						switch (req.bRequest)
+						{
+						case USB_REQ_CLEAR_FEATURE:
+							ACK_REQ();
+							ret = 0;
+							break;
+
+						default:
+							NAK_REQ();
+							ret = -1;
+							break;
+						}
+					}
 					else
 					{
 						NAK_REQ();
