@@ -484,7 +484,11 @@ int board_init(void)
 #endif
 
 	/* board id for Linux */
+#if defined(OMAP44XX_TABLET_CONFIG)
+	gd->bd->bi_arch_number = MACH_TYPE_OMAP_BLAZE;
+#else
 	gd->bd->bi_arch_number = MACH_TYPE_OMAP_4430SDP;
+#endif
 	gd->bd->bi_boot_params = (0x80000000 + 0x100); /* boot param addr */
 
 	return 0;

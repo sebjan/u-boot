@@ -1830,8 +1830,13 @@ omap3430labrador_config :    unconfig
 omap3430zoom2_config :    unconfig
 	@./mkconfig $(@:_config=) arm omap3 omap3430zoom2
 
+omap44XXtablet_config \
 omap4430sdp_config :    unconfig
 	@./mkconfig $(@:_config=) arm omap4 omap4430sdp
+	@if [ "$(findstring tablet, $@)" ] ; then \
+		echo "#define OMAP44XX_TABLET_CONFIG" >> ./include/config.h ; \
+		echo "Configuring for OMAP4 Tablet .... "; \
+	fi;
 
 omap4430panda_config :    unconfig
 	@./mkconfig $(@:_config=) arm omap4 omap4430panda
