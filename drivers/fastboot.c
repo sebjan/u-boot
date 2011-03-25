@@ -1200,6 +1200,18 @@ int fastboot_preboot(void)
 	}
 #endif
 
+#if defined(OMAP44XX_TABLET_CONFIG)
+	/* Home key == Enter Fastboot */
+	if (!(__raw_readl(OMAP44XX_GPIO2_BASE + DATA_IN_OFFSET) & (1<<14))){
+		printf("Tablet: HOME key pressed: entering fastboot....\n");
+		return 1;
+	}
+	/* Back key == Enter Recovery */
+	if (!(__raw_readl(OMAP44XX_GPIO2_BASE + DATA_IN_OFFSET) & (1<<11))){
+		printf("Tablet: Back key pressed: entering recovery....\n");
+		goto start_recovery;
+	}
+#endif
 	if (__raw_readl(PRM_RSTST) & PRM_RSTST_RESET_WARM_BIT) {
 
 		printf("\n reboot command [%s]\n", PUBLIC_SAR_RAM_1_FREE);
