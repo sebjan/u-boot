@@ -866,16 +866,51 @@ static int rx_handler (const unsigned char *buffer, unsigned int buffer_size)
 
 		}
 
+		/* %fastboot oem <cmd> */
 		if (memcmp(cmdbuf, "oem ", 4) == 0) {
-			int r = fastboot_oem(cmdbuf + 4);
-			if (r < 0) {
-				strcpy(response,"FAIL");
-			} else {
-				strcpy(response,"OKAY");
-			}
+
 			ret = 0;
+			cmdbuf += 4;
+
+			/* fastboot oem format */
+			if(memcmp(cmdbuf, "format", 6) == 0){
+				ret = fastboot_oem(cmdbuf);
+				if (ret < 0) {
+					strcpy(response,"FAIL");
+				} else {
+					strcpy(response,"OKAY");
+				}
+				goto done;
+			}
+
+			/* fastboot oem recovery */
+			if(memcmp(cmdbuf, "recovery", 8) == 0){
+				sprintf(response,"OKAY");
+				fastboot_tx_status(response, strlen(response));
+
+				/* Clear all reset reasons */
+				__raw_writel(0xfff, PRM_RSTST);
+				strcpy(PUBLIC_SAR_RAM_1_FREE, "recovery");
+				/* now warm reset the silicon */
+				__raw_writel(PRM_RSTCTRL_RESET_WARM_BIT,
+					PRM_RSTCTRL);
+				/* Never returns */
+				while(1);
+			}
+
+			/* fastboot oem unlock */
+			if(memcmp(cmdbuf, "unlock", 6) == 0){
+				sprintf(response,"FAIL");
+				printf("\nfastboot: oem unlock "\
+						"not implemented yet!!\n");
+				goto done;
+			}
+
+			/* fastboot oem [xxx] */
+			printf("\nfastboot: do not understand oem %s\n", cmdbuf);
+			strcpy(response,"FAIL");
 			goto done;
-		}
+		} /* end: %fastboot oem <cmd> */
 
 		/* erase
 		   Erase a register flash partition
