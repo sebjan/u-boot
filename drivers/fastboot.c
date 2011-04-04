@@ -1278,7 +1278,7 @@ int fastboot_init(struct cmd_fastboot_interface *interface)
 	else
 		device_strings[DEVICE_STRING_PRODUCT_INDEX] = "Blaze";
 #elif defined(CONFIG_4430PANDA)
-	device_strings[DEVICE_STRING_PRODUCT_INDEX]       = "PANDA";
+	device_strings[DEVICE_STRING_PRODUCT_INDEX]       = "panda";
 #else
 	/* Default, An error message to prompt user */
 #error "Need a product name for fastboot"
