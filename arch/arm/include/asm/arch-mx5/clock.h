@@ -32,6 +32,9 @@ enum mxc_clock {
 	MXC_UART_CLK,
 	MXC_CSPI_CLK,
 	MXC_FEC_CLK,
+	MXC_DDR_CLK,
+	MXC_NFC_CLK,
+	MXC_PERIPH_CLK,
 };
 
 unsigned int imx_decode_pll(unsigned int pll, unsigned int f_ref);
@@ -39,5 +42,6 @@ unsigned int imx_decode_pll(unsigned int pll, unsigned int f_ref);
 u32 imx_get_uartclk(void);
 u32 imx_get_fecclk(void);
 unsigned int mxc_get_clock(enum mxc_clock clk);
+int mxc_set_clock(u32 ref, u32 freq, u32 clk_type);
 
 #endif /* __ASM_ARCH_CLOCK_H */
