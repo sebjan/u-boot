@@ -1002,24 +1002,30 @@ int fastboot_poll(void)
 	u16 intrtx;
 	u16 intrrx;
 	static u32 blink = 0;
+	u32 reg = 0x4A326000;
+	u8 pull = 0;
+
+#define OMAP44XX_WKUP_CTRL_BASE 0x4A31E000
+#define OMAP44XX_CTRL_BASE 0x4A100000
+
+#if defined(CONFIG_4430PANDA)
+	reg = OMAP44XX_WKUP_CTRL_BASE + CONTROL_WKUP_PAD1_FREF_CLK4_REQ;
+	pull = PTU;
+#else
+	reg = OMAP44XX_CTRL_BASE + CONTROL_PADCONF_MCSPI1_CS2;
+	pull = (1<<4);
+#endif
 
 	/* On panda blink the D1 LED in fastboot mode */
-#if defined(CONFIG_4430PANDA)
-	#define OMAP44XX_WKUP_CTRL_BASE 0x4A31E000
 	#define PRECEPTION_FACTOR 100000
-
-	if (blink  == 0x7fff + PRECEPTION_FACTOR)
-		__raw_writew((PTU | M3),
-			OMAP44XX_WKUP_CTRL_BASE + CONTROL_WKUP_PAD1_FREF_CLK4_REQ);
-
+	if (blink  == 0x7fff + PRECEPTION_FACTOR){
+		__raw_writew(__raw_readw(reg) | (pull), reg);
+	}
 	if (blink  == (0xffff + PRECEPTION_FACTOR)) {
-		__raw_writew((M3),
-			OMAP44XX_WKUP_CTRL_BASE + CONTROL_WKUP_PAD1_FREF_CLK4_REQ);
+		__raw_writew(__raw_readw(reg) & (~pull), reg);
 		blink = 0;
 	}
-
 	blink ++ ;
-#endif
 
 
 	/* Look at the interrupt registers */
