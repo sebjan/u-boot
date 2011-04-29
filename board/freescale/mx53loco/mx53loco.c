@@ -364,6 +364,10 @@ static void power_init(void)
 	val = pmic_reg_read(DA9053_SUPPLY_REG);
 	val |= DA9052_SUPPLY_VBCOREGO;
 	pmic_reg_write(DA9053_SUPPLY_REG, val);
+
+	/* Set Vcc peripheral to 1.35V */
+	pmic_reg_write(0x2f, 0x62);
+	pmic_reg_write(0x3c, 0x62);
 }
 
 int board_early_init_f(void)
