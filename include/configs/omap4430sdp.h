@@ -107,8 +107,8 @@
 
 /* Config CMD*/
 #define CONFIG_COMMANDS          ((CFG_CMD_I2C | CONFIG_CMD_DFL | NET_CMDS | \
-	CFG_CMD_JFFS2 | CFG_CMD_MMC | CFG_CMD_FAT) &			\
-	(~CFG_CMD_AUTOSCRIPT | CFG_CMD_NAND | CFG_CMD_ONENAND)) 
+	CFG_CMD_JFFS2 | CFG_CMD_MMC | CFG_CMD_FAT | CFG_CMD_AUTOSCRIPT) & \
+	~(CFG_CMD_NAND | CFG_CMD_ONENAND)) 
 
 #define CFG_I2C_SPEED            100
 #define CFG_I2C_SLAVE            1
@@ -133,29 +133,41 @@
 
 #define NAND_MAX_CHIPS           1
 
-/* Environment information */
-#if defined(CONFIG_4430ZEBU) && !defined(CONFIG_4430ES2)
-/* Give the standard Kernel jump command as boot cmd and without any delay */
-#define CONFIG_BOOTDELAY         0
-#define CONFIG_EXTRA_ENV_SETTINGS \
-	"bootcmd=go 0x80008000\0"
-#else
 #define CONFIG_BOOTDELAY         3
-#define CONFIG_ZERO_BOOTDELAY_CHECK     /* check for keypress on bootdelay==0 */
-#endif /*CONFIG_4430ZEBU */
 
-#ifdef NFS_BOOT_DEFAULTS
-#define CONFIG_BOOTARGS "mem=64M console=ttyS0,115200n8 noinitrd \
-	root=/dev/nfs rw nfsroot=128.247.77.158:/home/a0384864/wtbu/rootfs \
-	ip=dhcp"
-#else
+#define CONFIG_EXTRA_ENV_SETTINGS \
+	"loadaddr=0x82000000\0" \
+	"console=ttyS2,115200n8\0" \
+	"usbtty=cdc_acm\0" \
+	"vram=16M\0" \
+	"mmcdev=0\0" \
+	"mmcroot=/dev/mmcblk0p2 rw\0" \
+	"mmcrootfstype=ext3 rootwait\0" \
+	"mmcargs=setenv bootargs console=${console} " \
+		"vram=${vram} " \
+		"root=${mmcroot} " \
+		"rootfstype=${mmcrootfstype}\0" \
+	"loadbootscript=fatload mmc ${mmcdev} ${loadaddr} boot.scr\0" \
+	"bootscript=echo Running bootscript from mmc${mmcdev} ...; " \
+		"autoscr ${loadaddr}\0" \
+	"loaduimage=fatload mmc ${mmcdev} ${loadaddr} uImage\0" \
+	"mmcboot=echo Booting from mmc${mmcdev} ...; " \
+		"run mmcargs; " \
+		"bootm ${loadaddr}\0" \
+	"bootfile=uImage\0" \
+	"serverip=192.168.0.210\0" \
+	"ipaddr=192.168.0.211\0" \
 
-#define CONFIG_BOOTARGS "console=ttyO2,115200n8 mem=456M@0x80000000 mem=512M@0xA0000000" \
-			" init=/init vram=10M omapfb.vram=0:4M androidboot.console=ttyO2"
-
-#define CONFIG_BOOTCOMMAND "booti mmc1"
-
-#endif
+#define CONFIG_BOOTCOMMAND \
+	"if mmcinit ${mmcdev}; then " \
+		"if run loadbootscript; then " \
+			"run bootscript; " \
+		"else " \
+			"if run loaduimage; then " \
+				"run mmcboot; " \
+			"fi; " \
+		"fi; " \
+	"fi"
 
 #define CONFIG_NETMASK           255.255.254.0
 #define CONFIG_IPADDR            128.247.77.90
@@ -300,5 +312,8 @@ extern unsigned int boot_flash_type;
 #define NAND_DISABLE_CE(nand)
 #define NAND_ENABLE_CE(nand)
 #define NAND_WAIT_READY(nand)	udelay(10)
+
+#define CFG_HUSH_PARSER
+#define CFG_PROMPT_HUSH_PS2 "> "
 
 #endif                           /* __CONFIG_H */
