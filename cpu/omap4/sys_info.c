@@ -207,7 +207,7 @@ u32 load_mfg_info(void)
 			   running on a Blaze/SDP board. It is a temporal solution
 			   in the time apps eeprom for tablet is connected to I2C2
 			   or a better decision is taken */
-			puts ("Blaze/SDP Board.\n");
+			puts ("Blaze/SDP/panda Board.\n");
 			omap4_board_revision = 0x10;
 		}
 	}
