@@ -33,7 +33,22 @@
  */
 #define CONFIG_PANDA		1	/* working with Panda */
 
+/* USB Host networking options */
+#define CONFIG_CMD_USB			1
+#define CONFIG_USB_STORAGE		1
+#define CONFIG_USB_HOST_ETHER		1
+#define CONFIG_USB_EHCI			1
+#define CONFIG_USB_EHCI_OMAP4		1
+#define CONFIG_USB_HOST			1
+#define CONFIG_USB_ETHER_SMSC95XX	1
+
+/* Ethernet */
+#define CONFIG_NET_MULTI		1
+#define CONFIG_CMD_PING			1
+#define CONFIG_CMD_DHCP			1
+
 #include <configs/omap4_common.h>
+#define CONFIG_CMD_NET
 
 /* ENV related config options */
 #define CONFIG_ENV_IS_NOWHERE
