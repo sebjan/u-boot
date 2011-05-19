@@ -1,0 +1,13 @@
+diff --git a/include/configs/omap4430sdp.h b/include/configs/omap4430sdp.h
+index 0b9863e..4753392 100644
+--- a/include/configs/omap4430sdp.h
++++ b/include/configs/omap4430sdp.h
+@@ -140,7 +140,7 @@
+ 	"console=ttyS2,115200n8\0" \
+ 	"usbtty=cdc_acm\0" \
+ 	"vram=16M\0" \
+-	"mmcdev=0\0" \
++	"mmcdev=1\0" \
+ 	"mmcroot=/dev/mmcblk0p2 rw\0" \
+ 	"mmcrootfstype=ext3 rootwait\0" \
+ 	"mmcargs=setenv bootargs console=${console} " \
