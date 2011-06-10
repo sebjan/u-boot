@@ -42,6 +42,20 @@
 #define CONFIG_USB_HOST			1
 #define CONFIG_USB_ETHER_SMSC95XX	1
 
+/* BOOTP options */
+#define CONFIG_BOOTP_BOOTFILESIZE
+#define CONFIG_BOOTP_BOOTPATH
+#define CONFIG_BOOTP_GATEWAY
+#define CONFIG_BOOTP_HOSTNAME
+
+/* PXE */
+#define CONFIG_CMD_PXE
+#define CONFIG_MENU
+#define CONFIG_BOOTP_PXE
+#define CONFIG_BOOTP_PXE_CLIENTARCH	0x100
+#define CONFIG_BOOTP_VCI_STRING		"U-boot.armv7.omap4_panda"
+
+
 /* Ethernet */
 #define CONFIG_NET_MULTI		1
 #define CONFIG_CMD_PING			1
