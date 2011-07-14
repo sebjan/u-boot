@@ -62,6 +62,9 @@ static int format_mac_pxe(char *outbuf, size_t outbuf_len)
 	ethaddr = from_env("ethaddr");
 
 	if (!ethaddr)
+		ethaddr = from_env("usbethaddr");
+
+	if (!ethaddr)
 		return -ENOENT;
 
 	ethaddr_len = strlen(ethaddr);
