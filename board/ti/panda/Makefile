@@ -25,8 +25,10 @@ include $(TOPDIR)/config.mk
 
 LIB	= $(obj)lib$(BOARD).o
 
+COBJS-$(CONFIG_USB_EHCI) += ehci-panda.o
+
 ifndef CONFIG_SPL_BUILD
-COBJS	:= panda.o
+COBJS	:= $(COBJS-y) panda.o
 endif
 
 SRCS	:= $(COBJS:.o=.c)
