@@ -46,6 +46,18 @@
 #define CONFIG_MXC_UART
 #define CONFIG_SYS_MX53_UART1
 
+/* I2C Configs */
+#define CONFIG_CMD_I2C
+#define CONFIG_HARD_I2C
+#define CONFIG_I2C_MXC
+#define CONFIG_SYS_I2C_MX53_PORT1
+#define CONFIG_SYS_I2C_SPEED            100000
+#define CONFIG_SYS_I2C_SLAVE            0xfe
+
+/* PMIC Configs */
+#define CONFIG_DIALOG_PMIC
+#define CONFIG_SYS_DIALOG_PMIC_I2C_ADDR    0x48
+
 /* MMC Configs */
 #define CONFIG_FSL_ESDHC
 #define CONFIG_SYS_FSL_ESDHC_ADDR	0
