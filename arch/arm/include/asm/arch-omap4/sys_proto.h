@@ -53,6 +53,7 @@ u32 omap4_ddr_clk(void);
 void cancel_out(u32 *num, u32 *den, u32 den_limit);
 void sdram_init(void);
 u32 omap4_sdram_size(void);
+void omap4_die_id_to_ethernet_mac(u8 *, int);
 
 static inline u32 running_from_sdram(void)
 {
