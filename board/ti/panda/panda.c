@@ -67,6 +67,25 @@ int misc_init_r(void)
 
 void set_muxconf_regs_non_essential(void)
 {
+	/*
+	 * Enable USB phy ref clock before reconfiguring pins because
+	 * the phy seems to get in a bad state otherwise.
+	 */
+#define OMAP44XX_SCRM_BASE		0x4a30a000
+#define OMAP44XX_SCRM_ALTCLKSRC		(OMAP44XX_SCRM_BASE + 0x110)
+#define OMAP44XX_SCRM_AUXCLK1		(OMAP44XX_SCRM_BASE + 0x314)
+#define OMAP44XX_SCRM_AUXCLK3		(OMAP44XX_SCRM_BASE + 0x31c)
+	/* enable software ioreq */
+	sr32(OMAP44XX_SCRM_AUXCLK3, 8, 1, 0x1);
+	/* set for sys_clk (38.4MHz) */
+	sr32(OMAP44XX_SCRM_AUXCLK3, 1, 2, 0x0);
+	/* set divisor to 2 */
+	sr32(OMAP44XX_SCRM_AUXCLK3, 16, 4, 0x1);
+	/* set the clock source to active */
+	sr32(OMAP44XX_SCRM_ALTCLKSRC, 0, 1, 0x1);
+	/* enable clocks */
+	sr32(OMAP44XX_SCRM_ALTCLKSRC, 2, 2, 0x3);
+
 	do_set_mux(CONTROL_PADCONF_CORE, core_padconf_array_non_essential,
 		   sizeof(core_padconf_array_non_essential) /
 		   sizeof(struct pad_conf_entry));
