@@ -247,6 +247,15 @@ static inline void wait_for_lock(u32 *const base)
 	}
 }
 
+static void force_on(u32 *const reg, u32 val)
+{
+	u32 temp;
+
+	temp = readl(reg);
+	temp |= val;
+	writel(temp, reg);
+}
+
 static void do_setup_dpll(u32 *const base, const struct dpll_params *params,
 				u8 lock)
 {
@@ -439,6 +448,10 @@ static void setup_non_essential_dplls(void)
 
 	/* Now setup the dpll with the regular function */
 	do_setup_dpll(&prcm->cm_clkmode_dpll_usb, params, DPLL_LOCK);
+
+	/* Force on these two clocks */
+	force_on(&prcm->cm_div_m2_dpll_usb, 1 << 8);
+	force_on(&prcm->cm_clkdcoldo_dpll_usb, 1 << 8);
 
 #ifdef CONFIG_SYS_OMAP4_ABE_SYSCK
 	params = &abe_dpll_params_sysclk_196608khz[sysclk_ind];
