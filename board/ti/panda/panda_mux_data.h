@@ -57,7 +57,7 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{GPMC_NBE0_CLE, (M3)},						/* gpio_59 */
 	{GPMC_NBE1, (PTD | M3)},					/* gpio_60 */
 	{GPMC_WAIT0, (PTU | IEN | M3)},					/* gpio_61 */
-	{GPMC_WAIT1, (IEN | M3)},					/* gpio_62 */
+	{GPMC_WAIT1,  (PTD | OFF_EN | OFF_PD | OFF_OUT_PTD | M3)},	/* gpio_62 */
 	{C2C_DATA11, (PTD | M3)},					/* gpio_100 */
 	{C2C_DATA12, (M1)},						/* dsi1_te0 */
 	{C2C_DATA13, (PTD | M3)},					/* gpio_102 */
@@ -159,8 +159,8 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{UNIPRO_TY0, (OFF_EN | OFF_PD | OFF_IN | M1)},			/* kpd_col1 */
 	{UNIPRO_TX1, (OFF_EN | OFF_PD | OFF_IN | M1)},			/* kpd_col2 */
 	{UNIPRO_TY1, (OFF_EN | OFF_PD | OFF_IN | M1)},			/* kpd_col3 */
-	{UNIPRO_TX2, (OFF_EN | OFF_PD | OFF_IN | M1)},			/* kpd_col4 */
-	{UNIPRO_TY2, (OFF_EN | OFF_PD | OFF_IN | M1)},			/* kpd_col5 */
+	{UNIPRO_TX2, (OFF_EN | OFF_PD | OFF_IN | M1)},                  /* kpd_col4 */
+	{UNIPRO_TY2, (PTU | IEN | M3)},					/* gpio_1 */
 	{UNIPRO_RX0, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)},	/* kpd_row0 */
 	{UNIPRO_RY0, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)},	/* kpd_row1 */
 	{UNIPRO_RX1, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M1)},	/* kpd_row2 */
