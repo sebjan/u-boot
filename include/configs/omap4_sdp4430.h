@@ -98,8 +98,10 @@
 #define CONFIG_I2C_MULTI_BUS		1
 
 /* TWL6030 */
+#ifndef CONFIG_SPL_BUILD
 #define CONFIG_TWL6030_POWER		1
 #define CONFIG_CMD_BAT			1
+#endif
 
 /* MMC */
 #define CONFIG_GENERIC_MMC		1
