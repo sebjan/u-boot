@@ -38,7 +38,10 @@ COBJS-y += xyzModem.o
 
 # core command
 COBJS-y += cmd_boot.o
+ifdef CONFIG_CMD_BOOTM
 COBJS-$(CONFIG_CMD_BOOTM) += cmd_bootm.o
+COBJS-$(CONFIG_ANDROID_BOOT_IMAGE) += android_img.o
+endif
 COBJS-y += cmd_help.o
 COBJS-y += cmd_nvedit.o
 COBJS-y += cmd_version.o
