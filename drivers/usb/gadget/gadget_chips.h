@@ -26,10 +26,18 @@
 #define	gadget_is_amd5536udc(g)	0
 #endif
 
-#ifdef CONFIG_USB_GADGET_DUMMY_HCD
+#ifdef CONFIG_USB_DWC3
+#error YEAH
 #define	gadget_is_dummy(g)	(!strcmp("dummy_udc", (g)->name))
 #else
+#error OH NO
 #define	gadget_is_dummy(g)	0
+#endif
+
+#ifdef CONFIG_USB_GADGET_DUMMY_HCD
+#define	gadget_is_dwc3(g)	(!strcmp("dwc3-gadget", (g)->name))
+#else
+#define	gadget_is_dwc3(g)	0
 #endif
 
 #ifdef CONFIG_USB_GADGET_PXA2XX
@@ -216,5 +224,7 @@ static inline int usb_gadget_controller_number(struct usb_gadget *gadget)
 		return 0x20;
 	else if (gadget_is_m66592(gadget))
 		return 0x21;
+	else if (gadget_is_dwc3(gadget))
+		return 0x32;
 	return -ENOENT;
 }
