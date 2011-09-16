@@ -42,6 +42,11 @@ COBJS-$(CONFIG_SPEARUDC) += spr_udc.o
 endif
 endif
 
+ifdef CONFIG_CMD_FASTBOOT
+COBJS-y += f_fastboot.o u_fastboot.o
+COBJS-y += epautoconf.o usbstring.o
+endif
+
 COBJS	:= $(COBJS-y)
 SRCS	:= $(COBJS:.o=.c)
 OBJS	:= $(addprefix $(obj),$(COBJS))
