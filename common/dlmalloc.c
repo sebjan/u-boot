@@ -1276,7 +1276,8 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /*  sizes, alignments */
 
 #define SIZE_SZ                (sizeof(INTERNAL_SIZE_T))
-#define MALLOC_ALIGNMENT       (SIZE_SZ + SIZE_SZ)
+/* enforce 16byte aligmend for dwc3 */
+#define MALLOC_ALIGNMENT       ((SIZE_SZ + SIZE_SZ) * 2)
 #define MALLOC_ALIGN_MASK      (MALLOC_ALIGNMENT - 1)
 #define MINSIZE                (sizeof(struct malloc_chunk))
 
