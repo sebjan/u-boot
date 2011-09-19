@@ -95,6 +95,7 @@ struct usb_request {
 
 	int			status;
 	unsigned		actual;
+	unsigned		stream_id;
 };
 
 /*-------------------------------------------------------------------------*/
@@ -145,6 +146,8 @@ struct usb_ep {
 	const struct usb_ep_ops	*ops;
 	struct list_head	ep_list;
 	unsigned		maxpacket:16;
+	unsigned		max_streams:16;
+	unsigned		maxburst:16;
 };
 
 /*-------------------------------------------------------------------------*/

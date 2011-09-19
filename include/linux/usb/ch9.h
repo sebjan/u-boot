@@ -120,6 +120,32 @@
 #define USB_DEVICE_A_ALT_HNP_SUPPORT	5	/* (otg) other RH port does */
 #define USB_DEVICE_DEBUG_MODE		6	/* (special devices only) */
 
+/*
+ * Test Mode Selectors
+ * See USB 2.0 spec Table 9-7
+ */
+#define TEST_J		1
+#define TEST_K		2
+#define TEST_SE0_NAK	3
+#define TEST_PACKET	4
+#define TEST_FORCE_EN	5
+
+/*
+ * New Feature Selectors as added by USB 3.0
+ * See USB 3.0 spec Table 9-6
+ */
+#define USB_DEVICE_U1_ENABLE	48      /* dev may initiate U1 transition */
+#define USB_DEVICE_U2_ENABLE	49      /* dev may initiate U2 transition */
+#define USB_DEVICE_LTM_ENABLE	50      /* dev may send LTM */
+#define USB_INTRF_FUNC_SUSPEND	0       /* function suspend */
+
+#define USB_INTR_FUNC_SUSPEND_OPT_MASK  0xFF00
+/*
+ * Suspend Options, Table 9-7 USB 3.0 spec
+ */
+#define USB_INTRF_FUNC_SUSPEND_LP	(1 << (8 + 0))
+#define USB_INTRF_FUNC_SUSPEND_RW	(1 << (8 + 1))
+
 #define USB_ENDPOINT_HALT		0	/* IN/OUT will STALL */
 
 
@@ -502,6 +528,18 @@ struct usb_wireless_cap_descriptor {	/* Ultra Wide Band */
 } __attribute__((packed));
 
 /*-------------------------------------------------------------------------*/
+
+static inline int usb_endpoint_maxp(const struct usb_endpoint_descriptor *epd)
+{
+	return le16_to_cpu(epd->wMaxPacketSize);
+}
+
+static inline int usb_endpoint_xfer_bulk(
+		const struct usb_endpoint_descriptor *epd)
+{
+	return ((epd->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) ==
+			USB_ENDPOINT_XFER_BULK);
+}
 
 /* USB_DT_WIRELESS_ENDPOINT_COMP:  companion descriptor associated with
  * each endpoint descriptor for a wireless device
