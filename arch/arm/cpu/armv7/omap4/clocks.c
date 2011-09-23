@@ -940,6 +940,12 @@ void prcm_init(void)
 {
 	switch (omap4_hw_init_context()) {
 	case OMAP_INIT_CONTEXT_SPL:
+		if (omap_revision() >= OMAP4460_ES1_0) {
+			/* GPIO-1 clock needs to be enable before TPS init */
+			sr32(&prcm->cm_wkup_gpio1_clkctrl, 0, 32, 0x1);
+			wait_on_value((1 << 17)|(1 << 16), 0,
+					&prcm->cm_wkup_gpio1_clkctrl, LDELAY);
+		}
 	case OMAP_INIT_CONTEXT_UBOOT_FROM_NOR:
 	case OMAP_INIT_CONTEXT_UBOOT_AFTER_CH:
 		enable_basic_clocks();
