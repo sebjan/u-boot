@@ -151,7 +151,7 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{RFBI_DATA10, (PTD | M6)},    /*  GPIO6_176  */
 	{RFBI_DATA11, (PTD | M6)},    /*  GPIO6_177  */
 	{RFBI_DATA12, (PTD | M6)},    /*  GPIO6_178  */
-	{RFBI_DATA13, (PTU | IEN | M6)},    /*  GPIO6_179  */
+	{RFBI_DATA13, (IEN | M6)},    /*  GPIO6_179  */
 	{RFBI_DATA14, (M4)},    /*  KBD_COL7   */
 	{RFBI_DATA15, (M4)},    /*  KBD_COL6   */
 	{GPIO6_182, (M6)},    /*  GPIO6_182  */
@@ -248,9 +248,9 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{I2C5_SDA, (IEN | M0)},    /*  I2C5_SDA    */
 	{PERSLIMBUS2_CLOCK, (PTD | M6)},    /*  GPIO5_145   */
 	{PERSLIMBUS2_DATA, (PTD | IEN | M6)},    /*  GPIO5_146   */
-	{UART6_TX, (PTU | IEN | M6)},    /*  GPIO5_149   */
-	{UART6_RX, (PTU | IEN | M6)},    /*  GPIO5_150   */
-	{UART6_CTS, (PTU | IEN | M6)},    /*  GPIO5_151   */
+	{UART6_TX, (IEN | M6)},    /*  GPIO5_149   */
+	{UART6_RX, (IEN | M6)},    /*  GPIO5_150   */
+	{UART6_CTS, (IEN | M6)},    /*  GPIO5_151   */
 	{UART6_RTS, (PTU | M0)},    /*  UART6_RTS   */
 	{UART3_CTS_RCTX, (PTU | IEN | M6)},    /*  GPIO5_153   */
 	{UART3_RTS_IRSD, (PTU | IEN | M1)},    /*  HDQ_SIO     */
