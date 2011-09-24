@@ -120,13 +120,22 @@ static void cache_disable(uint32_t cache_bit)
 		reg = get_cr();
 		if ((reg & CR_C) != CR_C)
 			return;
-		/* if disabling data cache, disable mmu too */
-		cache_bit |= CR_M;
 		flush_dcache_all();
 	}
 	reg = get_cr();
 	cp_delay();
 	set_cr(reg & ~cache_bit);
+}
+
+void mmu_disable(void)
+{
+	uint32_t reg;
+
+	if (mmu_enabled()) {
+		reg = get_cr();
+		cp_delay();
+		set_cr(reg & ~CR_M);
+	}
 }
 #endif
 
