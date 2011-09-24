@@ -121,7 +121,7 @@ static const struct dpll_params
 	{665, 11, 2, 5, 8, 4, 62, 5, 5, 7},		/* 19.2 MHz */
 	{532, 12, 2, 5, 8, 4, 62, 5, 5, 7},		/* 26 MHz   */
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 27 MHz   */
-	{665, 23, 2, 5, 8, 4, 62, 5, 5, 7}		/* 38.4 MHz */
+	{665, 23, 4, 5, 8, 4, 62, 5, 5, 7}		/* 38.4 MHz */
 };
 
 static const struct dpll_params per_dpll_params_768mhz[NUM_SYS_CLKS] = {
@@ -205,7 +205,7 @@ const struct dpll_params *get_core_dpll_params(void)
 	u32 sysclk_ind = get_sys_clk_index();
 
 	/* Configuring the DDR to be at 532mhz */
-	return &core_dpll_params_2128mhz_ddr266[sysclk_ind];
+	return &core_dpll_params_2128mhz_ddr532[sysclk_ind];
 
 }
 

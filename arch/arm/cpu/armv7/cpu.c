@@ -77,6 +77,7 @@ int cleanup_before_linux(void)
 	 * problems for kernel
 	 */
 	invalidate_dcache_all();
+	mmu_disable();
 
 	return 0;
 }
