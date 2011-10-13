@@ -31,7 +31,7 @@ COBJS	:= timer.o
 COBJS	+= utils.o
 COBJS	+= gpio.o
 
-ifdef CONFIG_OMAP44XX
+ifneq ($(CONFIG_OMAP44XX)$(CONFIG_OMAP54XX),)
 COBJS	+= hwinit-common.o
 COBJS	+= clocks-common.o
 COBJS	+= emif-common.o
@@ -49,7 +49,7 @@ endif
 endif
 
 ifndef CONFIG_SPL_BUILD
-ifdef CONFIG_OMAP44XX
+ifneq ($(CONFIG_OMAP44XX)$(CONFIG_OMAP54XX),)
 COBJS	+= mem-common.o
 endif
 endif
