@@ -284,10 +284,9 @@ LIBS += post/libpost.o
 ifeq ($(SOC),omap3)
 LIBS += $(CPUDIR)/omap-common/libomap-common.o
 endif
-ifeq ($(SOC),omap4)
+ifneq ($(CONFIG_OMAP44XX)$(CONFIG_OMAP54XX),)
 LIBS += $(CPUDIR)/omap-common/libomap-common.o
 endif
-
 ifeq ($(SOC),s5pc1xx)
 LIBS += $(CPUDIR)/s5p-common/libs5p-common.o
 endif
