@@ -29,7 +29,6 @@ LIB	= $(obj)libcommon.o
 ifndef CONFIG_SPL_BUILD
 COBJS-y += main.o
 COBJS-y += command.o
-COBJS-y += dlmalloc.o
 COBJS-y += exports.o
 COBJS-$(CONFIG_SYS_HUSH_PARSER) += hush.o
 COBJS-y += image.o
@@ -183,6 +182,7 @@ COBJS-$(CONFIG_USB_KEYBOARD) += usb_kbd.o
 endif
 
 COBJS-y += console.o
+COBJS-y += dlmalloc.o
 COBJS-y += memsize.o
 COBJS-y += stdio.o
 
