@@ -175,6 +175,7 @@ void preloader_console_init(void)
 	gd->bd = &bdata;
 	gd->flags |= GD_FLG_RELOC;
 	gd->baudrate = CONFIG_BAUDRATE;
+	gd->have_console = 1;
 
 	serial_init();		/* serial communications setup */
 
