@@ -92,12 +92,16 @@ void spl_parse_image_header(const struct image_header *header)
 
 static void jump_to_image_no_args(void)
 {
-	typedef void (*image_entry_noargs_t)(void)__attribute__ ((noreturn));
+	typedef void (*image_entry_noargs_t)(u32 *)__attribute__ ((noreturn));
 	image_entry_noargs_t image_entry =
 			(image_entry_noargs_t) spl_image.entry_point;
 
 	debug("image entry point: 0x%X\n", spl_image.entry_point);
-	image_entry();
+	/* Pass the saved boot_params from rom code */
+#if defined(CONFIG_VIRTIO) || defined(CONFIG_ZEBU)
+	image_entry = 0x80100000;
+#endif
+	image_entry((u32 *)&boot_params);
 }
 
 void jump_to_image_no_args(void) __attribute__ ((noreturn));

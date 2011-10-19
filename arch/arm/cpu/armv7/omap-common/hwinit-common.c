@@ -34,6 +34,14 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+/*
+ * This is used to verify if the configuration header
+ * was executed by rom code prior to control of transfer
+ * to the bootloader. SPL is responsible for saving and
+ * passing the boot_params pointer to the u-boot.
+ */
+struct omap_boot_parameters boot_params __attribute__ ((section(".data")));
+
 #ifdef CONFIG_SPL_BUILD
 /*
  * We use static variables because global data is not ready yet.
@@ -41,12 +49,11 @@ DECLARE_GLOBAL_DATA_PTR;
  * We would not typically need to save these parameters in regular
  * U-Boot. This is needed only in SPL at the moment.
  */
-u32 omap_bootdevice = BOOT_DEVICE_MMC1;
 u32 omap_bootmode = MMCSD_MODE_FAT;
 
-u32 omap_boot_device(void)
+u8 omap_boot_device(void)
 {
-	return omap_bootdevice;
+	return boot_params.omap_bootdevice;
 }
 
 u32 omap_boot_mode(void)
@@ -71,12 +78,16 @@ void set_mux_conf_regs(void)
 		set_muxconf_regs_essential();
 		break;
 	case OMAP_INIT_CONTEXT_UBOOT_AFTER_SPL:
+#ifdef CONFIG_UBOOT_ENABLE_PADS_ALL
 		set_muxconf_regs_non_essential();
+#endif
 		break;
 	case OMAP_INIT_CONTEXT_UBOOT_FROM_NOR:
 	case OMAP_INIT_CONTEXT_UBOOT_AFTER_CH:
 		set_muxconf_regs_essential();
+#ifdef CONFIG_UBOOT_ENABLE_PADS_ALL
 		set_muxconf_regs_non_essential();
+#endif
 		break;
 	}
 }
