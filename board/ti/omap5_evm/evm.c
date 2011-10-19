@@ -27,12 +27,12 @@
 #include <asm/arch/sys_proto.h>
 #include <asm/arch/mmc_host_def.h>
 
-#include "sdp4430_mux_data.h"
+#include "mux_data.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
 const struct omap_sysinfo sysinfo = {
-	"Board: OMAP4430 SDP\n"
+	"Board: OMAP5430 EVM\n"
 };
 
 /**
@@ -43,8 +43,7 @@ const struct omap_sysinfo sysinfo = {
 int board_init(void)
 {
 	gpmc_init();
-
-	gd->bd->bi_arch_number = MACH_TYPE_OMAP_4430SDP;
+	gd->bd->bi_arch_number = MACH_TYPE_OMAP5_SEVM;
 	gd->bd->bi_boot_params = (0x80000000 + 0x100); /* boot param addr */
 
 	return 0;
@@ -56,7 +55,7 @@ int board_eth_init(bd_t *bis)
 }
 
 /**
- * @brief misc_init_r - Configure SDP board specific configurations
+ * @brief misc_init_r - Configure EVM board specific configurations
  * such as power configurations, ethernet initialization as phase2 of
  * boot sequence
  *
@@ -79,10 +78,6 @@ void set_muxconf_regs_essential(void)
 	do_set_mux(CONTROL_PADCONF_WKUP, wkup_padconf_array_essential,
 		   sizeof(wkup_padconf_array_essential) /
 		   sizeof(struct pad_conf_entry));
-
-	/* gpio_wk7 is used for controlling TPS on 4460 */
-	if (omap_revision() >= OMAP4460_ES1_0)
-		writew(M3, CONTROL_WKUP_PAD1_FREF_CLK4_REQ);
 }
 
 void set_muxconf_regs_non_essential(void)
@@ -106,11 +101,3 @@ int board_mmc_init(bd_t *bis)
 }
 #endif
 #endif
-
-/*
- * get_board_rev() - get board revision
- */
-u32 get_board_rev(void)
-{
-	return 0x20;
-}

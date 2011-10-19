@@ -83,3 +83,11 @@ int board_mmc_init(bd_t *bis)
 	return 0;
 }
 #endif
+
+/*
+ * get_board_rev() - get board revision
+ */
+u32 get_board_rev(void)
+{
+	return 0x20;
+}

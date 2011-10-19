@@ -3312,6 +3312,7 @@ extern unsigned int __machine_arch_type;
 #define MACH_TYPE_T5388P               3336
 #define MACH_TYPE_DINGO                3337
 #define MACH_TYPE_GOFLEXHOME           3338
+#define MACH_TYPE_OMAP5_SEVM           3777
 
 #ifdef CONFIG_ARCH_EBSA110
 # ifdef machine_arch_type
@@ -42911,6 +42912,18 @@ extern unsigned int __machine_arch_type;
 # define machine_is_goflexhome()	(machine_arch_type == MACH_TYPE_GOFLEXHOME)
 #else
 # define machine_is_goflexhome()	(0)
+#endif
+
+#ifdef CONFIG_MACH_OMAP5_SEVM
+# ifdef machine_arch_type
+#  undef machine_arch_type
+#  define machine_arch_type     __machine_arch_type
+# else
+#  define machine_arch_type     MACH_TYPE_OMAP5_SEVM
+# endif
+# define machine_is_omap5_sevm()      (machine_arch_type == MACH_TYPE_OMAP5_SEVM)
+#else
+# define machine_is_omap5_sevm()      (0)
 #endif
 
 /*
