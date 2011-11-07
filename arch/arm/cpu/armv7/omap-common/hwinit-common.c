@@ -130,17 +130,21 @@ void omap_rev_string(char *omap_rev_string)
 void s_init(void)
 {
 	init_omap_revision();
-	watchdog_init();
+#if !defined(CONFIG_VIRTIO) && !defined(CONFIG_ZEBU)
 	set_mux_conf_regs();
+#endif
 #ifdef CONFIG_SPL_BUILD
 	setup_clocks_for_console();
 	preloader_console_init();
 	do_io_settings();
 #endif
+#ifndef CONFIG_VIRTIO
 	prcm_init();
+	watchdog_init();
 #ifdef CONFIG_SPL_BUILD
 	/* For regular u-boot sdram_init() is called from dram_init() */
 	sdram_init();
+#endif
 #endif
 }
 
@@ -179,7 +183,7 @@ void watchdog_init(void)
 u32 omap_sdram_size(void)
 {
 	u32 section, i, total_size = 0, size, addr;
-
+#ifndef CONFIG_VIRTIO
 	for (i = 0; i < 4; i++) {
 		section	= __raw_readl(DMM_BASE + i*4);
 		addr = section & EMIF_SYS_ADDR_MASK;
@@ -195,10 +199,11 @@ u32 omap_sdram_size(void)
 	}
 
 	total_size = SZ_16M;
-
+#else
+	total_size = SZ_16M;
+#endif
 	return total_size;
 }
-
 
 /*
  * Routine: dram_init

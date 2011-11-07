@@ -174,7 +174,8 @@ struct control_lpddr2io_regs {
  * at 0x40304000(EMU base) so that our code works for both EMU and GP
  */
 #define NON_SECURE_SRAM_START	0x40304000
-#define NON_SECURE_SRAM_END	0x40320000	/* Not inclusive */
+#define NON_SECURE_SRAM_END     0x40320000
+
 /* base address for indirect vectors (internal boot mode) */
 #define SRAM_ROM_VECT_BASE	0x4031F000
 /* Temporary SRAM stack used while low level init is done */

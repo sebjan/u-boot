@@ -73,6 +73,7 @@ ulong get_timer(ulong base)
 /* delay x useconds */
 void __udelay(unsigned long usec)
 {
+#ifndef CONFIG_ZEBU
 	long tmo = usec * (TIMER_CLOCK / 1000) / 1000;
 	unsigned long now, last = readl(&timer_base->tcrr);
 
@@ -84,6 +85,7 @@ void __udelay(unsigned long usec)
 			tmo -= now - last;
 		last = now;
 	}
+#endif
 }
 
 ulong get_timer_masked(void)

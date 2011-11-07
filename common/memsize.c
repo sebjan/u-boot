@@ -59,7 +59,7 @@ long get_ram_size(long *base, long maxsize)
 	save[i] = *addr;
 	sync ();
 	*addr = 0;
-
+	printf("\n value at 0x80000000 is %x", *addr);
 	sync ();
 	if ((val = *addr) != 0) {
 		/* Restore the original data before leaving the function.

@@ -244,6 +244,13 @@ void configure_mpu_dpll(void)
 			CM_CLKSEL_DCC_EN_MASK);
 	}
 
+#ifdef CONFIG_ZEBU
+		setbits_le32(&prcm->cm_mpu_mpu_clkctrl,
+			MPU_CLKCTRL_CLKSEL_EMIF_DIV_MODE_MASK);
+		setbits_le32(&prcm->cm_mpu_mpu_clkctrl,
+			MPU_CLKCTRL_CLKSEL_ABE_DIV_MODE_MASK);
+#endif
+
 	params = get_mpu_dpll_params();
 
 	do_setup_dpll(&prcm->cm_clkmode_dpll_mpu, params, DPLL_LOCK, "mpu");
@@ -301,6 +308,7 @@ static void setup_non_essential_dplls(void)
 	params = get_iva_dpll_params();
 	do_setup_dpll(&prcm->cm_clkmode_dpll_iva, params, DPLL_LOCK, "iva");
 
+#ifndef CONFIG_ZEBU
 	/*
 	 * USB:
 	 * USB dpll is J-type. Need to set DPLL_SD_DIV for jitter correction
@@ -321,6 +329,7 @@ static void setup_non_essential_dplls(void)
 	/* Now setup the dpll with the regular function */
 	do_setup_dpll(&prcm->cm_clkmode_dpll_usb, params, DPLL_LOCK, "usb");
 
+#endif
 	/* Configure ABE dpll */
 	params = get_abe_dpll_params();
 #ifdef CONFIG_SYS_OMAP_ABE_SYSCK
@@ -592,7 +601,9 @@ void prcm_init(void)
 	case OMAP_INIT_CONTEXT_UBOOT_FROM_NOR:
 	case OMAP_INIT_CONTEXT_UBOOT_AFTER_CH:
 		enable_basic_clocks();
+#ifndef CONFIG_ZEBU
 		scale_vcores();
+#endif
 		setup_dplls();
 #ifdef CONFIG_UBOOT_CLOCKS_ENABLE_ALL
 		setup_non_essential_dplls();
