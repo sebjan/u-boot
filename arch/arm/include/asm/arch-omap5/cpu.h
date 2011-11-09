@@ -143,9 +143,6 @@ struct watchdog {
 #define I2C_BASE2		(OMAP54XX_L4_PER_BASE + 0x72000)
 #define I2C_BASE3		(OMAP54XX_L4_PER_BASE + 0x60000)
 
-/* MUSB base */
-#define MUSB_BASE		(OMAP54XX_L4_CORE_BASE + 0xAB000)
-
 /* OMAP4 GPIO registers */
 #define OMAP_GPIO_REVISION		0x0000
 #define OMAP_GPIO_SYSCONFIG		0x0010
