@@ -112,6 +112,18 @@
 
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV	1
 
+#define CONFIG_USB_DWC3                        1
+#define CONFIG_USB_DWC3_UDC_REGS		((void *)0x4a030000)
+#define CONFIG_USB_DWC3_UDC_REGS_END		((void *)0x4a03ffff)
+#define CONFIG_USB_DWC3_WRAP_REGS		((void *)0x4a020000)
+#define CONFIG_USB_DWC3_WRAP_REGS_END		((void *)0x4a02ffff)
+#ifdef CONFIG_USB_DWC3
+#define CONFIG_SYS_DCACHE_OFF 1
+#define CONFIG_SYS_L2CACHE_OFF 1
+#endif
+#define CONFIG_CMD_FASTBOOT            1
+#define CONFIG_ANDROID_BOOT_IMAGE	1
+
 /* Flash */
 #define CONFIG_SYS_NO_FLASH	1
 
