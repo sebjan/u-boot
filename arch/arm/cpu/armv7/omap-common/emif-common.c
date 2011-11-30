@@ -149,7 +149,7 @@ void emif_update_timings(u32 base, const struct emif_regs *regs)
 	writel(regs->sdram_tim1, &emif->emif_sdram_tim_1_shdw);
 	writel(regs->sdram_tim2, &emif->emif_sdram_tim_2_shdw);
 	writel(regs->sdram_tim3, &emif->emif_sdram_tim_3_shdw);
-#ifndef CONFIG_ZEBU
+
 	if (omap_revision() == OMAP4430_ES1_0) {
 		/* ES1 bug EMIF should be in force idle during freq_update */
 		writel(0, &emif->emif_pwr_mgmt_ctrl);
@@ -157,6 +157,7 @@ void emif_update_timings(u32 base, const struct emif_regs *regs)
 		writel(EMIF_PWR_MGMT_CTRL, &emif->emif_pwr_mgmt_ctrl);
 		writel(EMIF_PWR_MGMT_CTRL_SHDW, &emif->emif_pwr_mgmt_ctrl_shdw);
 	}
+#ifndef CONFIG_ZEBU
 	writel(regs->read_idle_ctrl, &emif->emif_read_idlectrl_shdw);
 	writel(regs->zq_config, &emif->emif_zq_config);
 	writel(regs->temp_alert_config, &emif->emif_temp_alert_config);
@@ -1110,8 +1111,8 @@ void sdram_init(void)
 	u32 in_sdram, size_prog, size_detect;
 
 	debug(">>sdram_init()\n");
-
-	if (omap_hw_init_context() == OMAP_INIT_CONTEXT_UBOOT_AFTER_SPL)
+	if ((omap_hw_init_context() == OMAP_INIT_CONTEXT_UBOOT_AFTER_SPL) ||
+            (omap_hw_init_context() == OMAP_INIT_CONTEXT_UBOOT_AFTER_CH))
 		return;
 
 	in_sdram = running_from_sdram();

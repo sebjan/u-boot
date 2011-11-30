@@ -108,11 +108,7 @@ const struct dmm_lisa_map_regs lisa_map_4G_x_1_x_2 = {
 
 static void emif_get_reg_dump_sdp(u32 emif_nr, const struct emif_regs **regs)
 {
-#ifdef CONFIG_ZEBU
-	*regs = &emif_regs_elpida_400_mhz_2cs;
-#else
-	regs = &emif_regs_elpida_532_mhz_1cs;
-#endif
+	*regs = &emif_regs_elpida_532_mhz_1cs;
 }
 void emif_get_reg_dump(u32 emif_nr, const struct emif_regs **regs)
 	__attribute__((weak, alias("emif_get_reg_dump_sdp")));

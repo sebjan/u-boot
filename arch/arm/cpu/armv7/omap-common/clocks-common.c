@@ -148,7 +148,7 @@ static void do_setup_dpll(u32 *const base, const struct dpll_params *params,
 			/* Dpll locked with ideal values for nominal opps. */
 			debug("\n %s Dpll already locked with ideal"
 						"nominal opp values", dpll);
-			return;
+			goto setup_post_dividers;
 		}
 	}
 
@@ -167,11 +167,12 @@ static void do_setup_dpll(u32 *const base, const struct dpll_params *params,
 	if (lock)
 		do_lock_dpll(base);
 
-	setup_post_dividers(base, params);
-
 	/* Wait till the DPLL locks */
 	if (lock)
 		wait_for_lock(base);
+
+setup_post_dividers:
+	setup_post_dividers(base, params);
 }
 
 u32 omap_ddr_clk(void)
@@ -599,12 +600,14 @@ void prcm_init(void)
 	switch (omap_hw_init_context()) {
 	case OMAP_INIT_CONTEXT_SPL:
 	case OMAP_INIT_CONTEXT_UBOOT_FROM_NOR:
-	case OMAP_INIT_CONTEXT_UBOOT_AFTER_CH:
-		enable_basic_clocks();
 #ifndef CONFIG_ZEBU
 		scale_vcores();
 #endif
 		setup_dplls();
+
+	case OMAP_INIT_CONTEXT_UBOOT_AFTER_CH:
+		enable_basic_clocks();
+
 #ifdef CONFIG_UBOOT_CLOCKS_ENABLE_ALL
 		setup_non_essential_dplls();
 		enable_non_essential_clocks();
