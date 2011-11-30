@@ -106,11 +106,7 @@ static const struct dpll_params
 	{665, 11, 1, 5, 8, 4, 62, 5, 5, 7},		/* 19.2 MHz */
 	{532, 12, 1, 5, 8, 4, 62, 5, 5, 7},		/* 26 MHz   */
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 27 MHz   */
-#ifndef CONFIG_ZEBU
-	{665, 23, 2, 5, 8, 4, 62, 5, 5, 7}		/* 38.4 MHz */
-#else
-	{665, 23, 4, 5, 8, 4, 62, 5, 5, 7}		/* 38.4 MHz */
-#endif
+	{1330, 47, 2, 5, 8, 4, 62, 5, 5, 7}		/* 38.4 MHz */
 };
 
 static const struct dpll_params
@@ -121,7 +117,7 @@ static const struct dpll_params
 	{665, 11, 2, 5, 8, 4, 62, 5, 5, 7},		/* 19.2 MHz */
 	{532, 12, 2, 5, 8, 4, 62, 5, 5, 7},		/* 26 MHz   */
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 27 MHz   */
-	{665, 23, 4, 5, 8, 4, 62, 5, 5, 7}		/* 38.4 MHz */
+	{1330, 47, 4, 5, 8, 4, 62, 5, 5, 7}		/* 38.4 MHz */
 };
 
 static const struct dpll_params per_dpll_params_768mhz[NUM_SYS_CLKS] = {
@@ -141,7 +137,7 @@ static const struct dpll_params iva_dpll_params_2330mhz[NUM_SYS_CLKS] = {
 	{727, 14, -1, -1, 4, 7, -1, -1},	/* 19.2 MHz */
 	{931, 25, -1, -1, 4, 7, -1, -1},	/* 26 MHz   */
 	{931, 26, -1, -1, 4, 7, -1, -1},	/* 27 MHz   */
-	{412, 16, -1, -1, 4, 7, -1, -1}		/* 38.4 MHz */
+	{1972, 64, -1, -1, 5, 6, -1, -1}		/* 38.4 MHz */
 };
 
 /* ABE M & N values with sys_clk as source */
