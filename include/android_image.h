@@ -65,12 +65,12 @@ u32 android_img_get_end(struct andr_img_hdr *hdr);
 u32 android_img_get_kload(struct andr_img_hdr *hdr);
 int android_image_get_kernel(struct andr_img_hdr *hdr, int verify);
 #else
-static inline u32 android_img_get_end(struct andr_img_hdr *hdr) { return 0 };
-static inline u32 android_img_get_kload(struct andr_img_hdr *hdr) { return 0 };
+static inline u32 android_img_get_end(struct andr_img_hdr *hdr) { return 0; }
+static inline u32 android_img_get_kload(struct andr_img_hdr *hdr) { return 0; }
 static inline int android_image_get_kernel(struct andr_img_hdr *hdr, int verify)
 {
 	return -1;
-};
+}
 #endif
 
 /*
