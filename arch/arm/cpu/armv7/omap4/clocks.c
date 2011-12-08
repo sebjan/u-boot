@@ -78,15 +78,15 @@ static const struct dpll_params mpu_dpll_params_1400mhz[NUM_SYS_CLKS] = {
 	{638, 34, 1, -1, -1, -1, -1, -1}	/* 38.4 MHz */
 };
 
-/* dpll locked at 1584 MHz - MPU clk at 792 MHz(OPP Turbo 4430) */
-static const struct dpll_params mpu_dpll_params_1584mhz[NUM_SYS_CLKS] = {
-	{66, 0, 1, -1, -1, -1, -1, -1},		/* 12 MHz   */
-	{792, 12, 1, -1, -1, -1, -1, -1},	/* 13 MHz   */
-	{330, 6, 1, -1, -1, -1, -1, -1},	/* 16.8 MHz */
-	{165, 3, 1, -1, -1, -1, -1, -1},	/* 19.2 MHz */
-	{396, 12, 1, -1, -1, -1, -1, -1},	/* 26 MHz   */
-	{88, 2, 1, -1, -1, -1, -1, -1},		/* 27 MHz   */
-	{165, 7, 1, -1, -1, -1, -1, -1}		/* 38.4 MHz */
+/* dpll locked at 2000 MHz - MPU clk at 1000 MHz(OPP Nitro 4430) */
+static const struct dpll_params mpu_dpll_params_2000mhz[NUM_SYS_CLKS] = {
+	{250, 2, 1, -1, -1, -1, -1, -1},	/* 12 MHz   */
+	{1000, 12, 1, -1, -1, -1, -1, -1},	/* 13 MHz   */
+	{119, 1, 1, -1, -1, -1, -1, -1},	/* 16.8 MHz */
+	{625, 11, 1, -1, -1, -1, -1, -1},	/* 19.2 MHz */
+	{500, 12, 1, -1, -1, -1, -1, -1},	/* 26 MHz   */
+	{1000, 26, 1, -1, -1, -1, -1, -1},	/* 27 MHz   */
+	{625, 23, 1, -1, -1, -1, -1, -1}	/* 38.4 MHz */
 };
 
 /* dpll locked at 1200 MHz - MPU clk at 600 MHz */
@@ -346,7 +346,7 @@ u32 omap4_ddr_clk(void)
  *
  * Resulting MPU frequencies:
  * 4430 ES1.0	: 600 MHz
- * 4430 ES2.x	: 792 MHz (OPP Turbo)
+ * 4430 ES2.x	: 1000 MHz (OPP Nitro)
  * 4460		: 700 MHz (OPP 100) - DCC disabled
  */
 void configure_mpu_dpll(void)
@@ -361,7 +361,7 @@ void configure_mpu_dpll(void)
 	if (omap4_rev == OMAP4430_ES1_0)
 		params = &mpu_dpll_params_1200mhz[sysclk_ind];
 	else if (omap4_rev < OMAP4460_ES1_0)
-		params = &mpu_dpll_params_1584mhz[sysclk_ind];
+		params = &mpu_dpll_params_2000mhz[sysclk_ind];
 	else
 		params = &mpu_dpll_params_1400mhz[sysclk_ind];
 
