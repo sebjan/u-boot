@@ -112,7 +112,13 @@
 
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV	1
 
-#define CONFIG_USB_DWC3                        1
+/*
+ * DWC3 requires caches to be off. This is done by default once you uncomment
+ * the option below. Since the majority of users probably prefer caches over
+ * DWC3, DWC3 is disabled by default. If you need fastboot (and therefore DWC3)
+ * feel free to enable it.
+ * #define CONFIG_USB_DWC3                        1
+ */
 #define CONFIG_USB_DWC3_UDC_REGS		((void *)0x4a030000)
 #define CONFIG_USB_DWC3_UDC_REGS_END		((void *)0x4a03ffff)
 #define CONFIG_USB_DWC3_WRAP_REGS		((void *)0x4a020000)
@@ -120,8 +126,8 @@
 #ifdef CONFIG_USB_DWC3
 #define CONFIG_SYS_DCACHE_OFF 1
 #define CONFIG_SYS_L2CACHE_OFF 1
-#endif
 #define CONFIG_CMD_FASTBOOT            1
+#endif
 #define CONFIG_ANDROID_BOOT_IMAGE	1
 
 /* Flash */
