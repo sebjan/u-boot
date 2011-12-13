@@ -53,9 +53,9 @@ struct andr_img_hdr {
 	u32 page_size;		/* flash page size we assume */
 	u32 unused[2];		/* future expansion: should be 0 */
 
-	u8 name[ANDR_BOOT_NAME_SIZE]; /* asciiz product name */
+	char name[ANDR_BOOT_NAME_SIZE]; /* asciiz product name */
 
-	u8 cmdline[ANDR_BOOT_ARGS_SIZE];
+	char cmdline[ANDR_BOOT_ARGS_SIZE];
 
 	u32 id[8]; /* timestamp / checksum / sha1 / etc */
 };
