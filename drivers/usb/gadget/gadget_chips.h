@@ -27,10 +27,8 @@
 #endif
 
 #ifdef CONFIG_USB_DWC3
-#error YEAH
 #define	gadget_is_dummy(g)	(!strcmp("dummy_udc", (g)->name))
 #else
-#error OH NO
 #define	gadget_is_dummy(g)	0
 #endif
 
