@@ -110,6 +110,9 @@
 #define CONFIG_DOS_PARTITION		1
 
 
+/* This is required for ethernet to work */
+#define CONFIG_UBOOT_ENABLE_PADS_ALL	1
+
 /* USB */
 #define CONFIG_MUSB_UDC			1
 #define CONFIG_USB_OMAP3		1
