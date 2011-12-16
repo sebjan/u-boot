@@ -23,6 +23,7 @@
  * MA 02111-1307 USA
  */
 #include <common.h>
+#include <netdev.h>
 #include <twl6030.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/arch/mmc_host_def.h>
@@ -52,7 +53,12 @@ int board_init(void)
 
 int board_eth_init(bd_t *bis)
 {
-	return 0;
+	int r = 0;
+
+#ifdef CONFIG_KS8851
+	r = ks8851_eth_initialize(bis);
+#endif
+	return r;
 }
 
 /**

@@ -109,6 +109,8 @@
 #define CONFIG_SYS_MMC_SET_DEV		1
 #define CONFIG_DOS_PARTITION		1
 
+/* SPI */
+#define CONFIG_OMAP_SPI                1
 
 /* This is required for ethernet to work */
 #define CONFIG_UBOOT_ENABLE_PADS_ALL	1
@@ -135,8 +137,6 @@
 #define CONFIG_CMD_MMC		/* MMC support                  */
 
 /* Disabled commands */
-#undef CONFIG_CMD_NET
-#undef CONFIG_CMD_NFS
 #undef CONFIG_CMD_FPGA		/* FPGA configuration Support   */
 #undef CONFIG_CMD_IMLS		/* List all found images        */
 

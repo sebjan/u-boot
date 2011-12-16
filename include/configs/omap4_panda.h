@@ -40,4 +40,9 @@
 
 #define CONFIG_SYS_PROMPT		"Panda # "
 
+/* Disabled commands */
+#undef CONFIG_CMD_DHCP
+#undef CONFIG_CMD_NET
+#undef CONFIG_CMD_NFS
+
 #endif /* __CONFIG_PANDA_H */

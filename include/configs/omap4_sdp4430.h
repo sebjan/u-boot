@@ -47,6 +47,15 @@
 #define CONFIG_ENV_OFFSET		0xE0000
 #define CONFIG_CMD_SAVEENV
 
+/* Network */
+#define CONFIG_NET_MULTI	1
+#define CONFIG_KS8851		1
+
 #define CONFIG_SYS_PROMPT		"OMAP4430 SDP # "
+
+/* Enabled commands */
+#define CONFIG_CMD_DHCP		/* DHCP Support			*/
+#define CONFIG_CMD_NET		/* bootp, tftpboot, rarpboot	*/
+#define CONFIG_CMD_NFS		/* NFS support			*/
 
 #endif /* __CONFIG_SDP4430_H */
