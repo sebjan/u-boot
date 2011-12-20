@@ -691,6 +691,7 @@ extern struct omap4_prcm_regs *const prcm;
 extern const u32 sys_clk_array[8];
 
 void scale_vcores(void);
+u32 get_offset_code(u32 offset);
 void do_scale_tps62361(u32 reg, u32 volt_mv);
 u32 omap_ddr_clk(void);
 void do_scale_vcore(u32 vcore_reg, u32 volt_mv);

@@ -245,17 +245,29 @@ void scale_vcores(void)
 
 	setup_sri2c();
 
-	/* Enable 1.22V from TPS for vdd_mpu */
-	volt = 1220;
-	do_scale_tps62361(TPS62361_REG_ADDR_SET1, volt);
+	/* Palmas settings */
+	/* Enable 1.04V from TPS for vdd_mpu */
+	volt = 1040;
+	do_scale_vcore(SMPS_REG_ADDR_12_MPU, volt);
 
-	/* VCORE 1 - for vdd_core */
-	volt = 1000;
-	do_scale_vcore(SMPS_REG_ADDR_VCORE1, volt);
+	/* VCORE 1.04v - for vdd_core */
+	volt = 1040;
+	do_scale_vcore(SMPS_REG_ADDR_45_IVA, volt);
 
-	/* VCORE 2 - for vdd_MM */
-	volt = 1125;
-	do_scale_vcore(SMPS_REG_ADDR_VCORE2, volt);
+	/* VCORE 1.04v - for vdd_MM */
+	volt = 1040;
+	do_scale_vcore(SMPS_REG_ADDR_8_CORE, volt);
+}
+
+u32 get_offset_code(u32 offset)
+{
+	u32 offset_code, step = 10000; /* 10 mV represented in uV */
+
+	offset -= PALMAS_SMPS_BASE_VOLT_STD_MODE_WITH_OFFSET_UV;
+
+	offset_code = (offset + step - 1) / step;
+
+	return offset_code;
 }
 
 /*
