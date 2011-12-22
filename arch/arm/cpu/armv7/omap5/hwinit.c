@@ -57,6 +57,64 @@ const struct gpio_bank *const omap_gpio_bank = gpio_bank_54xx;
  */
 void do_io_settings(void)
 {
+	u32 io_settings = 0, mask = 0;
+	struct omap5_sys_ctrl_regs *ioregs_base =
+			(struct omap5_sys_ctrl_regs *) OMAP5_IOREGS_BASE;
+
+	/* Impedance settings EMMC, C2C 1,2, hsi2 */
+	mask = (ds_mask << 2) | (ds_mask << 8) |
+		(ds_mask << 16) | (ds_mask << 18);
+	io_settings = readl(&(ioregs_base->control_smart1io_padconf_0)) &
+				(~mask);
+	io_settings |= (ds_60_ohm << 8) | (ds_45_ohm << 16) |
+			(ds_45_ohm << 18) | (ds_60_ohm << 2);
+	writel(io_settings, &(ioregs_base->control_smart1io_padconf_0));
+
+	/* Impedance settings Mcspi2 */
+	mask = (ds_mask << 30);
+	io_settings = readl(&(ioregs_base->control_smart1io_padconf_1)) &
+			(~mask);
+	io_settings |= (ds_60_ohm << 30);
+	writel(io_settings, &(ioregs_base->control_smart1io_padconf_1));
+
+	/* Impedance settings C2C 3,4 */
+	mask = (ds_mask << 14) | (ds_mask << 16);
+	io_settings = readl(&(ioregs_base->control_smart1io_padconf_2)) &
+			(~mask);
+	io_settings |= (ds_45_ohm << 14) | (ds_45_ohm << 16);
+	writel(io_settings, &(ioregs_base->control_smart1io_padconf_2));
+
+	/* Slew rate settings EMMC, C2C 1,2 */
+	mask = (sc_mask << 8) | (sc_mask << 16) | (sc_mask << 18);
+	io_settings = readl(&(ioregs_base->control_smart2io_padconf_0)) &
+			(~mask);
+	io_settings |= (sc_fast << 8) | (sc_na << 16) | (sc_na << 18);
+	writel(io_settings, &(ioregs_base->control_smart2io_padconf_0));
+
+	/* Slew rate settings hsi2, Mcspi2 */
+	mask = (sc_mask << 24) | (sc_mask << 28);
+	io_settings = readl(&(ioregs_base->control_smart2io_padconf_1)) &
+			(~mask);
+	io_settings |= (sc_fast << 28) | (sc_fast << 24);
+	writel(io_settings, &(ioregs_base->control_smart2io_padconf_1));
+
+	/* Slew rate settings C2C 3,4 */
+	mask = (sc_mask << 16) | (sc_mask << 18);
+	io_settings = readl(&(ioregs_base->control_smart2io_padconf_2)) &
+			(~mask);
+	io_settings |= (sc_na << 16) | (sc_na << 18);
+	writel(io_settings, &(ioregs_base->control_smart2io_padconf_2));
+
+	/* impedance and slew rate settings for usb */
+	mask = (usb_i_mask << 29) | (usb_i_mask << 26) | (usb_i_mask << 23) |
+		(usb_i_mask << 20) | (usb_i_mask << 17) | (usb_i_mask << 14);
+	io_settings = readl(&(ioregs_base->control_smart3io_padconf_1)) &
+			(~mask);
+	io_settings |= (ds_60_ohm << 29) | (ds_60_ohm << 26) |
+		       (ds_60_ohm << 23) | (sc_fast << 20) |
+		       (sc_fast << 17) | (sc_fast << 14);
+	writel(io_settings, &(ioregs_base->control_smart3io_padconf_1));
+
 }
 #endif
 
