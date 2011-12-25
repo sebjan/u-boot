@@ -113,6 +113,9 @@ static void do_lpddr2_init(u32 base, u32 cs)
 static void lpddr2_init(u32 base, const struct emif_regs *regs)
 {
 	struct emif_reg_struct *emif = (struct emif_reg_struct *)base;
+	u32 *ext_phy_ctrl_base = 0;
+	u32 *emif_ext_phy_ctrl_base = 0;
+	u32 i = 0;
 
 	/* Not NVM */
 	clrbits_le32(&emif->emif_lpddr2_nvm_config, EMIF_REG_CS1NVMEN_MASK);
@@ -129,6 +132,18 @@ static void lpddr2_init(u32 base, const struct emif_regs *regs)
 	 */
 	writel(regs->sdram_config_init, &emif->emif_sdram_config);
 	writel(regs->emif_ddr_phy_ctlr_1_init, &emif->emif_ddr_phy_ctrl_1);
+
+	ext_phy_ctrl_base = (u32 *) &(regs->emif_ddr_ext_phy_ctrl_1);
+	emif_ext_phy_ctrl_base = (u32 *) &(emif->emif_ddr_ext_phy_ctrl_1);
+
+	if (omap_revision() >= OMAP5430_ES1_0) {
+		/* Configure external phy control registers */
+		for (i = 0; i < NUMBER_OF_EMIF_EXT_CTRL_REGISTERS; i++) {
+			writel(*ext_phy_ctrl_base, emif_ext_phy_ctrl_base++);
+			/* Write the shadow register here as well */
+			writel(*ext_phy_ctrl_base++, emif_ext_phy_ctrl_base++);
+		}
+	}
 
 	do_lpddr2_init(base, CS0);
 	if (regs->sdram_config & EMIF_REG_EBANK_MASK)
@@ -176,6 +191,7 @@ void emif_update_timings(u32 base, const struct emif_regs *regs)
 			&emif->emif_l3_config);
 	}
 #endif
+
 }
 
 #ifndef CONFIG_SYS_EMIF_PRECALCULATED_TIMING_REGS
@@ -392,6 +408,11 @@ static u32 get_sdram_tim_1_reg(const struct lpddr2_ac_timings *timings,
 	val = max(min_tck->tRP_AB, ns_2_cycles(timings->tRPab)) - 1;
 	tim1 |= val << EMIF_REG_T_RP_SHIFT;
 
+	if (omap_revision() >= OMAP5430_ES1_0) {
+		val = max(min_tck->tRTW, ns_x2_2_cycles(timings->tRTWx2)) - 1;
+		tim1 |= val << EMIF_REG_T_RTW_SHIFT;
+	}
+
 	return tim1;
 }
 
@@ -438,6 +459,11 @@ static u32 get_sdram_tim_3_reg(const struct lpddr2_ac_timings *timings,
 
 	val = max(min_tck->tCKESR, ns_2_cycles(timings->tCKESR)) - 1;
 	tim3 |= val << EMIF_REG_T_CKESR_SHIFT;
+
+	if (omap_revision() >= OMAP5430_ES1_0) {
+		val = ns_2_cycles(timings->tCSTA) - 1;
+		tim3 |= val << EMIF_REG_T_CSTA_SHIFT;
+	}
 
 	return tim3;
 }

@@ -100,6 +100,8 @@
 #define EMIF_REG_REFRESH_RATE_SHDW_MASK		(0xffff << 0)
 
 /* SDRAM_TIM_1 */
+#define EMIF_REG_T_RTW_SHIFT				29
+#define EMIF_REG_T_RTW_MASK				(0x7 << 29)
 #define EMIF_REG_T_RP_SHIFT				25
 #define EMIF_REG_T_RP_MASK				(0xf << 25)
 #define EMIF_REG_T_RCD_SHIFT			21
@@ -160,6 +162,8 @@
 #define EMIF_REG_T_CKE_SHDW_MASK			(0x7 << 0)
 
 /* SDRAM_TIM_3 */
+#define EMIF_REG_T_CSTA_SHIFT			24
+#define EMIF_REG_T_CSTA_MASK			(0xf << 24)
 #define EMIF_REG_T_CKESR_SHIFT			21
 #define EMIF_REG_T_CKESR_MASK			(0x7 << 21)
 #define EMIF_REG_ZQ_ZQCS_SHIFT			15
@@ -471,6 +475,8 @@
 #define EMIF_REG_DDR_PHY_CTRL_2_SHIFT		0
 #define EMIF_REG_DDR_PHY_CTRL_2_MASK		(0xffffffff << 0)
 
+/* DDR_EXT_PHY_CTRL_0_24 */
+
 /* DMM */
 #define DMM_BASE			0x4E000040
 
@@ -530,6 +536,7 @@
 	(DMM_SDRC_INTL_NONE << EMIF_SDRC_INTL_SHIFT)|\
 	(0xFF << EMIF_SYS_ADDR_SHIFT))
 
+#define NUMBER_OF_EMIF_EXT_CTRL_REGISTERS	0x18
 
 /* Reg mapping structure */
 struct emif_reg_struct {
@@ -584,6 +591,55 @@ struct emif_reg_struct {
 	u32 emif_ddr_phy_ctrl_1;
 	u32 emif_ddr_phy_ctrl_1_shdw;
 	u32 emif_ddr_phy_ctrl_2;
+	u32 pad[68];
+	u32 emif_ddr_ext_phy_ctrl_1;
+	u32 emif_ddr_ext_phy_ctrl_1_shdw;
+	u32 emif_ddr_ext_phy_ctrl_2;
+	u32 emif_ddr_ext_phy_ctrl_2_shdw;
+	u32 emif_ddr_ext_phy_ctrl_3;
+	u32 emif_ddr_ext_phy_ctrl_3_shdw;
+	u32 emif_ddr_ext_phy_ctrl_4;
+	u32 emif_ddr_ext_phy_ctrl_4_shdw;
+	u32 emif_ddr_ext_phy_ctrl_5;
+	u32 emif_ddr_ext_phy_ctrl_5_shdw;
+	u32 emif_ddr_ext_phy_ctrl_6;
+	u32 emif_ddr_ext_phy_ctrl_6_shdw;
+	u32 emif_ddr_ext_phy_ctrl_7;
+	u32 emif_ddr_ext_phy_ctrl_7_shdw;
+	u32 emif_ddr_ext_phy_ctrl_8;
+	u32 emif_ddr_ext_phy_ctrl_8_shdw;
+	u32 emif_ddr_ext_phy_ctrl_9;
+	u32 emif_ddr_ext_phy_ctrl_9_shdw;
+	u32 emif_ddr_ext_phy_ctrl_10;
+	u32 emif_ddr_ext_phy_ctrl_10_shdw;
+	u32 emif_ddr_ext_phy_ctrl_11;
+	u32 emif_ddr_ext_phy_ctrl_11_shdw;
+	u32 emif_ddr_ext_phy_ctrl_12;
+	u32 emif_ddr_ext_phy_ctrl_12_shdw;
+	u32 emif_ddr_ext_phy_ctrl_13;
+	u32 emif_ddr_ext_phy_ctrl_13_shdw;
+	u32 emif_ddr_ext_phy_ctrl_14;
+	u32 emif_ddr_ext_phy_ctrl_14_shdw;
+	u32 emif_ddr_ext_phy_ctrl_15;
+	u32 emif_ddr_ext_phy_ctrl_15_shdw;
+	u32 emif_ddr_ext_phy_ctrl_16;
+	u32 emif_ddr_ext_phy_ctrl_16_shdw;
+	u32 emif_ddr_ext_phy_ctrl_17;
+	u32 emif_ddr_ext_phy_ctrl_17_shdw;
+	u32 emif_ddr_ext_phy_ctrl_18;
+	u32 emif_ddr_ext_phy_ctrl_18_shdw;
+	u32 emif_ddr_ext_phy_ctrl_19;
+	u32 emif_ddr_ext_phy_ctrl_19_shdw;
+	u32 emif_ddr_ext_phy_ctrl_20;
+	u32 emif_ddr_ext_phy_ctrl_20_shdw;
+	u32 emif_ddr_ext_phy_ctrl_21;
+	u32 emif_ddr_ext_phy_ctrl_21_shdw;
+	u32 emif_ddr_ext_phy_ctrl_22;
+	u32 emif_ddr_ext_phy_ctrl_22_shdw;
+	u32 emif_ddr_ext_phy_ctrl_23;
+	u32 emif_ddr_ext_phy_ctrl_23_shdw;
+	u32 emif_ddr_ext_phy_ctrl_24;
+	u32 emif_ddr_ext_phy_ctrl_24_shdw;
 };
 
 struct dmm_lisa_map_regs {
@@ -943,7 +999,8 @@ struct lpddr2_ac_timings {
 	u8 tDQSCKMAXx2;
 	u8 tRASmax;
 	u8 tFAW;
-
+	u8 tRTWx2;
+	u8 tCSTA;
 };
 
 /*
@@ -965,6 +1022,7 @@ struct lpddr2_min_tck {
 	u8  tCKE;
 	u32 tCKESR;
 	u32 tFAW;
+	u32 tRTW;
 };
 
 struct lpddr2_device_details {
@@ -1005,6 +1063,30 @@ struct emif_regs {
 	u32 temp_alert_config;
 	u32 emif_ddr_phy_ctlr_1_init;
 	u32 emif_ddr_phy_ctlr_1;
+	u32 emif_ddr_ext_phy_ctrl_1;
+	u32 emif_ddr_ext_phy_ctrl_2;
+	u32 emif_ddr_ext_phy_ctrl_3;
+	u32 emif_ddr_ext_phy_ctrl_4;
+	u32 emif_ddr_ext_phy_ctrl_5;
+	u32 emif_ddr_ext_phy_ctrl_6;
+	u32 emif_ddr_ext_phy_ctrl_7;
+	u32 emif_ddr_ext_phy_ctrl_8;
+	u32 emif_ddr_ext_phy_ctrl_9;
+	u32 emif_ddr_ext_phy_ctrl_10;
+	u32 emif_ddr_ext_phy_ctrl_11;
+	u32 emif_ddr_ext_phy_ctrl_12;
+	u32 emif_ddr_ext_phy_ctrl_13;
+	u32 emif_ddr_ext_phy_ctrl_14;
+	u32 emif_ddr_ext_phy_ctrl_15;
+	u32 emif_ddr_ext_phy_ctrl_16;
+	u32 emif_ddr_ext_phy_ctrl_17;
+	u32 emif_ddr_ext_phy_ctrl_18;
+	u32 emif_ddr_ext_phy_ctrl_19;
+	u32 emif_ddr_ext_phy_ctrl_20;
+	u32 emif_ddr_ext_phy_ctrl_21;
+	u32 emif_ddr_ext_phy_ctrl_22;
+	u32 emif_ddr_ext_phy_ctrl_23;
+	u32 emif_ddr_ext_phy_ctrl_24;
 };
 
 /* assert macros */
