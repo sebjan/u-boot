@@ -245,12 +245,10 @@ void configure_mpu_dpll(void)
 			CM_CLKSEL_DCC_EN_MASK);
 	}
 
-#ifdef CONFIG_ZEBU
-		setbits_le32(&prcm->cm_mpu_mpu_clkctrl,
-			MPU_CLKCTRL_CLKSEL_EMIF_DIV_MODE_MASK);
-		setbits_le32(&prcm->cm_mpu_mpu_clkctrl,
-			MPU_CLKCTRL_CLKSEL_ABE_DIV_MODE_MASK);
-#endif
+	setbits_le32(&prcm->cm_mpu_mpu_clkctrl,
+		MPU_CLKCTRL_CLKSEL_EMIF_DIV_MODE_MASK);
+	setbits_le32(&prcm->cm_mpu_mpu_clkctrl,
+		MPU_CLKCTRL_CLKSEL_ABE_DIV_MODE_MASK);
 
 	params = get_mpu_dpll_params();
 
