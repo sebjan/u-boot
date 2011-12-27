@@ -86,6 +86,7 @@ static void do_lpddr2_init(u32 base, u32 cs)
 	/* Wait till device auto initialization is complete */
 	while (get_mr(base, cs, LPDDR2_MR0) & LPDDR2_MR0_DAI_MASK)
 		;
+#endif
 	set_mr(base, cs, LPDDR2_MR10, MR10_ZQ_ZQINIT);
 	/*
 	 * tZQINIT = 1 us
@@ -93,21 +94,17 @@ static void do_lpddr2_init(u32 base, u32 cs)
 	 */
 
 	sdelay(2000);
-#endif
+
 	set_mr(base, cs, LPDDR2_MR1, MR1_BL_8_BT_SEQ_WRAP_EN_NWR_3);
-#ifndef CONFIG_ZEBU
+
 	set_mr(base, cs, LPDDR2_MR16, MR16_REF_FULL_ARRAY);
-#endif
+
 	/*
 	 * Enable refresh along with writing MR2
 	 * Encoding of RL in MR2 is (RL - 2)
 	 */
 	mr_addr = LPDDR2_MR2 | EMIF_REG_REFRESH_EN_MASK;
 	set_mr(base, cs, mr_addr, RL_FINAL - 2);
-
-#ifdef CONFIG_ZEBU
-	set_mr(base, cs, LPDDR2_MR3, 0x2);
-#endif
 }
 
 static void lpddr2_init(u32 base, const struct emif_regs *regs)
@@ -172,14 +169,11 @@ void emif_update_timings(u32 base, const struct emif_regs *regs)
 		writel(EMIF_PWR_MGMT_CTRL, &emif->emif_pwr_mgmt_ctrl);
 		writel(EMIF_PWR_MGMT_CTRL_SHDW, &emif->emif_pwr_mgmt_ctrl_shdw);
 	}
-#ifndef CONFIG_ZEBU
 	writel(regs->read_idle_ctrl, &emif->emif_read_idlectrl_shdw);
 	writel(regs->zq_config, &emif->emif_zq_config);
 	writel(regs->temp_alert_config, &emif->emif_temp_alert_config);
-#endif
 	writel(regs->emif_ddr_phy_ctlr_1, &emif->emif_ddr_phy_ctrl_1_shdw);
 
-#ifndef CONFIG_ZEBU
 	if (omap_revision() == OMAP5430_ES1_0) {
 		writel(EMIF_L3_CONFIG_VAL_SYS_10_MPU_5_LL_0,
 			&emif->emif_l3_config);
@@ -190,8 +184,6 @@ void emif_update_timings(u32 base, const struct emif_regs *regs)
 		writel(EMIF_L3_CONFIG_VAL_SYS_10_LL_0,
 			&emif->emif_l3_config);
 	}
-#endif
-
 }
 
 #ifndef CONFIG_SYS_EMIF_PRECALCULATED_TIMING_REGS

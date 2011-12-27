@@ -48,42 +48,6 @@
  */
 
 #ifdef CONFIG_SYS_EMIF_PRECALCULATED_TIMING_REGS
-#ifdef CONFIG_ZEBU
-const struct emif_regs emif_regs_elpida_532_mhz_1cs = {
-	.sdram_config_init		= 0x808022b2,
-	.sdram_config			= 0x808022b2,
-	.ref_ctrl			= 0x0000081A,
-	.sdram_tim1			= 0x772F6873,
-	.sdram_tim2			= 0x304A129A,
-	.sdram_tim3			= 0x02F7E45F,
-	.read_idle_ctrl			= 0x0,
-	.zq_config			= 0x0,
-	.temp_alert_config		= 0x0,
-	.emif_ddr_phy_ctlr_1_init	= 0x081E,
-	.emif_ddr_phy_ctlr_1		= 0x0E38200d
-};
-
-const struct emif_regs emif_regs_elpida_400_mhz_2cs = {
-	.sdram_config_init		= 0x808022b2,
-	.sdram_config			= 0x808022b2,
-	.ref_ctrl			= 0x00000c2e,
-	.sdram_tim1			= 0x10eb0652,
-	.sdram_tim2			= 0x20370dd2,
-	.sdram_tim3			= 0x00a04333,
-	.read_idle_ctrl			= 0x0,
-	.zq_config			= 0x0,
-	.temp_alert_config		= 0x0,
-	.emif_ddr_phy_ctlr_1_init	= 0x081E,
-	.emif_ddr_phy_ctlr_1		= 0x0E38200d
-};
-
-const struct dmm_lisa_map_regs lisa_map_2G_x_1_x_2 = {
-	.dmm_lisa_map_0 = 0x80640300,
-	.dmm_lisa_map_1 = 0,
-	.dmm_lisa_map_2 = 0,
-	.dmm_lisa_map_3 = 0
-};
-#else
 const struct emif_regs emif_regs_elpida_532_mhz_2cs = {
 	.sdram_config_init		= 0x80800EBA,
 	.sdram_config			= 0x808022BA,
@@ -242,7 +206,6 @@ const struct dmm_lisa_map_regs lisa_map_4G_x_1_x_2 = {
 	.dmm_lisa_map_2 = 0,
 	.dmm_lisa_map_3 = 0x80640300
 };
-#endif
 
 static void emif_get_reg_dump_sdp(u32 emif_nr, const struct emif_regs **regs)
 {
@@ -254,11 +217,7 @@ void emif_get_reg_dump(u32 emif_nr, const struct emif_regs **regs)
 static void emif_get_dmm_regs_sdp(const struct dmm_lisa_map_regs
 						**dmm_lisa_regs)
 {
-#ifndef CONFIG_ZEBU
 	*dmm_lisa_regs = &lisa_map_4G_x_1_x_2;
-#else
-	*dmm_lisa_regs = &lisa_map_2G_x_1_x_2;
-#endif
 }
 
 void emif_get_dmm_regs(const struct dmm_lisa_map_regs **dmm_lisa_regs)

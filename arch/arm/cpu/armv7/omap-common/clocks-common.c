@@ -309,7 +309,6 @@ static void setup_non_essential_dplls(void)
 	params = get_iva_dpll_params();
 	do_setup_dpll(&prcm->cm_clkmode_dpll_iva, params, DPLL_LOCK, "iva");
 
-#ifndef CONFIG_ZEBU
 	/*
 	 * USB:
 	 * USB dpll is J-type. Need to set DPLL_SD_DIV for jitter correction
@@ -330,7 +329,6 @@ static void setup_non_essential_dplls(void)
 	/* Now setup the dpll with the regular function */
 	do_setup_dpll(&prcm->cm_clkmode_dpll_usb, params, DPLL_LOCK, "usb");
 
-#endif
 	/* Configure ABE dpll */
 	params = get_abe_dpll_params();
 #ifdef CONFIG_SYS_OMAP_ABE_SYSCK

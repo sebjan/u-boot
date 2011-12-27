@@ -99,7 +99,7 @@ static void jump_to_image_no_args(void)
 
 	debug("image entry point: 0x%X\n", spl_image.entry_point);
 	/* Pass the saved boot_params from rom code */
-#if defined(CONFIG_VIRTIO) || defined(CONFIG_ZEBU)
+#if defined(CONFIG_ZEBU)
 	image_entry = 0x80100000;
 #endif
 	image_entry((u32 *)&boot_params);
@@ -113,7 +113,6 @@ void board_init_r(gd_t *id, ulong dummy)
 
 	mem_malloc_init(CONFIG_SYS_SPL_MALLOC_START,
 			CONFIG_SYS_SPL_MALLOC_SIZE);
-#ifndef CONFIG_VIRTIO
 	timer_init();
 	i2c_init(CONFIG_SYS_I2C_SPEED, CONFIG_SYS_I2C_SLAVE);
 
@@ -139,26 +138,13 @@ void board_init_r(gd_t *id, ulong dummy)
 	}
 
 #endif
-#ifdef CONFIG_SPL_NO_UBOOT
-#define OMAP4UART3             43
-	void (*theKernel)(int zero, int arch, uint params);
-	theKernel = (void (*)(int, int, uint)) 0x80008000;
-	ulong *uart_scratch_pad_address;
-	printf("Original Opcode at (at address %08lx is %08lx) ...\n",
-		(ulong) theKernel, *((ulong *) 0x80008000));
-
-	uart_scratch_pad_address = 0x80003ffc;
-	*uart_scratch_pad_address = OMAP4UART3;
-	theKernel(0, 0xEC1, 0x80000100);
-#endif
-#endif
 	switch (spl_image.os) {
 	case IH_OS_U_BOOT:
 		debug("Jumping to U-Boot\n");
 		jump_to_image_no_args();
 		break;
 	default:
-#if !defined(CONFIG_ZEBU) && !defined(CONFIG_VIRTIO)
+#if !defined(CONFIG_ZEBU)
 		puts("Unsupported OS image.. Jumping nevertheless..\n");
 #endif
 		jump_to_image_no_args();

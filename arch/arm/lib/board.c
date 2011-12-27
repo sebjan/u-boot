@@ -505,7 +505,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	}
 #endif
 
-#if !defined(CONFIG_VIRTIO) && !defined(CONFIG_ZEBU)
+#if !defined(CONFIG_ZEBU)
 #if defined(CONFIG_CMD_NAND)
 	puts("NAND:  ");
 	nand_init();		/* go init the NAND */
@@ -535,9 +535,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	/* IP Address */
 	gd->bd->bi_ip_addr = getenv_IPaddr("ipaddr");
 
-#if !defined(CONFIG_VIRTIO) && !defined(CONFIG_ZEBU)
 	stdio_init();  /* get the devices list going. */
-#endif
 
 	jumptable_init();
 
@@ -546,15 +544,13 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	api_init();
 #endif
 
-#if !defined(CONFIG_VIRTIO) && !defined(CONFIG_ZEBU)
 	console_init_r();      /* fully init console as a device */
-#endif
 
 #if defined(CONFIG_ARCH_MISC_INIT)
 	/* miscellaneous arch dependent initialisations */
 	arch_misc_init();
 #endif
-#if !defined(CONFIG_VIRTIO) && !defined(CONFIG_ZEBU)
+#if !defined(CONFIG_ZEBU)
 #if defined(CONFIG_MISC_INIT_R)
 	/* miscellaneous platform dependent initialisations */
 	misc_init_r();
@@ -579,19 +575,16 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	s = getenv("loadaddr");
 	if (s != NULL)
 		load_addr = simple_strtoul(s, NULL, 16);
-#if !defined(CONFIG_VIRTIO) && !defined(CONFIG_ZEBU)
 #if defined(CONFIG_CMD_NET)
 	s = getenv("bootfile");
 	if (s != NULL)
 		copy_filename(BootFile, s, sizeof(BootFile));
-#endif
 #endif
 
 #ifdef BOARD_LATE_INIT
 	board_late_init();
 #endif
 
-#if !defined(CONFIG_VIRTIO) && !defined(CONFIG_ZEBU)
 #ifdef CONFIG_BITBANGMII
 	bb_miiphy_init();
 #endif
@@ -602,7 +595,6 @@ void board_init_r(gd_t *id, ulong dest_addr)
 #if defined(CONFIG_RESET_PHY_R)
 	debug("Reset Ethernet PHY\n");
 	reset_phy();
-#endif
 #endif
 #endif
 

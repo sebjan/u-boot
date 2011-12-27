@@ -131,10 +131,6 @@ void init_omap_revision(void)
 	case MIDR_CORTEX_A15_R0P0:
 		*omap5_revision = OMAP5430_ES1_0;
 	default:
-		#if defined(CONFIG_ZEBU) || defined(CONFIG_VIRTIO)
-			*omap5_revision = OMAP5430_ES1_0;
-		#else
-			*omap5_revision = OMAP5430_SILICON_ID_INVALID;
-		#endif
+		*omap5_revision = OMAP5430_SILICON_ID_INVALID;
 	}
 }
