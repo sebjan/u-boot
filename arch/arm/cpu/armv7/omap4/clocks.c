@@ -357,6 +357,9 @@ void enable_basic_clocks(void)
 		&prcm->cm_l4per_gpio4_clkctrl,
 		&prcm->cm_l4per_gpio5_clkctrl,
 		&prcm->cm_l4per_gpio6_clkctrl,
+		&prcm->cm_l3init_usbphy_clkctrl,
+		&prcm->cm_clksel_usb_60mhz,
+		&prcm->cm_l3init_hsusbtll_clkctrl,
 		0
 	};
 
@@ -366,6 +369,8 @@ void enable_basic_clocks(void)
 		&prcm->cm_l4per_gptimer2_clkctrl,
 		&prcm->cm_wkup_wdtimer2_clkctrl,
 		&prcm->cm_l4per_uart3_clkctrl,
+		&prcm->cm_l3init_fsusb_clkctrl,
+		&prcm->cm_l3init_hsusbhost_clkctrl,
 		0
 	};
 
