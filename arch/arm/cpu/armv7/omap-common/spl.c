@@ -99,7 +99,7 @@ static void jump_to_image_no_args(void)
 
 	debug("image entry point: 0x%X\n", spl_image.entry_point);
 	/* Pass the saved boot_params from rom code */
-#if defined(CONFIG_ZEBU)
+#if defined(CONFIG_WAKEUP)
 	image_entry = 0x80100000;
 #endif
 	image_entry((u32 *)&boot_params);
@@ -117,7 +117,7 @@ void board_init_r(gd_t *id, ulong dummy)
 	i2c_init(CONFIG_SYS_I2C_SPEED, CONFIG_SYS_I2C_SLAVE);
 
 	boot_device = omap_boot_device();
-#ifndef CONFIG_ZEBU
+#ifndef CONFIG_WAKEUP
 	debug("boot device - %d\n", boot_device);
 	switch (boot_device) {
 #ifdef CONFIG_SPL_MMC_SUPPORT
@@ -144,7 +144,7 @@ void board_init_r(gd_t *id, ulong dummy)
 		jump_to_image_no_args();
 		break;
 	default:
-#if !defined(CONFIG_ZEBU)
+#if !defined(CONFIG_WAKEUP)
 		puts("Unsupported OS image.. Jumping nevertheless..\n");
 #endif
 		jump_to_image_no_args();

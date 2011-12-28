@@ -39,6 +39,8 @@
 #define CONFIG_OMAP5430		1	/* which is in a 5430 */
 #define CONFIG_5430EVM		1	/* working with EVM */
 #define CONFIG_ARCH_CPU_INIT
+#define CONFIG_MACH_OMAP_5430EVM 1
+#define CONFIG_WAKEUP		1
 
 /* Get CPU defs */
 #include <asm/arch/cpu.h>
@@ -51,10 +53,11 @@
 /* Clock Defines */
 #define V_OSCK			38400000	/* Clock output from T2 */
 #define V_SCLK                   V_OSCK
+#define CONFIG_UBOOT_CLOCKS_ENABLE_ALL	1	/* Enable all clocks */
+#define CONFIG_UBOOT_ENABLE_PADS_ALL	1	/* Enable all PADS for now */
 
 #undef CONFIG_USE_IRQ				/* no support for IRQs */
 #define CONFIG_MISC_INIT_R
-
 #define CONFIG_OF_LIBFDT		1
 
 #define CONFIG_CMDLINE_TAG		1	/* enable passing of ATAGs */
@@ -87,6 +90,7 @@
 #define CONFIG_CONS_INDEX		3
 #define CONFIG_SYS_NS16550_COM3		UART3_BASE
 
+#define CONFIG_ENV_IS_NOWHERE
 #define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{4800, 9600, 19200, 38400, 57600,\
 					115200}
@@ -100,7 +104,6 @@
 #define CONFIG_I2C_MULTI_BUS		1
 
 /* TWL6030 */
-#define CONFIG_TWL6030_POWER		1
 #define CONFIG_CMD_BAT			1
 
 /* MMC */
@@ -110,10 +113,7 @@
 #define CONFIG_SYS_MMC_SET_DEV		1
 #define CONFIG_DOS_PARTITION		1
 
-/* MMC ENV related defines */
-#define CONFIG_ENV_IS_IN_MMC		1
-#define CONFIG_SYS_MMC_ENV_DEV		1	/* SLOT2: eMMC(1) */
-#define CONFIG_ENV_OFFSET		0xE0000
+#define CONFIG_SYS_CONSOLE_IS_IN_ENV	1
 
 /* Flash */
 #define CONFIG_SYS_NO_FLASH	1
@@ -163,15 +163,7 @@
 		"bootm ${loadaddr}\0" \
 
 #define CONFIG_BOOTCOMMAND \
-	"if mmc rescan ${mmcdev}; then " \
-		"if run loadbootscript; then " \
-			"run bootscript; " \
-		"else " \
-			"if run loaduimage; then " \
-				"run mmcboot; " \
-			"fi; " \
-		"fi; " \
-	"fi"
+	"bootm 0x80300000"
 
 #define CONFIG_AUTO_COMPLETE		1
 

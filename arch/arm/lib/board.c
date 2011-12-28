@@ -505,7 +505,6 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	}
 #endif
 
-#if !defined(CONFIG_ZEBU)
 #if defined(CONFIG_CMD_NAND)
 	puts("NAND:  ");
 	nand_init();		/* go init the NAND */
@@ -515,15 +514,16 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	onenand_init();
 #endif
 
+#if !defined(CONFIG_WAKEUP)
 #ifdef CONFIG_GENERIC_MMC
        puts("MMC:   ");
        mmc_initialize(gd->bd);
+#endif
 #endif
 
 #ifdef CONFIG_HAS_DATAFLASH
 	AT91F_DataflashInit();
 	dataflash_print_info();
-#endif
 #endif
 	/* initialize environment */
 	env_relocate();
@@ -550,11 +550,9 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	/* miscellaneous arch dependent initialisations */
 	arch_misc_init();
 #endif
-#if !defined(CONFIG_ZEBU)
 #if defined(CONFIG_MISC_INIT_R)
 	/* miscellaneous platform dependent initialisations */
 	misc_init_r();
-#endif
 #endif
 	 /* set up exceptions */
 	interrupt_init();
