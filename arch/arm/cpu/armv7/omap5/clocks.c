@@ -88,6 +88,16 @@ static const struct dpll_params mpu_dpll_params_1100mhz[NUM_SYS_CLKS] = {
 	{1375, 47, 1, -1, -1, -1, -1, -1, -1, -1}	/* 38.4 MHz */
 };
 
+static const struct dpll_params mpu_dpll_params_800mhz[NUM_SYS_CLKS] = {
+	{200, 2, 1, -1, -1, -1, -1, -1, -1, -1},	/* 12 MHz   */
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 13 MHz   */
+	{619, 12, 1, -1, -1, -1, -1, -1, -1, -1},	/* 16.8 MHz */
+	{125, 2, 1, -1, -1, -1, -1, -1, -1, -1},	/* 19.2 MHz */
+	{400, 12, 1, -1, -1, -1, -1, -1, -1, -1},	/* 26 MHz   */
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 27 MHz   */
+	{125, 5, 1, -1, -1, -1, -1, -1, -1, -1}		/* 38.4 MHz */
+};
+
 static const struct dpll_params mpu_dpll_params_550mhz[NUM_SYS_CLKS] = {
 	{275, 2, 2, -1, -1, -1, -1, -1, -1, -1},	/* 12 MHz   */
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 13 MHz   */
@@ -193,7 +203,7 @@ void setup_post_dividers(u32 *const base, const struct dpll_params *params)
 const struct dpll_params *get_mpu_dpll_params(void)
 {
 	u32 sysclk_ind = get_sys_clk_index();
-	return &mpu_dpll_params_1100mhz[sysclk_ind];
+	return &mpu_dpll_params_800mhz[sysclk_ind];
 }
 
 const struct dpll_params *get_core_dpll_params(void)
