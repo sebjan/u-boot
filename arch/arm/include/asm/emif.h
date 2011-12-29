@@ -776,7 +776,7 @@ struct dmm_lisa_map_regs {
 /* EMIF_L3_CONFIG register value */
 #define EMIF_L3_CONFIG_VAL_SYS_10_LL_0	0x0A0000FF
 #define EMIF_L3_CONFIG_VAL_SYS_10_MPU_3_LL_0	0x0A300000
-#define EMIF_L3_CONFIG_VAL_SYS_10_MPU_5_LL_0	0x0A300000
+#define EMIF_L3_CONFIG_VAL_SYS_10_MPU_5_LL_0	0x0A500000
 
 /*
  * Value of bits 12:31 of DDR_PHY_CTRL_1 register:

@@ -84,8 +84,22 @@ const struct dmm_lisa_map_regs lisa_map_2G_x_1_x_2 = {
 	.dmm_lisa_map_3 = 0
 };
 #else
+const struct emif_regs emif_regs_elpida_532_mhz_2cs = {
+	.sdram_config_init		= 0x80800EBA,
+	.sdram_config			= 0x808022BA,
+	.ref_ctrl			= 0x0000081A,
+	.sdram_tim1			= 0x772F6873,
+	.sdram_tim2			= 0x304A129A,
+	.sdram_tim3			= 0x02F7E45F,
+	.read_idle_ctrl			= 0x00050000,
+	.zq_config			= 0x000B3215,
+	.temp_alert_config		= 0x08000A05,
+	.emif_ddr_phy_ctlr_1_init	= 0x0E38200D,
+	.emif_ddr_phy_ctlr_1		= 0x0E38200D
+};
+
 const struct emif_regs emif_regs_elpida_532_mhz_1cs = {
-	.sdram_config_init		= 0x80801aB2,
+	.sdram_config_init		= 0x80800EB2,
 	.sdram_config			= 0x808022B2,
 	.ref_ctrl			= 0x0000081A,
 	.sdram_tim1			= 0x772F6873,
@@ -96,6 +110,82 @@ const struct emif_regs emif_regs_elpida_532_mhz_1cs = {
 	.temp_alert_config		= 0x08000A05,
 	.emif_ddr_phy_ctlr_1_init	= 0x0E38200D,
 	.emif_ddr_phy_ctlr_1		= 0x0E38200D
+};
+
+const struct emif_regs emif_regs_elpida_266_mhz_2cs = {
+	.sdram_config_init		= 0x80800EBA,
+	.sdram_config			= 0x808022BA,
+	.ref_ctrl			= 0x0000040D,
+	.sdram_tim1			= 0x2A86B419,
+	.sdram_tim2			= 0x1025094A,
+	.sdram_tim3			= 0x026BA22F,
+	.read_idle_ctrl			= 0x00050000,
+	.zq_config			= 0x000B3215,
+	.temp_alert_config		= 0x08000A05,
+	.emif_ddr_phy_ctlr_1_init	= 0x0E382008,
+	.emif_ddr_phy_ctlr_1		= 0x0E38200D,
+	.emif_ddr_ext_phy_ctrl_1	= 0x04020080,
+	.emif_ddr_ext_phy_ctrl_2	= 0x0A414829,
+	.emif_ddr_ext_phy_ctrl_3	= 0x14829052,
+	.emif_ddr_ext_phy_ctrl_4	= 0x000520A4,
+	.emif_ddr_ext_phy_ctrl_5	= 0x04010040,
+	.emif_ddr_ext_phy_ctrl_6	= 0x01004010,
+	.emif_ddr_ext_phy_ctrl_7	= 0x00001004,
+	.emif_ddr_ext_phy_ctrl_8	= 0x04010040,
+	.emif_ddr_ext_phy_ctrl_9	= 0x01004010,
+	.emif_ddr_ext_phy_ctrl_10	= 0x00001004,
+	.emif_ddr_ext_phy_ctrl_11	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_12	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_13	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_14	= 0x80080080,
+	.emif_ddr_ext_phy_ctrl_15	= 0x00800800,
+	.emif_ddr_ext_phy_ctrl_16	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_17	= 0x00000001,
+	.emif_ddr_ext_phy_ctrl_18	= 0x540A8150,
+	.emif_ddr_ext_phy_ctrl_19	= 0xA81502A0,
+	.emif_ddr_ext_phy_ctrl_20	= 0x002A0540,
+	.emif_ddr_ext_phy_ctrl_21	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_22	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_23	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_24	= 0x00000077
+};
+
+const struct emif_regs emif_regs_elpida_266_mhz_1cs = {
+	.sdram_config_init		= 0x80800EB2,
+	.sdram_config			= 0x808022B2,
+	.ref_ctrl			= 0x0000081A,
+	.sdram_tim1			= 0x772F6873,
+	.sdram_tim2			= 0x304A129A,
+	.sdram_tim3			= 0x02F7E45F,
+	.read_idle_ctrl			= 0x00050000,
+	.zq_config			= 0x000B3215,
+	.temp_alert_config		= 0x08000A05,
+	.emif_ddr_phy_ctlr_1_init	= 0x0E382008,
+	.emif_ddr_phy_ctlr_1		= 0x0E38200D,
+	.emif_ddr_ext_phy_ctrl_1	= 0x04020080,
+	.emif_ddr_ext_phy_ctrl_2	= 0x0A414829,
+	.emif_ddr_ext_phy_ctrl_3	= 0x14829052,
+	.emif_ddr_ext_phy_ctrl_4	= 0x000520A4,
+	.emif_ddr_ext_phy_ctrl_5	= 0x04010040,
+	.emif_ddr_ext_phy_ctrl_6	= 0x01004010,
+	.emif_ddr_ext_phy_ctrl_7	= 0x00001004,
+	.emif_ddr_ext_phy_ctrl_8	= 0x04010040,
+	.emif_ddr_ext_phy_ctrl_9	= 0x01004010,
+	.emif_ddr_ext_phy_ctrl_10	= 0x00001004,
+	.emif_ddr_ext_phy_ctrl_11	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_12	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_13	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_14	= 0x80080080,
+	.emif_ddr_ext_phy_ctrl_15	= 0x00800800,
+	.emif_ddr_ext_phy_ctrl_16	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_17	= 0x00000001,
+	.emif_ddr_ext_phy_ctrl_18	= 0x540A8150,
+	.emif_ddr_ext_phy_ctrl_19	= 0xA81502A0,
+	.emif_ddr_ext_phy_ctrl_20	= 0x002A0540,
+	.emif_ddr_ext_phy_ctrl_21	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_22	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_23	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_24	= 0x00000077
 };
 
 const struct dmm_lisa_map_regs lisa_map_4G_x_1_x_2 = {
