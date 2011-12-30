@@ -91,11 +91,21 @@ static const struct dpll_params mpu_dpll_params_1100mhz[NUM_SYS_CLKS] = {
 static const struct dpll_params mpu_dpll_params_800mhz[NUM_SYS_CLKS] = {
 	{200, 2, 1, -1, -1, -1, -1, -1, -1, -1},	/* 12 MHz   */
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 13 MHz   */
-	{619, 12, 1, -1, -1, -1, -1, -1, -1, -1},	/* 16.8 MHz */
-	{125, 2, 1, -1, -1, -1, -1, -1, -1, -1},	/* 19.2 MHz */
+	{1000, 20, 1, -1, -1, -1, -1, -1, -1, -1},	/* 16.8 MHz */
+	{375, 8, 1, -1, -1, -1, -1, -1, -1, -1},	/* 19.2 MHz */
 	{400, 12, 1, -1, -1, -1, -1, -1, -1, -1},	/* 26 MHz   */
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 27 MHz   */
-	{125, 5, 1, -1, -1, -1, -1, -1, -1, -1}		/* 38.4 MHz */
+	{375, 17, 1, -1, -1, -1, -1, -1, -1, -1}		/* 38.4 MHz */
+};
+
+static const struct dpll_params mpu_dpll_params_400mhz[NUM_SYS_CLKS] = {
+	{200, 2, 2, -1, -1, -1, -1, -1, -1, -1},	/* 12 MHz   */
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 13 MHz   */
+	{1000, 20, 2, -1, -1, -1, -1, -1, -1, -1},	/* 16.8 MHz */
+	{375, 8, 2, -1, -1, -1, -1, -1, -1, -1},	/* 19.2 MHz */
+	{400, 12, 2, -1, -1, -1, -1, -1, -1, -1},	/* 26 MHz   */
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 27 MHz   */
+	{375, 17, 2, -1, -1, -1, -1, -1, -1, -1}		/* 38.4 MHz */
 };
 
 static const struct dpll_params mpu_dpll_params_550mhz[NUM_SYS_CLKS] = {
@@ -108,6 +118,7 @@ static const struct dpll_params mpu_dpll_params_550mhz[NUM_SYS_CLKS] = {
 	{1375, 47, 2, -1, -1, -1, -1, -1, -1, -1}	/* 38.4 MHz */
 };
 
+#ifdef OPP_NOM
 static const struct dpll_params
 			core_dpll_params_2128mhz_ddr532[NUM_SYS_CLKS] = {
 	{266, 2, 2, 5, 8, 4, 62, 5, 5, 7},		/* 12 MHz   */
@@ -118,18 +129,41 @@ static const struct dpll_params
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 27 MHz   */
 	{665, 23, 2, 5, 8, 4, 62, 5, 5, 7}		/* 38.4 MHz */
 };
+#elif defined OPP_HIGH
+static const struct dpll_params
+			core_dpll_params_2128mhz_ddr532[NUM_SYS_CLKS] = {
+	{266, 2, 2, 5, 8, 4, 62, 4, 5, 7},		/* 12 MHz   */
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 13 MHz   */
+	{570, 8, 2, 5, 8, 4, 62, 4, 5, 7},		/* 16.8 MHz */
+	{665, 11, 2, 5, 8, 4, 62, 4, 5, 7},		/* 19.2 MHz */
+	{532, 12, 2, 5, 8, 4, 62, 4, 5, 7},		/* 26 MHz   */
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 27 MHz   */
+	{665, 23, 2, 5, 8, 4, 62, 4, 5, 7}		/* 38.4 MHz */
+};
+#endif
 
 static const struct dpll_params
 			core_dpll_params_2128mhz_ddr266[NUM_SYS_CLKS] = {
-	{266, 2, 4, 5, 8, 4, 62, 5, 5, 7},		/* 12 MHz   */
+	{266, 2, 4, 5, 8, 8, 62, 10, 10, 14},		/* 12 MHz   */
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 13 MHz   */
-	{570, 8, 4, 5, 8, 4, 62, 5, 5, 7},		/* 16.8 MHz */
-	{665, 11, 4, 5, 8, 4, 62, 5, 5, 7},		/* 19.2 MHz */
-	{532, 12, 4, 5, 8, 4, 62, 5, 5, 7},		/* 26 MHz   */
+	{570, 8, 4, 5, 8, 8, 62, 10, 10, 14},		/* 16.8 MHz */
+	{665, 11, 4, 5, 8, 8, 62, 10, 10, 14},		/* 19.2 MHz */
+	{532, 12, 4, 8, 8, 8, 62, 10, 10, 14},		/* 26 MHz   */
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 27 MHz   */
-	{1330, 47, 4, 5, 8, 4, 62, 5, 5, 7}		/* 38.4 MHz */
+	{665, 23, 4, 8, 8, 8, 62, 10, 10, 14}		/* 38.4 MHz */
 };
 
+#ifdef OPP_LOW
+static const struct dpll_params per_dpll_params_768mhz[NUM_SYS_CLKS] = {
+	{32, 0, 4, 4, 6, 4, -1, 4, -1, -1},		/* 12 MHz   */
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 13 MHz   */
+	{160, 6, 4, 4, 6, 4, -1, 4, -1, -1},		/* 16.8 MHz */
+	{20, 0, 4, 4, 6, 4, -1, 4, -1, -1},		/* 19.2 MHz */
+	{192, 12, 4, 4, 6, 4, -1, 4, -1, -1},		/* 26 MHz   */
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 27 MHz   */
+	{10, 0, 4, 4, 6, 4, -1, 4, -1, -1}		/* 38.4 MHz */
+};
+#else
 static const struct dpll_params per_dpll_params_768mhz[NUM_SYS_CLKS] = {
 	{32, 0, 4, 3, 6, 4, -1, 2, -1, -1},		/* 12 MHz   */
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 13 MHz   */
@@ -139,7 +173,19 @@ static const struct dpll_params per_dpll_params_768mhz[NUM_SYS_CLKS] = {
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 27 MHz   */
 	{10, 0, 4, 3, 6, 4, -1, 2, -1, -1}		/* 38.4 MHz */
 };
+#endif
 
+#ifdef OPP_HIGH
+static const struct dpll_params iva_dpll_params_1064mhz[NUM_SYS_CLKS] = {
+	{233, 2, -1, -1, 2, 2, -1, -1, -1, -1},		/* 12 MHz   */
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 13 MHz   */
+	{285, 8, -1, -1, 2, 2, -1, -1, -1, -1},		/* 16.8 MHz */
+	{665, 23, -1, -1, 2, 2, -1, -1, -1, -1},	/* 19.2 MHz */
+	{266, 12, -1, -1, 2, 2, -1, -1, -1, -1},	/* 26 MHz   */
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 27 MHz   */
+	{665, 47, -1, -1, 2, 2, -1, -1, -1, -1}		/* 38.4 MHz */
+};
+#elif defined OPP_NOM
 static const struct dpll_params iva_dpll_params_2330mhz[NUM_SYS_CLKS] = {
 	{1165, 11, -1, -1, 5, 6, -1, -1, -1, -1},	/* 12 MHz   */
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 13 MHz   */
@@ -149,6 +195,17 @@ static const struct dpll_params iva_dpll_params_2330mhz[NUM_SYS_CLKS] = {
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 27 MHz   */
 	{1972, 64, -1, -1, 5, 6, -1, -1, -1, -1}	/* 38.4 MHz */
 };
+#elif defined OPP_LOW
+static const struct dpll_params iva_dpll_params_2330mhz[NUM_SYS_CLKS] = {
+	{1165, 11, -1, -1, 10, 12, -1, -1, -1, -1},	/* 12 MHz   */
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 13 MHz   */
+	{2011, 28, -1, -1, 10, 12, -1, -1, -1, -1},	/* 16.8 MHz */
+	{1881, 30, -1, -1, 10, 12, -1, -1, -1, -1},	/* 19.2 MHz */
+	{1165, 25, -1, -1, 10, 12, -1, -1, -1, -1},	/* 26 MHz   */
+	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	/* 27 MHz   */
+	{1972, 64, -1, -1, 10, 12, -1, -1, -1, -1}	/* 38.4 MHz */
+};
+#endif
 
 /* ABE M & N values with sys_clk as source */
 static const struct dpll_params
@@ -203,16 +260,25 @@ void setup_post_dividers(u32 *const base, const struct dpll_params *params)
 const struct dpll_params *get_mpu_dpll_params(void)
 {
 	u32 sysclk_ind = get_sys_clk_index();
+#ifdef OPP_HIGH
+	return &mpu_dpll_params_1100mhz[sysclk_ind];
+#elif defined OPP_NOM
 	return &mpu_dpll_params_800mhz[sysclk_ind];
+#else
+	return &mpu_dpll_params_400mhz[sysclk_ind];
+#endif
 }
 
 const struct dpll_params *get_core_dpll_params(void)
 {
 	u32 sysclk_ind = get_sys_clk_index();
-
+#ifdef OPP_LOW
+	/* Configuring the DDR to be at 266mhz */
+	return &core_dpll_params_2128mhz_ddr266[sysclk_ind];
+#else
 	/* Configuring the DDR to be at 532mhz */
 	return &core_dpll_params_2128mhz_ddr532[sysclk_ind];
-
+#endif
 }
 
 const struct dpll_params *get_per_dpll_params(void)
@@ -224,7 +290,11 @@ const struct dpll_params *get_per_dpll_params(void)
 const struct dpll_params *get_iva_dpll_params(void)
 {
 	u32 sysclk_ind = get_sys_clk_index();
+#ifdef OPP_HIGH
+	return &iva_dpll_params_1064mhz[sysclk_ind];
+#else
 	return &iva_dpll_params_2330mhz[sysclk_ind];
+#endif
 }
 
 const struct dpll_params *get_usb_dpll_params(void)
@@ -257,15 +327,15 @@ void scale_vcores(void)
 
 	/* Palmas settings */
 	/* Enable 1.04V from TPS for vdd_mpu */
-	volt = 1040;
+	volt = VDD_MPU;
 	do_scale_vcore(SMPS_REG_ADDR_12_MPU, volt);
 
 	/* VCORE 1.04v - for vdd_core */
-	volt = 1040;
+	volt = VDD_CORE;
 	do_scale_vcore(SMPS_REG_ADDR_45_IVA, volt);
 
 	/* VCORE 1.04v - for vdd_MM */
-	volt = 1040;
+	volt = VDD_MM;
 	do_scale_vcore(SMPS_REG_ADDR_8_CORE, volt);
 }
 

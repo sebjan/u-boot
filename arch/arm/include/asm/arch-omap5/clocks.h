@@ -638,6 +638,21 @@ struct omap5_prcm_regs {
 #define SMPS_REG_ADDR_45_IVA	0x2B
 #define SMPS_REG_ADDR_8_CORE	0x37
 
+/* OPP SETTINGS */
+#ifdef OPP_LOW
+#define VDD_MPU		950
+#define VDD_MM		950
+#define VDD_CORE	950
+#elif defined OPP_NOM
+#define VDD_MPU		1040
+#define VDD_MM		1040
+#define VDD_CORE	1050
+#elif defined OPP_HIGH
+#define VDD_MPU		1220
+#define VDD_MM		1200
+#define VDD_CORE	1040
+#endif
+
 /* Standard offset is 0.5v expressed in uv */
 #define PALMAS_SMPS_BASE_VOLT_STD_MODE_WITH_OFFSET_UV 500000
 
