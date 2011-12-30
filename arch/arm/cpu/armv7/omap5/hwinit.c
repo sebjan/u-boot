@@ -115,6 +115,31 @@ void do_io_settings(void)
 		       (sc_fast << 17) | (sc_fast << 14);
 	writel(io_settings, &(ioregs_base->control_smart3io_padconf_1));
 
+	/* LPDDR2 io settings */
+	writel(DDR_IO_I_34OHM_SR_FASTEST_WD_DQ_NO_PULL_DQS_PULL_DOWN,
+					&(ioregs_base->control_ddrch1_0));
+	writel(DDR_IO_I_34OHM_SR_FASTEST_WD_DQ_NO_PULL_DQS_PULL_DOWN,
+					&(ioregs_base->control_ddrch1_1));
+	writel(DDR_IO_I_34OHM_SR_FASTEST_WD_DQ_NO_PULL_DQS_PULL_DOWN,
+					&(ioregs_base->control_ddrch2_0));
+	writel(DDR_IO_I_34OHM_SR_FASTEST_WD_DQ_NO_PULL_DQS_PULL_DOWN,
+					&(ioregs_base->control_ddrch2_1));
+	writel(DDR_IO_I_34OHM_SR_FASTEST_WD_CK_CKE_NCS_CA_PULL_DOWN,
+					&(ioregs_base->control_lpddr2ch1_0));
+	writel(DDR_IO_I_34OHM_SR_FASTEST_WD_CK_CKE_NCS_CA_PULL_DOWN,
+					&(ioregs_base->control_lpddr2ch1_1));
+	writel(DDR_IO_0_DDR2_DQ_INT_EN_ALL_DDR3_CA_DIS_ALL,
+					&(ioregs_base->control_ddrio_0));
+	writel(DDR_IO_1_DQ_OUT_EN_ALL_DQ_INT_EN_ALL,
+					&(ioregs_base->control_ddrio_1));
+	writel(DDR_IO_2_CA_OUT_EN_ALL_CA_INT_EN_ALL,
+					&(ioregs_base->control_ddrio_2));
+
+	/* Efuse settings */
+	writel(EFUSE_1, &(ioregs_base->control_efuse_1));
+	writel(EFUSE_2, &(ioregs_base->control_efuse_2));
+	writel(EFUSE_3, &(ioregs_base->control_efuse_3));
+	writel(EFUSE_4, &(ioregs_base->control_efuse_4));
 }
 #endif
 

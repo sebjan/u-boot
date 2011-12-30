@@ -95,7 +95,10 @@ static void do_lpddr2_init(u32 base, u32 cs)
 
 	sdelay(2000);
 
-	set_mr(base, cs, LPDDR2_MR1, MR1_BL_8_BT_SEQ_WRAP_EN_NWR_3);
+	if (omap_revision() >= OMAP5430_ES1_0)
+		set_mr(base, cs, LPDDR2_MR1, MR1_BL_8_BT_SEQ_WRAP_EN_NWR_8);
+	else
+		set_mr(base, cs, LPDDR2_MR1, MR1_BL_8_BT_SEQ_WRAP_EN_NWR_3);
 
 	set_mr(base, cs, LPDDR2_MR16, MR16_REF_FULL_ARRAY);
 
@@ -105,6 +108,9 @@ static void do_lpddr2_init(u32 base, u32 cs)
 	 */
 	mr_addr = LPDDR2_MR2 | EMIF_REG_REFRESH_EN_MASK;
 	set_mr(base, cs, mr_addr, RL_FINAL - 2);
+
+	if (omap_revision() >= OMAP5430_ES1_0)
+		set_mr(base, cs, LPDDR2_MR3, 0x1);
 }
 
 static void lpddr2_init(u32 base, const struct emif_regs *regs)
@@ -130,16 +136,22 @@ static void lpddr2_init(u32 base, const struct emif_regs *regs)
 	writel(regs->sdram_config_init, &emif->emif_sdram_config);
 	writel(regs->emif_ddr_phy_ctlr_1_init, &emif->emif_ddr_phy_ctrl_1);
 
-	ext_phy_ctrl_base = (u32 *) &(regs->emif_ddr_ext_phy_ctrl_1);
+	ext_phy_ctrl_base = (u32 *) &(regs->emif_ddr_ext_phy_ctrl_1_init);
 	emif_ext_phy_ctrl_base = (u32 *) &(emif->emif_ddr_ext_phy_ctrl_1);
 
 	if (omap_revision() >= OMAP5430_ES1_0) {
 		/* Configure external phy control registers */
 		for (i = 0; i < NUMBER_OF_EMIF_EXT_CTRL_REGISTERS; i++) {
-			writel(*ext_phy_ctrl_base, emif_ext_phy_ctrl_base++);
+			writel(*ext_phy_ctrl_base++, emif_ext_phy_ctrl_base++);
 			/* Write the shadow register here as well */
 			writel(*ext_phy_ctrl_base++, emif_ext_phy_ctrl_base++);
 		}
+
+		/* configure the wr_rd_levelling and rd_wr_thresh registers */
+		writel(regs->emif_rd_wr_lvl_rmp_win, &emif->emif_rd_wr_lvl_rmp_win);
+		writel(regs->emif_rd_wr_lvl_rmp_ctl, &emif->emif_rd_wr_lvl_rmp_ctl);
+		writel(regs->emif_rd_wr_lvl_ctl, &emif->emif_rd_wr_lvl_ctl);
+		writel(regs->emif_rd_wr_exec_thresh, &emif->emif_rd_wr_exec_thresh);
 	}
 
 	do_lpddr2_init(base, CS0);
