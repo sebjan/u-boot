@@ -600,23 +600,21 @@ void prcm_init(void)
 	switch (omap_hw_init_context()) {
 	case OMAP_INIT_CONTEXT_SPL:
 	case OMAP_INIT_CONTEXT_UBOOT_FROM_NOR:
-#ifndef CONFIG_ZEBU
-		scale_vcores();
-#endif
-		setup_dplls();
-
 	case OMAP_INIT_CONTEXT_UBOOT_AFTER_CH:
+		scale_vcores();
+		setup_dplls();
 		enable_basic_clocks();
-
-#ifdef CONFIG_UBOOT_CLOCKS_ENABLE_ALL
-		setup_non_essential_dplls();
-		enable_non_essential_clocks();
-#endif
 		break;
 	default:
 		break;
 	}
 
-	if (OMAP_INIT_CONTEXT_SPL == omap_hw_init_context())
+	if (OMAP_INIT_CONTEXT_SPL != omap_hw_init_context())
+	{
+#ifdef CONFIG_UBOOT_CLOCKS_ENABLE_ALL
+		setup_non_essential_dplls();
+		enable_non_essential_clocks();
+#endif
 		enable_basic_uboot_clocks();
+	}
 }
