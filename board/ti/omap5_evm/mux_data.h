@@ -227,19 +227,19 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{ABEMCPDM_DL_DATA, (M0)},    /*  ABEMCPDM_DL_DATA */
 	{ABEMCPDM_FRAME, (IEN | M0)},    /*  ABEMCPDM_FRAME   */
 	{ABEMCPDM_LB_CLK, (M0)},    /*  ABEMCPDM_LB_CLK  */
-	{WLSDIO_CLK, (M0)},    /*  WLSDIO_CLK  */
-	{WLSDIO_CMD, (IEN | M0)},    /*  WLSDIO_CMD  */
-	{WLSDIO_DATA0, (IEN | M0)},    /*  WLSDIO_DATA0*/
-	{WLSDIO_DATA1, (IEN | M0)},    /*  WLSDIO_DATA1*/
-	{WLSDIO_DATA2, (IEN | M0)},    /*  WLSDIO_DATA2*/
-	{WLSDIO_DATA3, (IEN | M0)},    /*  WLSDIO_DATA3*/
+	{WLSDIO_CLK, (PTU | IEN | M0)},    /*  WLSDIO_CLK  */
+	{WLSDIO_CMD, (PTU | IEN | M0)},    /*  WLSDIO_CMD  */
+	{WLSDIO_DATA0, (PTU | IEN | M0)},    /*  WLSDIO_DATA0*/
+	{WLSDIO_DATA1, (PTU | IEN | M0)},    /*  WLSDIO_DATA1*/
+	{WLSDIO_DATA2, (PTU | IEN | M0)},    /*  WLSDIO_DATA2*/
+	{WLSDIO_DATA3, (PTU | IEN | M0)},    /*  WLSDIO_DATA3*/
 	{UART5_RX, (PTU | IEN | M0)},    /*  UART5_RX    */
 	{UART5_TX, (M0)},    /*  UART5_TX    */
 	{UART5_CTS, (PTU | IEN | M0)},    /*  UART5_CTS   */
 	{UART5_RTS, (M0)},    /*  UART5_RTS   */
 	{I2C2_SCL, (IEN | M0)},    /*  I2C2_SCL    */
 	{I2C2_SDA, (IEN | M0)},    /*  I2C2_SDA    */
-	{MCSPI1_CLK, (PTD | M6)},    /*  GPIO5_140   */
+	{MCSPI1_CLK, (M6)},    /*  GPIO5_140   */
 	{MCSPI1_SOMI, (IEN | M6)},    /*  GPIO5_141   */
 	{MCSPI1_SIMO, (PTD | M6)},    /*  GPIO5_142   */
 	{MCSPI1_CS0, (PTD | M6)},    /*  GPIO5_143   */
@@ -280,7 +280,7 @@ const struct pad_conf_entry wkup_padconf_array_non_essential[] = {
 	{FREF_CLK0_OUT, (M0)},    /*  FREF_CLK0_OUT  */
 	{FREF_CLK1_OUT, (M0)},    /*  FREF_CLK1_OUT  */
 	{FREF_CLK2_OUT, (M0)},    /*  FREF_CLK2_OUT  */
-	{FREF_CLK2_REQ, (PTD | IEN | M6)},    /*  GPIO1_WK9      */
+	{FREF_CLK2_REQ, (PTU | IEN | M6)},    /*  GPIO1_WK9      */
 	{FREF_CLK1_REQ, (PTD | IEN | M6)},    /*  GPIO1_WK8      */
 	{SYS_NRESPWRON, (IEN | M0)},    /*  SYS_NRESPWRON  */
 	{SYS_NRESWARM, (PTU | IEN | M0)},    /*  SYS_NRESWARM   */
