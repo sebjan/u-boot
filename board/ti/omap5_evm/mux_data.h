@@ -29,17 +29,17 @@
 
 const struct pad_conf_entry core_padconf_array_essential[] = {
 
-	{EMMC_CLK, (M0)}, /*  EMMC_CLK   */
-	{EMMC_CMD, (IEN | M0)}, /*  EMMC_CMD   */
-	{EMMC_DATA0, (IEN | M0)}, /*  EMMC_DATA0 */
-	{EMMC_DATA1, (IEN | M0)}, /*  EMMC_DATA1 */
-	{EMMC_DATA2, (IEN | M0)}, /*  EMMC_DATA2 */
-	{EMMC_DATA3, (IEN | M0)}, /*  EMMC_DATA3 */
-	{EMMC_DATA4, (IEN | M0)}, /*  EMMC_DATA4 */
-	{EMMC_DATA5, (IEN | M0)}, /*  EMMC_DATA5 */
-	{EMMC_DATA6, (IEN | M0)}, /*  EMMC_DATA6 */
-	{EMMC_DATA7, (IEN | M0)}, /*  EMMC_DATA7 */
-	{SDCARD_CLK, (PTU | M0)}, /*  SDCARD_CLK  */
+	{EMMC_CLK, (PTU | IEN | M0)}, /*  EMMC_CLK   */
+	{EMMC_CMD, (PTU | IEN | M0)}, /*  EMMC_CMD   */
+	{EMMC_DATA0, (PTU | IEN | M0)}, /*  EMMC_DATA0 */
+	{EMMC_DATA1, (PTU | IEN | M0)}, /*  EMMC_DATA1 */
+	{EMMC_DATA2, (PTU | IEN | M0)}, /*  EMMC_DATA2 */
+	{EMMC_DATA3, (PTU | IEN | M0)}, /*  EMMC_DATA3 */
+	{EMMC_DATA4, (PTU | IEN | M0)}, /*  EMMC_DATA4 */
+	{EMMC_DATA5, (PTU | IEN | M0)}, /*  EMMC_DATA5 */
+	{EMMC_DATA6, (PTU | IEN | M0)}, /*  EMMC_DATA6 */
+	{EMMC_DATA7, (PTU | IEN | M0)}, /*  EMMC_DATA7 */
+	{SDCARD_CLK, (PTU | IEN | M0)}, /*  SDCARD_CLK  */
 	{SDCARD_CMD, (PTU | IEN | M0)}, /*  SDCARD_CMD  */
 	{SDCARD_DATA0, (PTU | IEN | M0)}, /*  SDCARD_DATA0*/
 	{SDCARD_DATA1, (PTU | IEN | M0)}, /*  SDCARD_DATA1*/
