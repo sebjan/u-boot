@@ -173,6 +173,9 @@ void emif_update_timings(u32 base, const struct emif_regs *regs)
 	writel(regs->sdram_tim1, &emif->emif_sdram_tim_1_shdw);
 	writel(regs->sdram_tim2, &emif->emif_sdram_tim_2_shdw);
 	writel(regs->sdram_tim3, &emif->emif_sdram_tim_3_shdw);
+	writel(0x4040, &emif->emif_pwr_mgmt_ctrl);
+	writel(0x4040, &emif->emif_pwr_mgmt_ctrl_shdw);
+
 
 	if (omap_revision() == OMAP4430_ES1_0) {
 		/* ES1 bug EMIF should be in force idle during freq_update */
