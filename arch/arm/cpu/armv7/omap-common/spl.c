@@ -117,7 +117,6 @@ void board_init_r(gd_t *id, ulong dummy)
 	i2c_init(CONFIG_SYS_I2C_SPEED, CONFIG_SYS_I2C_SLAVE);
 
 	boot_device = omap_boot_device();
-#ifndef CONFIG_WAKEUP
 	debug("boot device - %d\n", boot_device);
 	switch (boot_device) {
 #ifdef CONFIG_SPL_MMC_SUPPORT
@@ -137,7 +136,6 @@ void board_init_r(gd_t *id, ulong dummy)
 		break;
 	}
 
-#endif
 	switch (spl_image.os) {
 	case IH_OS_U_BOOT:
 		debug("Jumping to U-Boot\n");

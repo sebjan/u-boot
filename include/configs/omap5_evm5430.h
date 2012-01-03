@@ -40,7 +40,6 @@
 #define CONFIG_5430EVM		1	/* working with EVM */
 #define CONFIG_ARCH_CPU_INIT
 #define CONFIG_MACH_OMAP_5430EVM 1
-#define CONFIG_WAKEUP		1
 
 /* Get CPU defs */
 #include <asm/arch/cpu.h>
