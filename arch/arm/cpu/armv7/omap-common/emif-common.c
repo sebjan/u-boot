@@ -146,12 +146,6 @@ static void lpddr2_init(u32 base, const struct emif_regs *regs)
 			/* Write the shadow register here as well */
 			writel(*ext_phy_ctrl_base++, emif_ext_phy_ctrl_base++);
 		}
-
-		/* configure the wr_rd_levelling and rd_wr_thresh registers */
-		writel(regs->emif_rd_wr_lvl_rmp_win, &emif->emif_rd_wr_lvl_rmp_win);
-		writel(regs->emif_rd_wr_lvl_rmp_ctl, &emif->emif_rd_wr_lvl_rmp_ctl);
-		writel(regs->emif_rd_wr_lvl_ctl, &emif->emif_rd_wr_lvl_ctl);
-		writel(regs->emif_rd_wr_exec_thresh, &emif->emif_rd_wr_exec_thresh);
 	}
 
 	do_lpddr2_init(base, CS0);
