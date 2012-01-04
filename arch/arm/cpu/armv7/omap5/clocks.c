@@ -326,16 +326,13 @@ void scale_vcores(void)
 	setup_sri2c();
 
 	/* Palmas settings */
-	/* Enable 1.04V from TPS for vdd_mpu */
 	volt = VDD_MPU;
 	do_scale_vcore(SMPS_REG_ADDR_12_MPU, volt);
 
-	/* VCORE 1.04v - for vdd_core */
-	volt = VDD_CORE;
+	volt = VDD_MM;
 	do_scale_vcore(SMPS_REG_ADDR_45_IVA, volt);
 
-	/* VCORE 1.04v - for vdd_MM */
-	volt = VDD_MM;
+	volt = VDD_CORE;
 	do_scale_vcore(SMPS_REG_ADDR_8_CORE, volt);
 }
 
