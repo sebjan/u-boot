@@ -514,11 +514,9 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	onenand_init();
 #endif
 
-#if !defined(CONFIG_WAKEUP)
 #ifdef CONFIG_GENERIC_MMC
        puts("MMC:   ");
        mmc_initialize(gd->bd);
-#endif
 #endif
 
 #ifdef CONFIG_HAS_DATAFLASH
