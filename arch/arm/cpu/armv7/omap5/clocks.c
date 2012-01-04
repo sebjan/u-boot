@@ -339,15 +339,19 @@ void scale_vcores(void)
 	do_scale_vcore(SMPS_REG_ADDR_8_CORE, volt);
 }
 
-u32 get_offset_code(u32 offset)
+u32 get_offset_code(u32 volt_offset)
 {
 	u32 offset_code, step = 10000; /* 10 mV represented in uV */
 
-	offset -= PALMAS_SMPS_BASE_VOLT_STD_MODE_WITH_OFFSET_UV;
+	volt_offset -= PALMAS_SMPS_BASE_VOLT_UV;
 
-	offset_code = (offset + step - 1) / step;
+	offset_code = (volt_offset + step - 1) / step;
 
-	return offset_code;
+	/*
+	 * Offset codes 1-6 all give the base voltage in Palmas
+	 * Offset code 0 switches OFF the SMPS 
+	 */
+	return offset_code + 6;
 }
 
 /*

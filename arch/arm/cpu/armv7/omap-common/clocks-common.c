@@ -396,11 +396,8 @@ void do_scale_vcore(u32 vcore_reg, u32 volt_mv)
 
 	offset_code = get_offset_code(offset);
 
-	/* The code starts at 1 not 0 */
-	offset_code++;
-
-	debug("do_scale_vcore: volt - %d offset_code - 0x%x\n", volt_mv,
-		offset_code);
+	debug("do_scale_vcore: vcore_reg - 0x%x volt - %d offset_code - 0x%x\n",
+		vcore_reg, volt_mv, offset_code);
 
 	temp = SMPS_I2C_SLAVE_ADDR |
 	    (vcore_reg << PRM_VC_VAL_BYPASS_REGADDR_SHIFT) |

@@ -329,7 +329,8 @@ u32 get_offset_code(u32 offset)
 
 	offset_code = (offset + step - 1) / step;
 
-	return offset_code;
+	/* The code starts at 1 not 0 */
+	return ++offset_code;
 }
 
 /*
