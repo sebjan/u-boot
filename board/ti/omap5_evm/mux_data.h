@@ -159,7 +159,7 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{GPIO6_184, (M4)},    /*  KBD_COL2   */
 	{GPIO6_185, (PTD | IEN | M6)},    /*  GPIO6_185  */
 	{GPIO6_186, (PTD | M6)},    /*  GPIO6_186  */
-	{GPIO6_187, (IEN | M4)},    /*  KBD_ROW2   */
+	{GPIO6_187, (PTU | IEN | M4)},    /*  KBD_ROW2   */
 	{RFBI_DATA0, (PTD | M6)},    /*  GPIO6_166  */
 	{RFBI_DATA1, (PTD | M6)},    /*  GPIO6_167  */
 	{RFBI_DATA2, (PTD | M6)},    /*  GPIO6_168  */
