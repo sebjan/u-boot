@@ -536,6 +536,17 @@
 	(DMM_SDRC_INTL_NONE << EMIF_SDRC_INTL_SHIFT)|\
 	(0xFF << EMIF_SYS_ADDR_SHIFT))
 
+/*
+ * Although have 2GB of memory connected on the sevm board,
+ * we are sacrificing 16MB of memory for trapping unmapped
+ * tiler address. So total available memory is 2GB - 16MB
+ */
+#ifdef CONFIG_OMAP54XX
+#define SDRAM_MEMORY_TILER_TRAP 0x01000000 /* 16 MB */
+#else
+#define SDRAM_MEMORY_TILER_TRAP 0x0
+#endif
+
 #define NUMBER_OF_EMIF_EXT_CTRL_REGISTERS	0x18
 
 /* Reg mapping structure */

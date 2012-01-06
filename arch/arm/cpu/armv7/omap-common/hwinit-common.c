@@ -183,6 +183,7 @@ u32 omap_sdram_size(void)
 	for (i = 0; i < 4; i++) {
 		section	= __raw_readl(DMM_BASE + i*4);
 		addr = section & EMIF_SYS_ADDR_MASK;
+
 		/* See if the address is valid */
 		if ((addr >= DRAM_ADDR_SPACE_START) &&
 		    (addr < DRAM_ADDR_SPACE_END)) {
@@ -194,7 +195,11 @@ u32 omap_sdram_size(void)
 		}
 	}
 
-	return total_size;
+	/*
+	 * Actual memory available minus 16MB of memory reserved for
+	 * tiler trap.
+	 */
+	return total_size - SDRAM_MEMORY_TILER_TRAP;
 }
 
 /*

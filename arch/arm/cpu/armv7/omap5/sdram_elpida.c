@@ -312,11 +312,15 @@ const struct emif_regs emif_regs_elpida_266_mhz_1cs = {
 	.emif_rd_wr_exec_thresh		= 0x00000305
 };
 
+/*
+ * 16MB section of highest priority to trap unmapped tiler access.
+ * and the rest is mapped for normal memory in the next section.
+ */
 const struct dmm_lisa_map_regs lisa_map_16G_x_1_x_2 = {
-	.dmm_lisa_map_0 = 0xFF020100,
+	.dmm_lisa_map_0 = 0x0,
 	.dmm_lisa_map_1 = 0,
-	.dmm_lisa_map_2 = 0,
-	.dmm_lisa_map_3 = 0x80740300
+	.dmm_lisa_map_2 = 0x80740300,
+	.dmm_lisa_map_3 = 0xFF020100
 };
 
 static void emif_get_reg_dump_sdp(u32 emif_nr, const struct emif_regs **regs)
