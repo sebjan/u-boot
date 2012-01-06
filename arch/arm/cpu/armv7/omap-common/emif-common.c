@@ -1132,7 +1132,7 @@ void dmm_init(u32 base)
  */
 void sdram_init(void)
 {
-	u32 in_sdram, size_prog, size_detect;
+	u32 in_sdram, size_prog, size_detect, i = 0;
 
 	debug(">>sdram_init()\n");
 	if ((omap_hw_init_context() == OMAP_INIT_CONTEXT_UBOOT_AFTER_SPL) ||
@@ -1159,6 +1159,15 @@ void sdram_init(void)
 	/* Do some testing after the init */
 	if (!in_sdram) {
 		size_prog = omap_sdram_size();
+		if ((size_prog & (size_prog -1)) != 0) {
+			i = 1;
+			while((i < size_prog) && (i))
+				i <<= 1;
+			if(i)
+				size_prog = i;
+			else
+				size_prog = (1 << 30);
+		}
 		size_detect = get_ram_size((long *)CONFIG_SYS_SDRAM_BASE,
 						size_prog);
 		/* Compare with the size programmed */
