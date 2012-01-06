@@ -476,10 +476,12 @@ void freq_update_core(void)
 	}
 
 	/* Put EMIF clock domain back in hw auto mode */
+#if 0
 	enable_clock_domain(&prcm->cm_memif_clkstctrl,
 				CD_CLKCTRL_CLKTRCTRL_HW_AUTO);
 	wait_for_clk_enable(&prcm->cm_memif_emif_1_clkctrl);
 	wait_for_clk_enable(&prcm->cm_memif_emif_2_clkctrl);
+#endif
 }
 
 void bypass_dpll(u32 *const base)
