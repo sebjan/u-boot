@@ -151,7 +151,7 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{RFBI_DATA10, (PTD | M6)},    /*  GPIO6_176  */
 	{RFBI_DATA11, (PTD | M6)},    /*  GPIO6_177  */
 	{RFBI_DATA12, (PTD | M6)},    /*  GPIO6_178  */
-	{RFBI_DATA13, (PTD | IEN | M6)},    /*  GPIO6_179  */
+	{RFBI_DATA13, (PTU | IEN | M6)},    /*  GPIO6_179  */
 	{RFBI_DATA14, (M4)},    /*  KBD_COL7   */
 	{RFBI_DATA15, (M4)},    /*  KBD_COL6   */
 	{GPIO6_182, (M6)},    /*  GPIO6_182  */
@@ -206,7 +206,7 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{TIMER11_PWM_EVT, (PTD | M6)},    /*  GPIO8_227  */
 	{TIMER5_PWM_EVT, (PTD | M6)},    /*  GPIO8_228  */
 	{TIMER6_PWM_EVT, (PTD | M6)},    /*  GPIO8_229  */
-	{TIMER8_PWM_EVT,      (PTD | M6)},    /*  GPIO8_230  */
+	{TIMER8_PWM_EVT,      (PTU | M6)},    /*  GPIO8_230  */
 	{I2C3_SCL, (IEN | M0)},    /*  I2C3_SCL   */
 	{I2C3_SDA, (IEN | M0)},    /*  I2C3_SDA   */
 	{GPIO8_233, (IEN | M2)},    /*  TIMER8_PWM_EVT   */
