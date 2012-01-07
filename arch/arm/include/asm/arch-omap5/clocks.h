@@ -514,6 +514,10 @@ struct omap5_prcm_regs {
 /* CM_IDLEST_DPLL fields */
 #define ST_DPLL_CLK_MASK		1
 
+/* SGX */
+#define CLKSEL_GPU_HYD_GCLK_MASK		(1 << 25)
+#define CLKSEL_GPU_CORE_GCLK_MASK		(1 << 24)
+
 /* CM_CLKSEL_DPLL */
 #define CM_CLKSEL_DPLL_DPLL_SD_DIV_SHIFT	24
 #define CM_CLKSEL_DPLL_DPLL_SD_DIV_MASK		(0xFF << 24)

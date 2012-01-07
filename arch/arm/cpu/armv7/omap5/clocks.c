@@ -412,6 +412,12 @@ void enable_basic_clocks(void)
 			 clk_modules_hw_auto_essential,
 			 clk_modules_explicit_en_essential,
 			 1);
+
+	/* Select 384Mhz for GPU as its the POR for ES1.0 */
+	setbits_le32(&prcm->cm_sgx_sgx_clkctrl,
+			CLKSEL_GPU_HYD_GCLK_MASK);
+	setbits_le32(&prcm->cm_sgx_sgx_clkctrl,
+			CLKSEL_GPU_CORE_GCLK_MASK);
 }
 
 void enable_basic_uboot_clocks(void)
