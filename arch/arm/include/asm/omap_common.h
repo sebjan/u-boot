@@ -45,7 +45,7 @@ void preloader_console_init(void);
 #define BOOT_DEVICE_ONE_NAND    4
 #define BOOT_DEVICE_MMC1        5
 #define BOOT_DEVICE_MMC2        6
-#define BOOT_DEVICE_MMC3	7
+#define BOOT_DEVICE_MMC2_2	7
 #elif defined(CONFIG_OMAP44XX) /* OMAP4 */
 #define BOOT_DEVICE_NONE	0
 #define BOOT_DEVICE_XIP		1
@@ -54,6 +54,7 @@ void preloader_console_init(void);
 #define BOOT_DEVICE_ONE_NAND	4
 #define BOOT_DEVICE_MMC1	5
 #define BOOT_DEVICE_MMC2	6
+#define BOOT_DEVICE_MMC2_2	0xFF
 #elif defined(CONFIG_OMAP34XX)	/* OMAP3 */
 #define BOOT_DEVICE_NONE	0
 #define BOOT_DEVICE_XIP		1
@@ -62,6 +63,7 @@ void preloader_console_init(void);
 #define BOOT_DEVICE_MMC2	5 /*emmc*/
 #define BOOT_DEVICE_MMC1	6
 #define BOOT_DEVICE_XIPWAIT	7
+#define BOOT_DEVICE_MMC2_2	0xFF
 #endif
 
 /* Boot type */
