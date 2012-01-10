@@ -165,10 +165,19 @@
 	"loaduimage=fatload mmc ${mmcdev} ${loadaddr} uImage\0" \
 	"mmcboot=echo Booting from mmc${mmcdev} ...; " \
 		"run mmcargs; " \
-		"bootm ${loadaddr}\0" \
+		"bootm ${loadaddr}\0"
 
 #define CONFIG_BOOTCOMMAND \
-	"bootm 0x80300000"
+	"if mmc rescan ${mmcdev}; then " \
+		"if run loadbootscript; then " \
+			"run bootscript; " \
+		"else " \
+			"if run loaduimage; then " \
+				"run mmcboot; " \
+			"fi; " \
+		"fi; " \
+	"fi"
+
 
 #define CONFIG_AUTO_COMPLETE		1
 
