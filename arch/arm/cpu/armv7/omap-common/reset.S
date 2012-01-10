@@ -27,7 +27,13 @@
 reset_cpu:
 	ldr	r1, rstctl			@ get addr for global reset
 						@ reg
+	ldr	r2, =omap_si_rev
+	ldr	r2, [r2]
+	ldr	r4, [r2]
+	ldr	r3, =0x54300100			@ omap5430ES1.0
+	cmp	r3, r4
 	ldr	r3, rstbit			@ sw reset bit
+	moveq	r3, r3, lsl #1			@ Use cold reset for 5430ES1.0
 	str	r3, [r1]			@ force reset
 	mov	r0, r0
 _loop_forever:
