@@ -697,7 +697,7 @@ struct dpll_regs {
 	u32 cm_div_h12_dpll;
 	u32 cm_div_h13_dpll;
 	u32 cm_div_h14_dpll;
-	u32 reserved[2];
+	u32 reserved[3];
 	u32 cm_div_h22_dpll;
 	u32 cm_div_h23_dpll;
 };
