@@ -106,8 +106,10 @@
 #define CONFIG_DRIVER_OMAP34XX_I2C	1
 #define CONFIG_I2C_MULTI_BUS		1
 
-/* TWL6030 */
-#define CONFIG_CMD_BAT			1
+/* TWL6035 */
+#ifndef CONFIG_SPL_BUILD
+#define CONFIG_TWL6035_POWER		1
+#endif
 
 /* MMC */
 #define CONFIG_GENERIC_MMC		1
