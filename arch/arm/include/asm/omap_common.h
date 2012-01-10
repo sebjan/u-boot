@@ -94,6 +94,12 @@ void spl_nand_load_image(void);
 /* MMC SPL functions */
 void spl_mmc_load_image(void);
 
+static inline u32 omap_revision(void)
+{
+	extern u32 *const omap_si_rev;
+	return *omap_si_rev;
+}
+
 /*
  * silicon revisions.
  * Moving this to common, so that most of code can be moved to common,
