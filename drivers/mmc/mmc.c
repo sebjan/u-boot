@@ -31,6 +31,7 @@
 #include <malloc.h>
 #include <linux/list.h>
 #include <div64.h>
+#include <asm/arch/mmc_host_def.h>
 
 /* Set block count limit because of 16 bit register limit on some hardware*/
 #ifndef CONFIG_SYS_MMC_MAX_BLK_COUNT
@@ -1201,11 +1202,15 @@ int mmc_init(struct mmc *mmc)
 	/* The internal partition reset to user partition(0) at every CMD0*/
 	mmc->part_num = 0;
 
+	if (mmc->priv == OMAP_HSMMC2_BASE) {
+		err = TIMEOUT;
+	} else {
 	/* Test for SD version 2 */
 	err = mmc_send_if_cond(mmc);
 
 	/* Now try to get the SD card's operating condition */
 	err = sd_send_op_cond(mmc);
+	}
 
 	/* If the command timed out, we check for an MMC card */
 	if (err == TIMEOUT) {
