@@ -29,6 +29,12 @@
 
 #include "mux_data.h"
 
+#ifdef CONFIG_USB_EHCI
+#include <usb.h>
+#include <asm/arch/ehci.h>
+#include <asm/ehci-omap.h>
+#endif
+
 DECLARE_GLOBAL_DATA_PTR;
 
 const struct omap_sysinfo sysinfo = {
@@ -106,4 +112,31 @@ int board_mmc_init(bd_t *bis)
 	return 0;
 }
 #endif
+#endif
+
+#ifdef CONFIG_USB_EHCI
+static struct omap_usbhs_board_data usbhs_bdata = {
+	.port_mode[0] = OMAP_USBHS_PORT_MODE_UNUSED,
+	.port_mode[1] = OMAP_EHCI_PORT_MODE_HSIC,
+	.port_mode[2] = OMAP_EHCI_PORT_MODE_HSIC,
+};
+
+int ehci_hcd_init(void)
+{
+	int ret;
+
+	ret = omap_ehci_hcd_init(&usbhs_bdata);
+	if (ret < 0)
+		return ret;
+
+	return 0;
+}
+
+int ehci_hcd_stop(void)
+{
+	int ret;
+
+	ret = omap_ehci_hcd_stop();
+	return ret;
+}
 #endif

@@ -375,6 +375,8 @@ void enable_basic_clocks(void)
 		&prcm->cm_l4per_gpio4_clkctrl,
 		&prcm->cm_l4per_gpio5_clkctrl,
 		&prcm->cm_l4per_gpio6_clkctrl,
+		&prcm->cm_clksel_usb_60mhz,
+		&prcm->cm_l3init_hsusbtll_clkctrl,
 		0
 	};
 
@@ -385,6 +387,7 @@ void enable_basic_clocks(void)
 		&prcm->cm_wkup_wdtimer2_clkctrl,
 		&prcm->cm_l4per_uart3_clkctrl,
 		&prcm->cm_l4per_i2c1_clkctrl,
+		&prcm->cm_l3init_hsusbhost_clkctrl,
 		0
 	};
 
@@ -408,10 +411,13 @@ void enable_basic_clocks(void)
 	setbits_le32(&prcm->cm_wkup_gptimer1_clkctrl,
 			GPTIMER1_CLKCTRL_CLKSEL_MASK);
 
-	do_enable_clocks(clk_domains_essential,
-			 clk_modules_hw_auto_essential,
-			 clk_modules_explicit_en_essential,
-			 1);
+	/* Enbale all 3 usb ports enable uhh, utmi and hsic clocks*/
+	setbits_le32(&prcm->cm_l3init_hsusbhost_clkctrl,
+			USB_HOST_HS_CLKCTRL_MASK);
+
+	/* Enbale all 3 usb host ports tll clocks*/
+	setbits_le32(&prcm->cm_l3init_hsusbtll_clkctrl,
+			USB_TLL_HS_CLKCTRL_MASK);
 
 	/* Select 384Mhz for GPU as its the POR for ES1.0 */
 	setbits_le32(&prcm->cm_sgx_sgx_clkctrl,
@@ -429,6 +435,12 @@ void enable_basic_clocks(void)
 	setbits_le32(&prcm->cm_coreaon_bandgap_clkctrl,
 		((OMAP_TS_CLK_ENABLE_MASK | OMAP_19M_TS_CLK_DIVIDER_MASK)
 			& ~OMAP_38M_TS_CLK_DIVIDER_MASK));
+
+	do_enable_clocks(clk_domains_essential,
+			 clk_modules_hw_auto_essential,
+			 clk_modules_explicit_en_essential,
+			 1);
+
 }
 
 void enable_basic_uboot_clocks(void)
