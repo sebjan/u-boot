@@ -223,10 +223,10 @@ const struct pad_conf_entry core_padconf_array_non_essential[] = {
 	{ABEMCBSP2_DX, (M0)},    /*  ABEMCBSP2_DX */
 	{ABEMCBSP2_FSX, (IEN | M0)},    /*  ABEMCBSP2_FSX  */
 	{ABEMCBSP2_CLKX, (IEN | M0)},    /*  ABEMCBSP2_CLKX */
-	{ABEMCPDM_UL_DATA, (IEN | M0)},    /*  ABEMCPDM_UL_DATA */
-	{ABEMCPDM_DL_DATA, (M0)},    /*  ABEMCPDM_DL_DATA */
-	{ABEMCPDM_FRAME, (IEN | M0)},    /*  ABEMCPDM_FRAME   */
-	{ABEMCPDM_LB_CLK, (M0)},    /*  ABEMCPDM_LB_CLK  */
+	{ABEMCPDM_UL_DATA, (PTD | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},    /*  ABEMCPDM_UL_DATA */
+	{ABEMCPDM_DL_DATA, (PTD | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},    /*  ABEMCPDM_DL_DATA */
+	{ABEMCPDM_FRAME, (PTU | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},    /*  ABEMCPDM_FRAME   */
+	{ABEMCPDM_LB_CLK, (PTD | IEN | OFF_EN | OFF_PD | OFF_IN | M0)},    /*  ABEMCPDM_LB_CLK  */
 	{WLSDIO_CLK, (PTU | IEN | M0)},    /*  WLSDIO_CLK  */
 	{WLSDIO_CMD, (PTU | IEN | M0)},    /*  WLSDIO_CMD  */
 	{WLSDIO_DATA0, (PTU | IEN | M0)},    /*  WLSDIO_DATA0*/
