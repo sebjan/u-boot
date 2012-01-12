@@ -473,9 +473,11 @@ struct omap5_prcm_regs {
 	u32 cm_wkup_rtc_clkctrl;		/* 4ae07880 */
 	u32 pad214;				/* 4ae07884 */
 	u32 cm_wkup_bandgap_clkctrl;		/* 4ae07888 */
-	u32 pad215[197];			/* 4ae0788c */
+	u32 pad215[1];				/* 4ae0788c */
+	u32 cm_wkupaon_scrm_clkctrl;		/* 4ae07890 */
+	u32 pad216[195];
 	u32 prm_vc_val_bypass;			/* 4ae07ba0 */
-	u32 pad216[4];
+	u32 pad217[4];
 	u32 prm_vc_cfg_i2c_mode;		/* 4ae07bb4 */
 	u32 prm_vc_cfg_i2c_clk;			/* 4ae07bb8 */
 };
@@ -614,6 +616,12 @@ struct omap5_prcm_regs {
 #define MPU_CLKCTRL_CLKSEL_EMIF_DIV_MODE_MASK	(1 << 24)
 #define MPU_CLKCTRL_CLKSEL_ABE_DIV_MODE_SHIFT	25
 #define MPU_CLKCTRL_CLKSEL_ABE_DIV_MODE_MASK	(1 << 25)
+
+/* CM_WKUPAON_SCRM_CLKCTRL */
+#define OPTFCLKEN_SCRM_PER_SHIFT		9
+#define OPTFCLKEN_SCRM_PER_MASK			(1 << 9)
+#define OPTFCLKEN_SCRM_CORE_SHIFT		8
+#define OPTFCLKEN_SCRM_CORE_MASK		(1 << 8)
 
 /* Clock frequencies */
 #define OMAP_SYS_CLK_FREQ_38_4_MHZ	38400000

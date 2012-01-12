@@ -418,6 +418,12 @@ void enable_basic_clocks(void)
 			CLKSEL_GPU_HYD_GCLK_MASK);
 	setbits_le32(&prcm->cm_sgx_sgx_clkctrl,
 			CLKSEL_GPU_CORE_GCLK_MASK);
+
+	/* Enable SCRM OPT clocks for PER and CORE dpll */
+	setbits_le32(&prcm->cm_wkupaon_scrm_clkctrl,
+			OPTFCLKEN_SCRM_PER_MASK);
+	setbits_le32(&prcm->cm_wkupaon_scrm_clkctrl,
+			OPTFCLKEN_SCRM_CORE_MASK);
 }
 
 void enable_basic_uboot_clocks(void)
