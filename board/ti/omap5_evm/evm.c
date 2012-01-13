@@ -78,6 +78,12 @@ void set_muxconf_regs_essential(void)
 	do_set_mux(CONTROL_PADCONF_WKUP, wkup_padconf_array_essential,
 		   sizeof(wkup_padconf_array_essential) /
 		   sizeof(struct pad_conf_entry));
+
+	/* Set the MSECURE Mode for GPIO234 pin */
+	if (get_device_type() == DEVICE_GP) {
+		u32 msecure_pad = CONTROL_PADCONF_CORE + GPIO8_234;
+		writew((readw(msecure_pad) & ~M7) | M1, msecure_pad);
+	}
 }
 
 void set_muxconf_regs_non_essential(void)
