@@ -65,4 +65,23 @@ void twl6035_mmc1_poweron_ldo(void)
 	palmas_write_u8(0x48, LDO9_CTRL, val);
 	return;
 }
+
+void twl6035_usb_poweron_ldo(void)
+{
+	u8 val = 0;
+
+	/* TURN ON LDO's needed */
+        val = LDO_ON | LDO_MODE_SLEEP | LDO_MODE_ACTIVE;
+
+	/* enable 3v3 supply for usb */
+	palmas_write_u8(TWL6035_CHIP_ADDR, SYSEN2_CTRL, val);
+
+	/* set to 3.3V */
+	val = 0x3f;
+	palmas_write_u8(TWL6035_CHIP_ADDR, LDOUSB_VOLTAGE, val);
+
+	/* enable LDO USB */
+	palmas_write_u8(TWL6035_CHIP_ADDR, LDOUSB_CTRL, val);
+
+}
 #endif

@@ -71,6 +71,9 @@ int misc_init_r(void)
 {
 #ifdef CONFIG_TWL6035_POWER
 	twl6035_init_settings();
+#ifdef CONFIG_USB_EHCI_OMAP
+	twl6035_usb_poweron_ldo();
+#endif
 #endif
 	return 0;
 }

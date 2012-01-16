@@ -31,6 +31,13 @@
 #define LDO9_CTRL		0x60
 #define LDO9_VOLTAGE		0x61
 
+/* SYSEN2_CTRL for 3v3 usb supply */
+#define SYSEN2_CTRL		0x1d9
+
+/* LDOUSB_CTRL */
+#define LDOUSB_CTRL		0x164
+#define LDOUSB_VOLTAGE		0x165
+
 /* Bit field definitions for LDOx_CTRL */
 #define LDO_ON			(1 << 4)
 #define LDO_MODE_SLEEP		(1 << 2)
