@@ -141,6 +141,10 @@ struct s32ktimer {
 #define DEVICE_TYPE_MASK (0x7 << DEVICE_TYPE_SHIFT)
 #define DEVICE_GP 0x3
 
+static inline void tshut_init(void)
+{
+}
+
 struct omap_sys_ctrl_regs {
 	unsigned int pad1[129];
 	unsigned int control_id_code;			/* 0x4A002204 */

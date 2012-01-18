@@ -204,7 +204,9 @@ struct omap5_prcm_regs {
 	u32 cm_ssc_modfreqdiv_dpll_unipro;	/* 4a0081ec */
 
 	/* cm2.core */
-	u32 pad0411[324];			/* 4a0081f0 */
+	u32 pad0411[278];			/* 4a0081f0 */
+	u32 cm_coreaon_bandgap_clkctrl;		/* 4a008648 */
+	u32 pad0444[45];			/* 4a00864c */
 	u32 cm_l3_1_clkstctrl;			/* 4a008700 */
 	u32 pad042[1];				/* 4a008704 */
 	u32 cm_l3_1_dynamicdep;			/* 4a008708 */
@@ -633,6 +635,14 @@ struct omap5_prcm_regs {
 #define PRM_VC_CFG_I2C_CLK_SCLH_MASK		0xFF
 #define PRM_VC_CFG_I2C_CLK_SCLL_SHIFT		8
 #define PRM_VC_CFG_I2C_CLK_SCLL_MASK		(0xFF << 8)
+
+/* Temperature sensor register bitfields */
+#define OMAP_TS_CLK_ENABLE_SHIFT		8
+#define OMAP_TS_CLK_ENABLE_MASK			(0x1 << 8)
+#define OMAP_19M_TS_CLK_DIVIDER_SHIFT		24
+#define OMAP_19M_TS_CLK_DIVIDER_MASK		(0x1 << 24)
+#define OMAP_38M_TS_CLK_DIVIDER_SHIFT		25
+#define OMAP_38M_TS_CLK_DIVIDER_MASK		(0x1 << 25)
 
 /* PRM_VC_VAL_BYPASS */
 #define PRM_VC_I2C_CHANNEL_FREQ_KHZ	400

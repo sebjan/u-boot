@@ -142,6 +142,7 @@ void s_init(void)
 	/* For regular u-boot sdram_init() is called from dram_init() */
 	sdram_init();
 #endif
+	tshut_init();
 }
 
 /*

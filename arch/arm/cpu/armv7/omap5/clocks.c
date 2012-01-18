@@ -424,6 +424,11 @@ void enable_basic_clocks(void)
 			OPTFCLKEN_SCRM_PER_MASK);
 	setbits_le32(&prcm->cm_wkupaon_scrm_clkctrl,
 			OPTFCLKEN_SCRM_CORE_MASK);
+
+	/* Enable On die temperature sensor clocks */
+	setbits_le32(&prcm->cm_coreaon_bandgap_clkctrl,
+		((OMAP_TS_CLK_ENABLE_MASK | OMAP_19M_TS_CLK_DIVIDER_MASK)
+			& ~OMAP_38M_TS_CLK_DIVIDER_MASK));
 }
 
 void enable_basic_uboot_clocks(void)
