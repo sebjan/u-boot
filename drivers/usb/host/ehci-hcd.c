@@ -686,6 +686,15 @@ ehci_submit_root(struct usb_device *dev, unsigned long pipe, void *buffer,
 			if (HCS_PPC(ehci_readl(&hccr->cr_hcsparams))) {
 				reg |= EHCI_PS_PP;
 				ehci_writel(status_reg, reg);
+				/*
+				 * REVISIT:
+				 * check the delay for omap5
+				 */
+#ifdef CONFIG_USB_EHCI_OMAP
+				omap_ehci_phy_reset(1, 1000);
+				wait_ms(10);
+				omap_ehci_phy_reset(0, 1000);
+#endif
 			}
 			break;
 		case USB_PORT_FEAT_RESET:

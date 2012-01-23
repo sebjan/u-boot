@@ -120,7 +120,7 @@ int board_usb_init(void) __attribute__((weak, alias("__board_usb_init")));
 #if defined(CONFIG_OMAP_EHCI_PHY1_RESET_GPIO) || \
 	defined(CONFIG_OMAP_EHCI_PHY2_RESET_GPIO)
 /* controls PHY(s) reset signal(s) */
-static inline void omap_ehci_phy_reset(int on, int delay)
+void omap_ehci_phy_reset(int on, int delay)
 {
 	/*
 	 * Refer ISSUE1:
