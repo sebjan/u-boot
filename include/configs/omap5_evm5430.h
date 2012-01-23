@@ -172,6 +172,7 @@
 #define CONFIG_ENV_OVERWRITE
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
+	"usbethaddr=9e:77:39:1b:c4:2d\0" \
 	"loadaddr=0x82000000\0" \
 	"console=ttyO2,115200n8\0" \
 	"usbtty=cdc_acm\0" \
