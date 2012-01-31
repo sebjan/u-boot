@@ -32,6 +32,7 @@
 #include <linux/list.h>
 #include <div64.h>
 #include <asm/arch/mmc_host_def.h>
+#include <asm/errno.h>
 
 /* Set block count limit because of 16 bit register limit on some hardware*/
 #ifndef CONFIG_SYS_MMC_MAX_BLK_COUNT
@@ -176,6 +177,7 @@ struct mmc *find_mmc_device(int dev_num)
 	return NULL;
 }
 
+#ifndef CONFIG_MMC_NO_ERASE
 static ulong mmc_erase_t(struct mmc *mmc, ulong start, lbaint_t blkcnt)
 {
 	struct mmc_cmd cmd;
@@ -257,7 +259,15 @@ mmc_berase(int dev_num, unsigned long start, lbaint_t blkcnt)
 
 	return blk;
 }
+#else
+static unsigned long
+mmc_berase(int dev_num, unsigned long start, lbaint_t blkcnt)
+{
+	return -ENOSYS;
+}
+#endif
 
+#ifndef CONFIG_MMC_NO_WRITE
 static ulong
 mmc_write_blocks(struct mmc *mmc, ulong start, lbaint_t blkcnt, const void*src)
 {
@@ -337,6 +347,13 @@ mmc_bwrite(int dev_num, ulong start, lbaint_t blkcnt, const void*src)
 
 	return blkcnt;
 }
+#else
+static ulong
+mmc_bwrite(int dev_num, ulong start, lbaint_t blkcnt, const void*src)
+{
+	return -ENOSYS;
+}
+#endif
 
 int mmc_read_blocks(struct mmc *mmc, void *dst, ulong start, lbaint_t blkcnt)
 {

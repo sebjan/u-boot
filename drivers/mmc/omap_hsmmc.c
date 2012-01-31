@@ -393,6 +393,7 @@ static int mmc_read_data(struct hsmmc *mmc_base, char *buf, unsigned int size)
 static int mmc_write_data(struct hsmmc *mmc_base, const char *buf,
 				unsigned int size)
 {
+#ifndef CONFIG_MMC_NO_WRITE
 	unsigned int *input_buf = (unsigned int *)buf;
 	unsigned int mmc_stat;
 	unsigned int count;
@@ -439,6 +440,7 @@ static int mmc_write_data(struct hsmmc *mmc_base, const char *buf,
 			break;
 		}
 	}
+#endif
 	return 0;
 }
 
