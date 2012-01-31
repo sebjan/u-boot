@@ -284,4 +284,5 @@
 #define CONFIG_SPL_SERIAL_SUPPORT
 #define CONFIG_SPL_LDSCRIPT "arch/arm/cpu/armv7/omap-common/u-boot-spl.lds"
 
+#define CONFIG_SYS_ENABLE_PADS_ALL
 #endif /* __CONFIG_OMAP4_COMMON_H */
