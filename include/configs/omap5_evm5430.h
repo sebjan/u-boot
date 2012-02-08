@@ -118,13 +118,13 @@
 
 #define CONFIG_DOS_PARTITION		1
 /* ENV related config options */
-#define CONFIG_ENV_IS_IN_MMC		1
+#ifdef CONFIG_ENV_IS_IN_MMC
 #define CONFIG_SYS_MMC_ENV_DEV		1	/* SLOT2: eMMC(1) */
 #define CONFIG_ENV_OFFSET		0xE0000
 #define CONFIG_CMD_SAVEENV
 
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV	1
-
+#endif
 /* Flash */
 #define CONFIG_SYS_NO_FLASH	1
 
