@@ -942,6 +942,7 @@ clean:
 	@rm -f $(obj)nand_spl/{u-boot.lds,u-boot-nand_spl.lds,u-boot-spl,u-boot-spl.map,System.map}
 	@rm -f $(obj)onenand_ipl/onenand-{ipl,ipl.bin,ipl.map}
 	@rm -f $(obj)mmc_spl/{u-boot.lds,u-boot-spl,u-boot-spl.map,u-boot-spl.bin,u-boot-mmc-spl.bin}
+	@rm -f $(obj)boot.scr
 	@rm -f $(ONENAND_BIN)
 	@rm -f $(obj)onenand_ipl/u-boot.lds
 	@rm -f $(obj)spl/{u-boot-spl,u-boot-spl.bin,u-boot-spl.lds,u-boot-spl.map}
@@ -962,6 +963,7 @@ clobber:	clean
 	@rm -f $(obj)u-boot.kwb
 	@rm -f $(obj)u-boot.imx
 	@rm -f $(obj)u-boot.ubl
+	@rm -f $(obj)boot.scr
 	@rm -f $(obj)tools/{env/crc32.c,inca-swap-bytes}
 	@rm -f $(obj)arch/powerpc/cpu/mpc824x/bedbug_603e.c
 	@rm -fr $(obj)include/asm/proc $(obj)include/asm/arch $(obj)include/asm
@@ -974,6 +976,15 @@ mrproper \
 distclean:	clobber unconfig
 ifneq ($(OBJTREE),$(SRCTREE))
 	rm -rf $(obj)*
+endif
+
+
+ifdef CONFIG_BOOT_SCRIPT_FILE
+boot.scr: $(SRCTREE)/$(subst ",,$(CONFIG_BOOT_SCRIPT_FILE))
+	mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n 'scr-file' -d $(CONFIG_BOOT_SCRIPT_FILE) boot.scr
+else
+boot.scr:
+	echo "Need to define CONFIG_BOOT_SCRIPT_FILE"
 endif
 
 backup:

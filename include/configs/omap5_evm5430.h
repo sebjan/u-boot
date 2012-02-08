@@ -271,6 +271,7 @@
 #define CONFIG_SPL_LIBGENERIC_SUPPORT
 #define CONFIG_SPL_SERIAL_SUPPORT
 #define CONFIG_SPL_LDSCRIPT "arch/arm/cpu/armv7/omap-common/u-boot-spl.lds"
+#define CONFIG_BOOT_SCRIPT_FILE "boot.scr.omap.txt"
 
 /*
  * 1MB into the SDRAM to allow for SPL's bss at the beginning of SDRAM

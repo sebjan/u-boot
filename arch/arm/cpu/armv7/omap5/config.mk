@@ -25,4 +25,5 @@ ifdef CONFIG_SPL_BUILD
 ALL-y	+= $(OBJTREE)/MLO
 else
 ALL-y	+= $(obj)u-boot.img
+ALL-y   += $(obj)boot.scr
 endif
