@@ -80,13 +80,25 @@ int misc_init_r(void)
 
 void set_muxconf_regs_essential(void)
 {
-	do_set_mux(CONTROL_PADCONF_CORE, core_padconf_array_essential,
-		   sizeof(core_padconf_array_essential) /
-		   sizeof(struct pad_conf_entry));
+	u32 omap_rev = omap_revision();
 
-	do_set_mux(CONTROL_PADCONF_WKUP, wkup_padconf_array_essential,
-		   sizeof(wkup_padconf_array_essential) /
-		   sizeof(struct pad_conf_entry));
+	if(omap_rev == OMAP5430_ES1_0) {
+		do_set_mux(CONTROL_PADCONF_CORE, core_padconf_array_essential,
+			   sizeof(core_padconf_array_essential) /
+			   sizeof(struct pad_conf_entry));
+
+		do_set_mux(CONTROL_PADCONF_WKUP, wkup_padconf_array_essential,
+			   sizeof(wkup_padconf_array_essential) /
+			   sizeof(struct pad_conf_entry));
+	} else {
+		do_set_mux(CONTROL_PADCONF_CORE, core_padconf_array_essential_uevm,
+			   sizeof(core_padconf_array_essential_uevm) /
+			   sizeof(struct pad_conf_entry));
+
+		do_set_mux(CONTROL_PADCONF_WKUP, wkup_padconf_array_essential_uevm,
+			   sizeof(wkup_padconf_array_essential_uevm) /
+			   sizeof(struct pad_conf_entry));
+	}
 
 	/* Set the MSECURE Mode for GPIO234 pin */
 	if (get_device_type() == DEVICE_GP) {
@@ -97,13 +109,25 @@ void set_muxconf_regs_essential(void)
 
 void set_muxconf_regs_non_essential(void)
 {
-	do_set_mux(CONTROL_PADCONF_CORE, core_padconf_array_non_essential,
-		   sizeof(core_padconf_array_non_essential) /
-		   sizeof(struct pad_conf_entry));
+	u32 omap_rev = omap_revision();
 
-	do_set_mux(CONTROL_PADCONF_WKUP, wkup_padconf_array_non_essential,
-		   sizeof(wkup_padconf_array_non_essential) /
-		   sizeof(struct pad_conf_entry));
+	if(omap_rev == OMAP5430_ES1_0) {
+		do_set_mux(CONTROL_PADCONF_CORE, core_padconf_array_non_essential,
+			   sizeof(core_padconf_array_non_essential) /
+			   sizeof(struct pad_conf_entry));
+
+		do_set_mux(CONTROL_PADCONF_WKUP, wkup_padconf_array_non_essential,
+			   sizeof(wkup_padconf_array_non_essential) /
+			   sizeof(struct pad_conf_entry));
+	} else {
+		do_set_mux(CONTROL_PADCONF_CORE, core_padconf_array_non_essential_uevm,
+			   sizeof(core_padconf_array_non_essential_uevm) /
+			   sizeof(struct pad_conf_entry));
+
+		do_set_mux(CONTROL_PADCONF_WKUP, wkup_padconf_array_non_essential_uevm,
+			   sizeof(wkup_padconf_array_non_essential_uevm) /
+			   sizeof(struct pad_conf_entry));
+	}
 }
 
 #ifndef CONFIG_SPL_BUILD

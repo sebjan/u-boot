@@ -296,4 +296,43 @@ const struct pad_conf_entry wkup_padconf_array_non_essential[] = {
 
 };
 
+/* Duplicate padconf here for uEVM, while we don't have a dedicated board definition */
+const struct pad_conf_entry core_padconf_array_essential_uevm[] = {
+
+	{SDCARD_CLK, (PTU | IEN | M0)}, /*  SDCARD_CLK  */
+	{SDCARD_CMD, (PTU | IEN | M0)}, /*  SDCARD_CMD  */
+	{SDCARD_DATA0, (PTU | IEN | M0)}, /*  SDCARD_DATA0*/
+	{SDCARD_DATA1, (PTU | IEN | M0)}, /*  SDCARD_DATA1*/
+	{SDCARD_DATA2, (PTU | IEN | M0)}, /*  SDCARD_DATA2*/
+	{SDCARD_DATA3, (PTU | IEN | M0)}, /*  SDCARD_DATA3*/
+	{UART3_RX_IRRX, (PTU | IEN | M0)}, /*  UART3_RX_IRRX    */
+	{UART3_TX_IRTX, (M0)},    /*  UART3_TX_IRTX    */
+
+};
+
+const struct pad_conf_entry wkup_padconf_array_essential_uevm[] = {
+
+	{SR_PMIC_SCL, (PTU | IEN | M0)}, /* SR_PMIC_SCL */
+	{SR_PMIC_SDA, (PTU | IEN | M0)}, /* SR_PMIC_SDA */
+	{SYS_32K, (IEN | M0)}, /*  SYS_32K     */
+
+};
+
+const struct pad_conf_entry core_padconf_array_non_essential_uevm[] = {
+	{HDMI_CEC, (IEN | M0)},    /*  HDMI_CEC   */
+	{HDMI_HPD, (PTD | IEN | M0)},    /*  HDMI_HPD   */
+	{HDMI_DDC_SCL, (IEN | M0)},    /*  HDMI_DDC_SCL */
+	{HDMI_DDC_SDA, (IEN | M0)},    /*  HDMI_DDC_SDA */
+	{I2C5_SCL, (IEN | M0)},    /*  I2C5_SCL    */
+	{I2C5_SDA, (IEN | M0)},    /*  I2C5_SDA    */
+	{I2C1_PMIC_SCL, (PTU | IEN | M0)},    /*  I2C1_PMIC_SCL  */
+	{I2C1_PMIC_SDA, (PTU | IEN | M0)},    /*  I2C1_PMIC_SDA  */
+
+};
+
+const struct pad_conf_entry wkup_padconf_array_non_essential_uevm[] = {
+
+
+};
+
 #endif /* _EVM4430_MUX_DATA_H */
