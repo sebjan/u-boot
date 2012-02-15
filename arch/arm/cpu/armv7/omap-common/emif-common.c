@@ -192,6 +192,121 @@ void emif_update_timings(u32 base, const struct emif_regs *regs)
 	}
 }
 
+static void ddr3_init(u32 base, const struct emif_regs *regs)
+{
+	struct emif_reg_struct *emif = (struct emif_reg_struct *)base;
+	u32 *ext_phy_ctrl_base = 0;
+	u32 *emif_ext_phy_ctrl_base = 0;
+	u32 i = 0;
+
+	writel(0x0, &emif->emif_lpddr2_nvm_config); /* Making SDRAM_CONFIG_2 0x0 (0x4C00000C) */
+	writel(regs->sdram_config_init, &emif->emif_sdram_config);
+	
+	writel(0x00002011, &emif->emif_iodft_tlgc);	// IODFT_TLGC
+	
+	writel(regs->zq_config, &emif->emif_zq_config);
+	writel(regs->temp_alert_config, &emif->emif_temp_alert_config);
+	writel(0x0A500000, &emif->emif_l3_config);	// OCP_CONFIG
+	writel(regs->emif_rd_wr_exec_thresh, &emif->emif_rd_wr_exec_thresh);
+	
+	writel(0x00000000, &emif->emif_pri_cos_map);	// PRI_COS_MAP
+	writel(0x00000000, &emif->emif_connid_cos_1);	// CONNID_COS_1
+	writel(0x00000000, &emif->emif_connid_cos_2);	// CONNID_COS_2
+	writel(0x00FFFFFF, &emif->emif_cos_config);	// COS_CONFIG
+
+	writel(regs->emif_ddr_phy_ctlr_2, &emif->emif_ddr_phy_ctrl_2);
+
+	writel(regs->emif_ddr_phy_ctlr_1_init, &emif->emif_ddr_phy_ctrl_1);
+	writel(regs->sdram_tim1, &emif->emif_sdram_tim_1);
+	writel(regs->sdram_tim2, &emif->emif_sdram_tim_2);
+	writel(regs->sdram_tim3, &emif->emif_sdram_tim_3);
+
+	writel(0x00000000, &emif->emif_lpddr2_nvm_tim);	// LPDDR2_NVM_TIM
+
+	writel(regs->ref_ctrl, &emif->emif_sdram_ref_ctrl);
+	writel(regs->read_idle_ctrl, &emif->emif_read_idlectrl);// DLL_CALIB_CTRL
+
+	ext_phy_ctrl_base = (u32 *) &(regs->emif_ddr_ext_phy_ctrl_1_init);
+	emif_ext_phy_ctrl_base = (u32 *) &(emif->emif_ddr_ext_phy_ctrl_1);
+
+	if (omap_revision() >= OMAP5430_ES1_0) {
+		/* Configure external phy control registers */
+		for (i = 0; i < NUMBER_OF_EMIF_EXT_CTRL_REGISTERS; i++) {
+			writel(*ext_phy_ctrl_base++, emif_ext_phy_ctrl_base++);
+			/* Write the shadow register here as well */
+			writel(*ext_phy_ctrl_base++, emif_ext_phy_ctrl_base++);
+		}
+	}
+
+	writel(regs->emif_rd_wr_lvl_rmp_win, &emif->emif_rd_wr_lvl_rmp_win);
+	writel(regs->emif_rd_wr_lvl_rmp_ctl, &emif->emif_rd_wr_lvl_rmp_ctl);
+	writel(0x00000000, &emif->emif_rd_wr_lvl_ctl);
+
+
+	/* Shadow regs - not sure if this is required? */
+	writel(regs->emif_ddr_phy_ctlr_1, &emif->emif_ddr_phy_ctrl_1_shdw);
+	writel(regs->sdram_tim1, &emif->emif_sdram_tim_1_shdw);
+	writel(regs->sdram_tim2, &emif->emif_sdram_tim_2_shdw);
+	writel(regs->sdram_tim3, &emif->emif_sdram_tim_3_shdw);
+
+	writel(0x00000000, &emif->emif_lpddr2_nvm_tim_shdw);	// LPDDR2_NVM_TIM_SHDW
+
+	//writel(0x00007070, &emif->emif_pwr_mgmt_ctrl_shdw); /* Will change in the sequencing */
+	writel(regs->ref_ctrl, &emif->emif_sdram_ref_ctrl_shdw);
+	writel(regs->read_idle_ctrl, &emif->emif_read_idlectrl_shdw);
+
+
+
+	/* Start the sequencing as given in GEl */
+
+	/* 1. Configure EMIF1 DDR in Self Refresh (CKE=0 and clk stopped)
+	 * and configure invert_clkout
+	 */
+	//PWR_MGMT_CTRL -- Enter "self refresh" mode
+	writel(0x00000200, &emif->emif_pwr_mgmt_ctrl);
+	// Insert 16 dummy read
+	for (i=0; i<0xFFF; i++)
+		//{readl(&emif->emif_pwr_mgmt_ctrl); }
+		{readl(0x4AE0CDC8); }
+	//DDR_PHY_CTRL_1 -- Set invert_clkout (if activated)
+	writel(0x0024420A, &emif->emif_ddr_phy_ctrl_1);
+	writel(0x0024420A, &emif->emif_ddr_phy_ctrl_1_shdw);
+
+	for (i=0; i<0xFFF; i++)
+		//{readl(&emif->emif_pwr_mgmt_ctrl); }
+		{readl(0x4AE0CDC8); }
+	//PWR_MGMT_CTRL -- Exit "self refresh" mode
+	writel(0x0, &emif->emif_pwr_mgmt_ctrl);
+
+	/* 2. Launch full leveling (WR_LVL + READ_GATE_LVL + READ_VLV) */
+	//RDWR_LVL_CTRL -- force RDWRLVLFULL_START=1 / Launch full leveling
+	writel(0x80000000, &emif->emif_rd_wr_lvl_ctl);
+	//dummy_read=*(int*)(0x4C000038);    // Wait for EMIF1 to be done with Full_LVL (SW stalling - EMIF keeps IDLE_ack adderted until Full_LVL completion)
+	readl(&emif->emif_rd_wr_lvl_ctl);
+	for (i=0; i<0xFFF; i++) readl(0x4AE0CDC8);
+
+	/* 3. Put back the Read Data Eye LVL num_of_samples=4 */
+	//EMIF1_SDRAM_CONFIG_EXT -- cslice_en[2:0]=111 / Local_odt=01 / dyn_pwrdn=1 / dis_reset=1 / rd_lvl_samples=00 (4)
+	if (base == EMIF1_BASE)
+		writel(0x00001A7, 0x4AE0C144);	// CONTROL_EMIF1_SDRAM_CONFIG_EXT
+	else if (base == EMIF2_BASE)
+		writel(0x00001A7, 0x4AE0C148);	// CONTROL_EMIF2_SDRAM_CONFIG_EXT
+	else
+		printf("ERROR - bad EMIF @ passed!\n");
+
+	/* 4. Launch 8 incremental WR_LVL (to compensate for a PHY limitation) */
+	//RDWR_LVL_CTRL -- force RDWRLVLFULL_START=0 / Set Write Leveling period = 2
+	writel(0x01000002, &emif->emif_rd_wr_lvl_ctl);
+	for (i=0; i<0xFFFF; i++)
+		//{readl(&emif->emif_pwr_mgmt_ctrl); } // Insert 4096 dummy read (should be at least 128us)
+		{readl(0x4AE0CDC8); } // Insert 4096 dummy read (should be at least 128us)
+
+	/* 5. Turn-OFF any incremental LVL for first samples debug */
+	writel(0x0, &emif->emif_rd_wr_lvl_ctl);   //RDWR_LVL_CTRL -- Turn-OFF any incremental LVL for first samples debug
+
+}
+
+
 #ifndef CONFIG_SYS_EMIF_PRECALCULATED_TIMING_REGS
 #define print_timing_reg(reg) debug(#reg" - 0x%08x\n", (reg))
 
@@ -975,11 +1090,15 @@ static void do_sdram_init(u32 base)
 	 * Changing the timing registers in EMIF can happen(going from one
 	 * OPP to another)
 	 */
-	if (!in_sdram)
-		lpddr2_init(base, regs);
-
-	/* Write to the shadow registers */
-	emif_update_timings(base, regs);
+	if (!in_sdram){
+		if (omap_revision() != OMAP5432_ES1_0)
+			lpddr2_init(base, regs);
+		else
+			ddr3_init(base, regs);
+	}
+	if (omap_revision() != OMAP5432_ES1_0)
+		/* Write to the shadow registers */
+		emif_update_timings(base, regs);
 
 	debug("<<do_sdram_init() %x\n", base);
 }
@@ -1133,6 +1252,7 @@ void dmm_init(u32 base)
 void sdram_init(void)
 {
 	u32 in_sdram, size_prog, size_detect, i = 0;
+	u32 omap_rev = omap_revision();
 
 	debug(">>sdram_init()\n");
 	if ((omap_hw_init_context() == OMAP_INIT_CONTEXT_UBOOT_AFTER_SPL) ||
@@ -1143,7 +1263,8 @@ void sdram_init(void)
 	debug("in_sdram = %d\n", in_sdram);
 
 	if (!in_sdram)
-		bypass_dpll(&prcm->cm_clkmode_dpll_core);
+		if(omap_rev != OMAP5432_ES1_0)
+			bypass_dpll(&prcm->cm_clkmode_dpll_core);
 
 	do_sdram_init(EMIF1_BASE);
 	do_sdram_init(EMIF2_BASE);
@@ -1153,8 +1274,10 @@ void sdram_init(void)
 		emif_post_init_config(EMIF1_BASE);
 		emif_post_init_config(EMIF2_BASE);
 	}
-	/* for the shadow registers to take effect */
-	freq_update_core();
+
+	if(omap_rev != OMAP5432_ES1_0)
+		/* for the shadow registers to take effect */
+		freq_update_core();
 
 	/* Do some testing after the init */
 	if (!in_sdram) {

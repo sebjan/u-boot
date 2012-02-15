@@ -312,6 +312,86 @@ const struct emif_regs emif_regs_elpida_266_mhz_1cs = {
 	.emif_rd_wr_exec_thresh		= 0x00000305
 };
 
+const struct emif_regs emif_regs_ddr_1066_mhz_2cs = {
+	.sdram_config_init		= 0x61851B3A,
+	.sdram_config			= 0x61851B3A,
+	.ref_ctrl			= 0x00001035,
+	.sdram_tim1			= 0xCCCF36B3,
+	.sdram_tim2			= 0x308F7FDA,
+	.sdram_tim3			= 0x027F88A8,
+	.read_idle_ctrl			= 0x00050000,
+	.zq_config			= 0x0007190B,
+	.temp_alert_config		= 0x00000000,
+	.emif_ddr_phy_ctlr_1_init	= 0x0020420A,
+	.emif_ddr_phy_ctlr_1		= 0x0020420A,
+	.emif_ddr_phy_ctlr_2		= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_1_init	= 0x04040100,
+	.emif_ddr_ext_phy_ctrl_1	= 0x04040100,
+	.emif_ddr_ext_phy_ctrl_2_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_2	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_3_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_3	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_4_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_4	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_5_init	= 0x04010040,
+	.emif_ddr_ext_phy_ctrl_5	= 0x04010040,
+	.emif_ddr_ext_phy_ctrl_6_init	= 0x01004010,
+	.emif_ddr_ext_phy_ctrl_6	= 0x01004010,
+	.emif_ddr_ext_phy_ctrl_7_init	= 0x00001004,
+	.emif_ddr_ext_phy_ctrl_7	= 0x00001004,
+	.emif_ddr_ext_phy_ctrl_8_init	= 0x04010040,
+	.emif_ddr_ext_phy_ctrl_8	= 0x04010040,
+	.emif_ddr_ext_phy_ctrl_9_init	= 0x01004010,
+	.emif_ddr_ext_phy_ctrl_9	= 0x01004010,
+	.emif_ddr_ext_phy_ctrl_10_init	= 0x00001004,
+	.emif_ddr_ext_phy_ctrl_10	= 0x00001004,
+	.emif_ddr_ext_phy_ctrl_11_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_11	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_12_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_12	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_13_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_13	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_14_init	= 0x80080080,
+	.emif_ddr_ext_phy_ctrl_14	= 0x80080080,
+	.emif_ddr_ext_phy_ctrl_15_init	= 0x00800800,
+	.emif_ddr_ext_phy_ctrl_15	= 0x00800800,
+	.emif_ddr_ext_phy_ctrl_16_init	= 0x08102040,
+	.emif_ddr_ext_phy_ctrl_16	= 0x08102040,
+	.emif_ddr_ext_phy_ctrl_17_init	= 0x00000002,
+	.emif_ddr_ext_phy_ctrl_17	= 0x00000002,
+	.emif_ddr_ext_phy_ctrl_18_init	= 0x0,
+	.emif_ddr_ext_phy_ctrl_18	= 0x0,
+	.emif_ddr_ext_phy_ctrl_19_init	= 0x0,
+	.emif_ddr_ext_phy_ctrl_19	= 0x0,
+	.emif_ddr_ext_phy_ctrl_20_init	= 0x0,
+	.emif_ddr_ext_phy_ctrl_20	= 0x0,
+	.emif_ddr_ext_phy_ctrl_21_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_21	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_22_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_22	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_23_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_23	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_24_init	= 0x00000057,
+	.emif_ddr_ext_phy_ctrl_24	= 0x00000057,
+	.emif_ddr_ext_phy_ctrl_25_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_25	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_26_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_26	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_27_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_27	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_28_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_28	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_29_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_29	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_30_init	= 0x00000000,
+	.emif_ddr_ext_phy_ctrl_30	= 0x00000000,
+	.emif_rd_wr_lvl_rmp_win		= 0x00000000,
+	.emif_rd_wr_lvl_rmp_ctl		= 0x80000000,
+	.emif_rd_wr_lvl_ctl		= 0x00000000,
+	.emif_rd_wr_exec_thresh		= 0x00000305
+};
+
+
 /*
  * 16MB section of highest priority to trap unmapped tiler access.
  * and the rest is mapped for normal memory in the next section.
@@ -325,7 +405,10 @@ const struct dmm_lisa_map_regs lisa_map_16G_x_1_x_2 = {
 
 static void emif_get_reg_dump_sdp(u32 emif_nr, const struct emif_regs **regs)
 {
-	*regs = &emif_regs_elpida_532_mhz_2cs;
+	if (omap_revision() == OMAP5432_ES1_0)
+		*regs = &emif_regs_ddr_1066_mhz_2cs;
+	else
+		*regs = &emif_regs_elpida_532_mhz_2cs;
 }
 void emif_get_reg_dump(u32 emif_nr, const struct emif_regs **regs)
 	__attribute__((weak, alias("emif_get_reg_dump_sdp")));
