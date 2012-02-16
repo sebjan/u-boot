@@ -1266,6 +1266,12 @@ void sdram_init(void)
 		if(omap_rev != OMAP5432_ES1_0)
 			bypass_dpll(&prcm->cm_clkmode_dpll_core);
 
+	// Hack! to be cleaned-up
+	if(omap_rev == OMAP5432_ES1_0) {
+		printf("Hack!\n");
+		writel(0, 0x4A004110);    // CM_DLL_CTRL
+	}
+
 	do_sdram_init(EMIF1_BASE);
 	do_sdram_init(EMIF2_BASE);
 
