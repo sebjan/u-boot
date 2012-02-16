@@ -673,9 +673,9 @@ struct omap5_prcm_regs {
 #define VDD_MM		950
 #define VDD_CORE	950
 #elif defined OPP_NOM
-#define VDD_MPU		1000
-#define VDD_MM		1000
-#define VDD_CORE	1040
+#define VDD_MPU		1150
+#define VDD_MM		1150
+#define VDD_CORE	1150
 #elif defined OPP_HIGH
 #define VDD_MPU		1220
 #define VDD_MM		1200
