@@ -110,8 +110,11 @@ void set_muxconf_regs_non_essential(void)
 #ifdef CONFIG_GENERIC_MMC
 int board_mmc_init(bd_t *bis)
 {
+	u32 omap_rev = omap_revision();
+
 	omap_mmc_init(0);
-	omap_mmc_init(1);
+	if(omap_rev == OMAP5430_ES1_0)
+		omap_mmc_init(1);
 	return 0;
 }
 #endif
