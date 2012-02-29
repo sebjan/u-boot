@@ -313,8 +313,8 @@ const struct emif_regs emif_regs_elpida_266_mhz_1cs = {
 };
 
 const struct emif_regs emif_regs_ddr_1066_mhz_2cs = {
-	.sdram_config_init		= 0x61851B32,
-	.sdram_config			= 0x61851B32,
+	.sdram_config_init		= 0x61851B3A,
+	.sdram_config			= 0x61851B3A,
 	.ref_ctrl			= 0x00001035,
 	.sdram_tim1			= 0xCCCF36B3,
 	.sdram_tim2			= 0x308F7FDA,
