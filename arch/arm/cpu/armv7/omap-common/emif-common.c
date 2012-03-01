@@ -1230,6 +1230,13 @@ void dmm_init(u32 base)
 		writel(lisa_map_regs->dmm_lisa_map_0,
 			&hw_lisa_map_regs->dmm_lisa_map_0);
 	}
+
+	/* Interleaving of high-order area */
+	if(omap_revision() == OMAP5432_ES1_0) {
+		unsigned int reg;
+		reg = readl(0x482a2000) | 0x100;
+		writel(reg, 0x482a2000);
+	}
 }
 
 /*
