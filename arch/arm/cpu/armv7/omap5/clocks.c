@@ -334,6 +334,11 @@ void scale_vcores(void)
 
 	volt = VDD_CORE;
 	do_scale_vcore(SMPS_REG_ADDR_8_CORE, volt);
+
+    /* Configure LDO SRAM "magic" bits */
+    writel(2, 0x4ae07bc4);
+    writel(2, 0x4ae07bcc);
+    writel(2, 0x4ae07bd4);
 }
 
 u32 get_offset_code(u32 volt_offset)
