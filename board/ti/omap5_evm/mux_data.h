@@ -328,21 +328,4 @@ const struct pad_conf_entry wkup_padconf_array_essential_uevm[] = {
 
 };
 
-const struct pad_conf_entry core_padconf_array_non_essential_uevm[] = {
-	{HDMI_CEC, (IEN | M0)},    /*  HDMI_CEC   */
-	{HDMI_HPD, (PTD | IEN | M0)},    /*  HDMI_HPD   */
-	{HDMI_DDC_SCL, (IEN | M0)},    /*  HDMI_DDC_SCL */
-	{HDMI_DDC_SDA, (IEN | M0)},    /*  HDMI_DDC_SDA */
-	{I2C5_SCL, (IEN | M0)},    /*  I2C5_SCL    */
-	{I2C5_SDA, (IEN | M0)},    /*  I2C5_SDA    */
-	{I2C1_PMIC_SCL, (PTU | IEN | M0)},    /*  I2C1_PMIC_SCL  */
-	{I2C1_PMIC_SDA, (PTU | IEN | M0)},    /*  I2C1_PMIC_SDA  */
-
-};
-
-const struct pad_conf_entry wkup_padconf_array_non_essential_uevm[] = {
-
-
-};
-
 #endif /* _EVM4430_MUX_DATA_H */

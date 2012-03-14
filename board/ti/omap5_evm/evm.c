@@ -111,21 +111,13 @@ void set_muxconf_regs_non_essential(void)
 {
 	u32 omap_rev = omap_revision();
 
-	if(omap_rev == OMAP5430_ES1_0) {
+	if(omap_rev == OMAP5430_ES1_0) { /* We want to get rid of these non-essential padconf! */
 		do_set_mux(CONTROL_PADCONF_CORE, core_padconf_array_non_essential,
 			   sizeof(core_padconf_array_non_essential) /
 			   sizeof(struct pad_conf_entry));
 
 		do_set_mux(CONTROL_PADCONF_WKUP, wkup_padconf_array_non_essential,
 			   sizeof(wkup_padconf_array_non_essential) /
-			   sizeof(struct pad_conf_entry));
-	} else {
-		do_set_mux(CONTROL_PADCONF_CORE, core_padconf_array_non_essential_uevm,
-			   sizeof(core_padconf_array_non_essential_uevm) /
-			   sizeof(struct pad_conf_entry));
-
-		do_set_mux(CONTROL_PADCONF_WKUP, wkup_padconf_array_non_essential_uevm,
-			   sizeof(wkup_padconf_array_non_essential_uevm) /
 			   sizeof(struct pad_conf_entry));
 	}
 }
