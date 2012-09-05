@@ -980,10 +980,10 @@ endif
 
 
 ifdef CONFIG_BOOT_SCRIPT_FILE
-boot.scr: $(SRCTREE)/$(subst ",,$(CONFIG_BOOT_SCRIPT_FILE))
+$(obj)boot.scr: $(SRCTREE)/$(subst ",,$(CONFIG_BOOT_SCRIPT_FILE))
 	mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n 'scr-file' -d $(CONFIG_BOOT_SCRIPT_FILE) boot.scr
 else
-boot.scr:
+$(obj)boot.scr:
 	echo "Need to define CONFIG_BOOT_SCRIPT_FILE"
 endif
 
